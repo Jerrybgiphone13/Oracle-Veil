@@ -1,0 +1,10 @@
+{
+  "name": "The Heart Cut",
+  "short_name": "Heart Cut",
+  "description": "A tactile celestial tarot ritual for love readings.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1a24",
+  "theme_color": "#0b1a24",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
