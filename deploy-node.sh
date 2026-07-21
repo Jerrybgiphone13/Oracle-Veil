@@ -18,12 +18,21 @@
 set -euo pipefail
 
 # ---- Fill these in from cPanel -> "SSH Access" ----
-SSH_USER="CPANEL_USERNAME"                   # <-- your cPanel username
 SSH_HOST="162.213.255.21"                    # server143-2.web-hosting.com
 SSH_PORT="21098"                             # Namecheap shared-hosting SSH port
 APP_ROOT="heartcut-app"                       # <-- must match the app's "Application root"
 
 cd "$(dirname "$0")"
+
+# Your cPanel username lives in an untracked file (deploy.local) so `git pull`
+# never clobbers it and it never lands in the public repo. One-time setup:
+#   echo 'SSH_USER="your-cpanel-username"' > deploy.local
+[ -f deploy.local ] && . ./deploy.local
+SSH_USER="${SSH_USER:-CPANEL_USERNAME}"
+if [ "$SSH_USER" = "CPANEL_USERNAME" ]; then
+  echo "Set your cPanel username first:  echo 'SSH_USER=\"yourname\"' > deploy.local" >&2
+  exit 1
+fi
 
 # ---- 1. Bump cache version (v=NN in index.html + sw.js, and the sw cache name) ----
 CUR=$(grep -oE 'heart-cut-v[0-9]+' sw.js | head -1 | grep -oE '[0-9]+$')
