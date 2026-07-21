@@ -67,4 +67,4 @@ http.createServer((request, response) => {
   if (request.method === "POST" && request.url === "/api/interpretation") return void interpret(request, response);
   if (request.method !== "GET" && request.method !== "HEAD") return response.writeHead(405).end();
   return void serveFile(request, response);
-}).listen(port, "127.0.0.1", () => console.log(`The Heart Cut is ready at http://127.0.0.1:${port}`));
+}).listen(port, () => console.log(`The Heart Cut is ready on port ${port}`));
