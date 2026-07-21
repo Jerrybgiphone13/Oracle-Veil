@@ -39,7 +39,7 @@ async function interpret(request, response) {
       headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptFor({ question: input.question.trim().slice(0, 340), cards }) }] }],
-        generationConfig: { temperature: 0.75, maxOutputTokens: 600 }
+        generationConfig: { temperature: 0.75, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } }
       })
     });
     const payload = await gemini.json().catch(() => ({}));
