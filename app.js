@@ -291,21 +291,17 @@ function normalizeSettings(settings = {}) {
   };
 }
 function loadState() {
+  // Always begin a fresh reading on load; only carry over saved preferences.
+  const fresh = createState();
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    const pileCount = Array.isArray(stored?.piles) ? stored.piles.reduce((sum, pile) => sum + (Array.isArray(pile) ? pile.length : 0), 0) : 0;
-    const totalCards = (Array.isArray(stored?.deck) ? stored.deck.length : 0) + pileCount + (stored?.ritualCard ? 1 : 0);
-    if (stored?.version === 2 && totalCards === 78) {
-      stored.settings = normalizeSettings(stored.settings);
-      return stored;
-    }
+    if (stored?.settings) fresh.settings = normalizeSettings(stored.settings);
   } catch { /* fresh reading */ }
-  return createState();
+  return fresh;
 }
 let state = loadState();
 let toastTimer;
 let transitioning = false;
-let renderedStage = null;
 let settingsOpen = false;
 const MUSIC_URL = "https://upload.wikimedia.org/wikipedia/commons/a/af/Kai_Engel_-_09_-_Sunset.ogg";
 const MUSIC_LEVEL = 0.5;
@@ -555,7 +551,7 @@ function renderChoose() {
   return { surface: `<div class="table-surface"><div class="spread-layer">${state.deck.map((card, index) => {
     const p = positionForSpread(index, state.deck.length, spread);
     const isPicked = picked.has(card.id);
-    return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg) ${isPicked ? "translateY(-2.6rem)" : ""}"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="Select a face-down card"></button></div>`;
+    return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="Select a face-down card"></button></div>`;
   }).join("")}</div><div class="draw-dock"><span class="dock-title">Drawn · ${state.selectedIds.length}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div></div>`, actions: `<p class="status-note">${state.selectedIds.length ? `${state.selectedIds.length} card${state.selectedIds.length === 1 ? " has" : "s have"} moved into the center tray.` : "Tap any face-down card. It will travel into the center tray."}</p><button class="seal-button" data-action="to-reveal" ${state.selectedIds.length === 3 ? "" : "disabled"}>${t("Place the four cards")}</button>` };
 }
 function revealActions() {
@@ -691,11 +687,8 @@ function render() {
   else if (state.stage === "question") markup = renderQuestion();
   else if (state.stage === "reading") markup = renderReading();
   else markup = renderRitual();
-  const stageChanged = renderedStage !== state.stage;
-  renderedStage = state.stage;
   app.innerHTML = `${markup}${renderAd()}${renderSettings()}${debugPanel()}`;
   updatePageLanguage();
-  if (stageChanged) app.querySelector(".world")?.classList.add("scene-enter");
   paintCardArt();
   bindGestures();
   persist();
@@ -925,11 +918,35 @@ function animateRitualDraw() {
     transitioning = false; interaction(); render();
   }, 680);
 }
+// Slide every pile onto the exact center of the field so they overlap into a single stack,
+// instead of each nudging a fixed amount toward the middle. Depth 0 sits on top.
+function convergePiles(field, depthFor) {
+  const piles = [...field.querySelectorAll(".pile")];
+  const depths = piles.map(depthFor); // capture selection-based depth before clearing it
+  piles.forEach((pile) => {
+    pile.classList.remove("chosen"); // once they start moving they are no longer "selected"
+    pile.querySelector(".order-badge")?.remove();
+    pile.querySelector(".pile-label")?.remove(); // drop the "pile one · N cards" text as they merge
+    pile.style.transform = "none";
+  });
+  const fieldRect = field.getBoundingClientRect();
+  const cx = fieldRect.left + fieldRect.width / 2;
+  const cy = fieldRect.top + fieldRect.height / 2;
+  piles.forEach((pile, index) => {
+    const rect = pile.getBoundingClientRect();
+    const depth = depths[index];
+    const dx = cx - (rect.left + rect.width / 2) + depth * 2;
+    const dy = cy - (rect.top + rect.height / 2) + depth * 3;
+    pile.style.zIndex = String(20 - depth);
+    pile.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+}
 function animateTwoPileJoin() {
   const field = document.querySelector("#reassemble-one-surface .pile-field");
   if (!field || transitioning || state.twoTop === null) return;
   transitioning = true;
   field.classList.add("joining");
+  convergePiles(field, (pile) => pile.classList.contains("chosen") ? 0 : 1);
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([8, 18, 11]); sound("settle", .2);
   setTimeout(() => {
@@ -947,6 +964,7 @@ function animateThreePileJoin() {
   if (!field || transitioning || state.assemblyOrder.length !== 3) return;
   transitioning = true;
   field.classList.add("stacking");
+  convergePiles(field, (pile) => Number(pile.style.getPropertyValue("--order")) || 0);
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([7, 18, 11]); sound("settle", .2);
   setTimeout(() => {
@@ -1083,6 +1101,25 @@ app.addEventListener("click", (event) => {
   if (example) { state.question = example.dataset.example; render(); return; }
   const target = event.target.closest("[data-action]"); if (target && !target.disabled) act(target.dataset.action, target);
 });
+function pickCutFromPoint(deck, clientY) {
+  const workbench = deck.closest(".cut-workbench");
+  if (!workbench) return;
+  const mode = workbench.dataset.cutMode;
+  const total = state.deck.length;
+  const rect = deck.getBoundingClientRect();
+  const frac = clamp((clientY - rect.top) / rect.height, 0, 1);
+  let value = clamp(Math.round(frac * total), 9, total - 9);
+  if (mode === "three") {
+    if (state.threeCuts.length && Math.abs(value - state.threeCuts[0]) < 12) value = value < state.threeCuts[0] ? state.threeCuts[0] - 12 : state.threeCuts[0] + 12;
+    value = clamp(value, 9, total - 9);
+    state.threeCutDraft = value;
+  } else {
+    state.cutDraft = value;
+  }
+  const range = workbench.querySelector(".cut-range");
+  if (range) range.value = value;
+  persist(); updateCutDeckVisual(mode, value);
+}
 function updateCutDeckVisual(mode, value) {
   const workbench = document.querySelector(`.cut-workbench[data-cut-mode="${mode}"]`);
   if (!workbench) return;
@@ -1141,6 +1178,19 @@ app.addEventListener("input", (event) => {
     persist(); updateCutDeckVisual("three", value);
   }
 });
+
+let cutDragDeck = null;
+app.addEventListener("pointerdown", (event) => {
+  if (transitioning) return;
+  const deck = event.target.closest(".cut-workbench .side-deck");
+  if (!deck) return;
+  cutDragDeck = deck;
+  capturePointer(deck, event);
+  pickCutFromPoint(deck, event.clientY);
+});
+window.addEventListener("pointermove", (event) => { if (cutDragDeck) pickCutFromPoint(cutDragDeck, event.clientY); });
+window.addEventListener("pointerup", () => { cutDragDeck = null; });
+window.addEventListener("pointercancel", () => { cutDragDeck = null; });
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 render();
