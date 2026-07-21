@@ -29,7 +29,10 @@ cd "$(dirname "$0")"
 CUR=$(grep -oE 'heart-cut-v[0-9]+' sw.js | head -1 | grep -oE '[0-9]+$')
 NEXT=$((CUR + 1))
 echo "Cache version v$CUR -> v$NEXT"
-sed -i '' "s/v=$CUR/v=$NEXT/g; s/heart-cut-v$CUR/heart-cut-v$NEXT/g" index.html sw.js
+# Portable in-place edit (works with both BSD sed on macOS and GNU sed).
+for f in index.html sw.js; do
+  sed "s/v=$CUR/v=$NEXT/g; s/heart-cut-v$CUR/heart-cut-v$NEXT/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+done
 
 # ---- 2. Upload the app (keep server.mjs + package.json; never the key or git cruft) ----
 rsync -avz \
