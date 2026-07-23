@@ -163,6 +163,8 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
 .seal-button[disabled] { opacity: .38; pointer-events: none; }
 .text-button { border-radius: 2px; padding: .55rem .9rem; background: rgba(8, 21, 29, .35); color: var(--paper-light); font-size: .83rem; }
 .back-link { align-self: center; border: 0; background: transparent; color: var(--gold); padding: .3rem; cursor: pointer; }
+.share-row { display: flex; justify-content: center; margin-top: 1.1rem; }
+.share-button::before { content: none; }
 
 .parchment {
   width: min(100%, 43rem);
