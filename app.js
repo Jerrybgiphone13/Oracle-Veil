@@ -16,6 +16,28 @@ const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "
 const STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
 const POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 
+const SHARE_THEMES = {
+  midnight: {
+    label: "Midnight",
+    bg: ["#0a1222", "#0f1a30"], panel: ["#0c1426", "#16223e"],
+    orbType: "moon", orb: ["#dfe3ef", "#9aa0b8"],
+    accent: "#d9b978", ink: "#efe6cf", building: "#0a1120", window: "#e6b866", labelInk: "#2b2f3d"
+  },
+  paperMoon: {
+    label: "Paper Moon",
+    bg: ["#0c1a24", "#123039"], panel: ["#102530", "#1a3a45"],
+    orbType: "moon", orb: ["#ece3c6", "#b9ac86"],
+    accent: "#dfbd78", ink: "#f5e8c8", building: "#0a1a20", window: "#e6c074", labelInk: "#2e2416"
+  },
+  goldenHour: {
+    label: "Golden Hour",
+    bg: ["#241708", "#3a2712"], panel: ["#2b1d0e", "#432f17"],
+    orbType: "sun", orb: ["#f5cf7a", "#e0a94f"],
+    accent: "#f2d79a", ink: "#f8eed3", building: "#21140a", window: "#ffd98a", labelInk: "#3a2a12"
+  }
+};
+const SHARE_THEME_ORDER = ["midnight", "paperMoon", "goldenHour"];
+
 const CARD_NOTES = {
   "The Lovers": ["choice", "alignment", "honest intimacy"],
   "The Star": ["hope", "renewal", "gentle faith"],
@@ -116,7 +138,12 @@ const I18N = {
     "Reversed": "Renversée", "Upright": "À l'endroit",
     "Four cards, gathered beneath one sky.": "Quatre cartes, réunies sous un même ciel.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Le tarot est proposé ici comme un outil de réflexion et d'imagination — non comme une prédiction factuelle ou un conseil professionnel.",
-    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture", "Share as an image": "Partager en image"
+    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture", "Share as an image": "Partager en image",
+    "Make it yours": "Personnalisez-la", "Back": "Retour", "Show card names": "Afficher les noms", "Include question": "Inclure la question",
+    "Continue to share": "Continuer le partage", "Save image": "Enregistrer l'image", "Midnight": "Minuit", "Paper Moon": "Lune de papier",
+    "Golden Hour": "Heure dorée", "MY TAROT": "MON TIRAGE", "READING": "DE TAROT", "THE HEART CUT": "THE HEART CUT", "reversed": "renversée",
+    "Preparing…": "Préparation…", "Preview of your shareable reading": "Aperçu de votre tirage à partager",
+    "Image saved — share it to your story.": "Image enregistrée — partagez-la dans votre story.", "Couldn't create the share image.": "Impossible de créer l'image."
   },
   ru: {
     "Settings": "Настройки", "Language": "Язык", "Sound effects": "Звуковые эффекты", "Volume": "Громкость",
@@ -166,7 +193,12 @@ const I18N = {
     "Reversed": "Перевёрнутая", "Upright": "Прямая",
     "Four cards, gathered beneath one sky.": "Четыре карты под одним небом.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Таро предлагается здесь как инструмент размышления и воображения — не как фактическое предсказание или профессиональный совет.",
-    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание", "Share as an image": "Поделиться как изображением"
+    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание", "Share as an image": "Поделиться как изображением",
+    "Make it yours": "Сделайте своим", "Back": "Назад", "Show card names": "Показывать названия", "Include question": "Добавить вопрос",
+    "Continue to share": "Поделиться", "Save image": "Сохранить изображение", "Midnight": "Полночь", "Paper Moon": "Бумажная луна",
+    "Golden Hour": "Золотой час", "MY TAROT": "МОЙ РАСКЛАД", "READING": "ТАРО", "THE HEART CUT": "THE HEART CUT", "reversed": "перевёрнутая",
+    "Preparing…": "Подготовка…", "Preview of your shareable reading": "Предпросмотр вашего расклада",
+    "Image saved — share it to your story.": "Изображение сохранено — поделитесь в истории.", "Couldn't create the share image.": "Не удалось создать изображение."
   },
   zh: {
     "Settings": "设置", "Language": "语言", "Sound effects": "音效", "Volume": "音量",
@@ -216,7 +248,12 @@ const I18N = {
     "Reversed": "逆位", "Upright": "正位",
     "Four cards, gathered beneath one sky.": "四张牌，共聚于同一片天空之下。",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "此处的塔罗是一种用于反思与想象的工具——并非事实预测或专业建议。",
-    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读", "Share as an image": "分享为图片"
+    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读", "Share as an image": "分享为图片",
+    "Make it yours": "定制专属", "Back": "返回", "Show card names": "显示牌名", "Include question": "包含问题",
+    "Continue to share": "继续分享", "Save image": "保存图片", "Midnight": "午夜", "Paper Moon": "纸月",
+    "Golden Hour": "黄金时刻", "MY TAROT": "我的塔罗", "READING": "解读", "THE HEART CUT": "THE HEART CUT", "reversed": "逆位",
+    "Preparing…": "准备中…", "Preview of your shareable reading": "分享图预览",
+    "Image saved — share it to your story.": "图片已保存——分享到你的故事。", "Couldn't create the share image.": "无法创建分享图片。"
   }
 };
 function t(source) {
@@ -280,6 +317,7 @@ function createState() {
     aiText: null,
     aiSummary: null,
     aiError: null,
+    share: { open: false, theme: "paperMoon", showNames: true, includeQuestion: false },
     settings: { language: "en", volume: 65, sfxEnabled: true, music: false, haptics: true, simplified: false },
     debug: false,
     performance: { interactions: 0, lastGesture: 0 }
@@ -668,113 +706,282 @@ function drawWrappedText(ctx, text, cx, y, maxWidth, lineHeight) {
   lines.forEach((line, index) => ctx.fillText(line, cx, y + index * lineHeight));
   return y + lines.length * lineHeight;
 }
-async function buildShareCanvas(question, cards, summary) {
+function drawSparkle(ctx, x, y, r, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  const inner = r * 0.3;
+  for (let i = 0; i < 8; i += 1) {
+    const rad = i % 2 === 0 ? r : inner;
+    const a = i * Math.PI / 4 - Math.PI / 2;
+    const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+function drawMoon(ctx, x, y, r, c0, c1) {
+  ctx.save();
+  ctx.shadowColor = "rgba(255,246,214,.4)"; ctx.shadowBlur = 55;
+  const g = ctx.createRadialGradient(x - r * .32, y - r * .32, r * .2, x, y, r);
+  g.addColorStop(0, c0); g.addColorStop(1, c1);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = "rgba(0,0,0,.08)";
+  [[-.28, .12, .2], [.3, -.22, .11], [.12, .34, .08], [-.05, -.08, .06]].forEach(([dx, dy, dr]) => {
+    ctx.beginPath(); ctx.arc(x + dx * r, y + dy * r, dr * r, 0, Math.PI * 2); ctx.fill();
+  });
+}
+function drawSun(ctx, x, y, r, c0, c1) {
+  ctx.save();
+  ctx.strokeStyle = c0; ctx.lineWidth = 5; ctx.lineCap = "round";
+  for (let i = 0; i < 16; i += 1) {
+    const a = i * Math.PI / 8;
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(a) * r * 1.25, y + Math.sin(a) * r * 1.25);
+    ctx.lineTo(x + Math.cos(a) * r * 1.62, y + Math.sin(a) * r * 1.62);
+    ctx.stroke();
+  }
+  ctx.shadowColor = "rgba(255,220,140,.5)"; ctx.shadowBlur = 50;
+  const g = ctx.createRadialGradient(x - r * .3, y - r * .3, r * .2, x, y, r);
+  g.addColorStop(0, c0); g.addColorStop(1, c1);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+function drawCloud(ctx, x, y, s, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3 / s;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-62, 18);
+  ctx.bezierCurveTo(-78, -6, -34, -30, -20, -8);
+  ctx.bezierCurveTo(-14, -34, 26, -34, 24, -4);
+  ctx.bezierCurveTo(46, -22, 74, 2, 44, 18);
+  ctx.lineTo(-62, 18);
+  ctx.stroke();
+  ctx.beginPath(); ctx.arc(42, 6, 8, Math.PI * .2, Math.PI * 1.7); ctx.stroke();
+  ctx.beginPath(); ctx.arc(-40, 2, 6, Math.PI * -.3, Math.PI * 1.2); ctx.stroke();
+  ctx.restore();
+}
+function drawSkyline(ctx, x, y, w, h, buildingColor, windowColor, rand) {
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y - 40, w, h + 40); ctx.clip();
+  let bx = x - 20;
+  while (bx < x + w + 20) {
+    const bw = 46 + rand() * 66;
+    const bh = h * (0.42 + rand() * 0.58);
+    const by = y + h - bh;
+    ctx.fillStyle = buildingColor;
+    ctx.fillRect(bx, by, bw, bh);
+    if (rand() > 0.6) { ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + bw / 2, by - 24); ctx.lineTo(bx + bw, by); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle = windowColor;
+    for (let wy = by + 14; wy < y + h - 10; wy += 22) {
+      for (let wx = bx + 9; wx < bx + bw - 9; wx += 17) {
+        if (rand() > 0.5) { ctx.globalAlpha = 0.5 + rand() * 0.5; ctx.fillRect(wx, wy, 6, 9); }
+      }
+    }
+    ctx.globalAlpha = 1;
+    bx += bw + 5;
+  }
+  ctx.restore();
+}
+function drawTape(ctx, cx, cy, w, h, angle) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
+  ctx.fillStyle = "rgba(228,212,172,.5)";
+  ctx.fillRect(-w / 2, -h / 2, w, h);
+  ctx.strokeStyle = "rgba(160,140,96,.35)"; ctx.lineWidth = 1;
+  ctx.strokeRect(-w / 2, -h / 2, w, h);
+  ctx.restore();
+}
+function drawParchment(ctx, x, y, w, h) {
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.4)"; ctx.shadowBlur = 20; ctx.shadowOffsetY = 9;
+  const g = ctx.createLinearGradient(x, y, x, y + h);
+  g.addColorStop(0, "#f1e4c4"); g.addColorStop(1, "#e0cda2");
+  ctx.fillStyle = g;
+  roundRectPath(ctx, x, y, w, h, 9);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = "rgba(140,116,72,.3)"; ctx.lineWidth = 1;
+  roundRectPath(ctx, x + 5, y + 5, w - 10, h - 10, 6);
+  ctx.stroke();
+}
+function drawShareArtwork(canvas, opts) {
+  const { cards, images, question, summary, theme: themeKey, showNames, includeQuestion } = opts;
+  const theme = SHARE_THEMES[themeKey] || SHARE_THEMES.paperMoon;
   const W = 1080, H = 1920;
-  const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d");
-  const images = await Promise.all(cards.map((card) => loadImage(cardImagePath(card))));
+  const rand = rngFor(`${state.seed}-share-${themeKey}`);
 
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-  bgGrad.addColorStop(0, "#08151d");
-  bgGrad.addColorStop(1, "#102d36");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-  const vignette = ctx.createRadialGradient(W / 2, H * .42, H * .15, W / 2, H * .42, H * .75);
-  vignette.addColorStop(0, "rgba(0,0,0,0)");
-  vignette.addColorStop(1, "rgba(0,0,0,.45)");
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, W, H);
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, theme.bg[0]); bg.addColorStop(1, theme.bg[1]);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-  ctx.strokeStyle = "rgba(229,202,139,.45)";
-  ctx.lineWidth = 2;
-  roundRectPath(ctx, 36, 36, W - 72, H - 72, 28);
-  ctx.stroke();
+  const M = 46, px = M, py = M, pw = W - 2 * M, ph = H - 2 * M;
+  const panel = ctx.createLinearGradient(0, py, 0, py + ph);
+  panel.addColorStop(0, theme.panel[0]); panel.addColorStop(1, theme.panel[1]);
+  ctx.save();
+  roundRectPath(ctx, px, py, pw, ph, 26); ctx.clip();
+  ctx.fillStyle = panel; ctx.fillRect(px, py, pw, ph);
+
+  // skyline along the bottom of the panel
+  drawSkyline(ctx, px, py + ph - 330, pw, 300, theme.building, theme.window, rngFor(`${state.seed}-city`));
+
+  // scattered stars (avoid the central title band)
+  const starRand = rngFor(`${state.seed}-stars`);
+  for (let i = 0; i < 16; i += 1) {
+    const sx = px + 40 + starRand() * (pw - 80);
+    const sy = py + 40 + starRand() * (ph * 0.62);
+    if (sy > py + 150 && sy < py + 420 && sx > W / 2 - 320 && sx < W / 2 + 320) continue;
+    drawSparkle(ctx, sx, sy, 7 + starRand() * 12, theme.accent);
+  }
+  // clouds
+  drawCloud(ctx, px + pw - 190, py + 150, 1.15, theme.accent);
+  drawCloud(ctx, px + 150, py + 300, 0.9, theme.accent);
+  drawCloud(ctx, px + pw - 120, py + 360, 0.7, theme.accent);
+
+  // orb
+  const ox = px + 150, oy = py + 175, or = 92;
+  if (theme.orbType === "sun") drawSun(ctx, ox, oy, or, theme.orb[0], theme.orb[1]);
+  else drawMoon(ctx, ox, oy, or, theme.orb[0], theme.orb[1]);
+  ctx.restore();
+
+  // panel border
+  ctx.strokeStyle = theme.accent; ctx.lineWidth = 3;
+  roundRectPath(ctx, px + 10, py + 10, pw - 20, ph - 20, 20); ctx.stroke();
+  ctx.strokeStyle = `${theme.accent}88`; ctx.lineWidth = 1.5;
+  roundRectPath(ctx, px + 20, py + 20, pw - 40, ph - 40, 15); ctx.stroke();
+  [[px + 40, py + 40], [px + pw - 40, py + 40], [px + 40, py + ph - 40], [px + pw - 40, py + ph - 40]].forEach(([cx, cy]) => drawSparkle(ctx, cx, cy, 12, theme.accent));
 
   ctx.textAlign = "center";
-  ctx.fillStyle = "#f4dfaa";
-  ctx.font = "600 30px Georgia, serif";
-  ctx.fillText("✦ THE HEART CUT ✦", W / 2, 150);
-  ctx.fillStyle = "#94743e";
-  ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
-  ctx.save(); ctx.letterSpacing = "3px"; ctx.fillText("A LOVE READING", W / 2, 192); ctx.restore();
+  // title label
+  const tlW = 560, tlH = 176, tlX = W / 2 - tlW / 2, tlY = py + 110;
+  drawParchment(ctx, tlX, tlY, tlW, tlH);
+  drawTape(ctx, tlX + 30, tlY + 6, 130, 42, -0.32);
+  drawTape(ctx, tlX + tlW - 26, tlY + 8, 130, 42, 0.3);
+  ctx.fillStyle = theme.labelInk;
+  ctx.font = "700 62px Georgia, serif";
+  ctx.save(); ctx.letterSpacing = "6px";
+  ctx.fillText(t("MY TAROT"), W / 2, tlY + 76);
+  ctx.fillText(t("READING"), W / 2, tlY + 142);
+  ctx.restore();
 
-  ctx.fillStyle = "#f5e8c8";
-  ctx.font = "italic 42px Georgia, serif";
-  const questionBottom = drawWrappedText(ctx, `“${question.trim()}”`, W / 2, 300, W - 220, 54);
+  let cursor = tlY + tlH + 40;
+  if (includeQuestion && question.trim()) {
+    ctx.fillStyle = theme.ink;
+    ctx.font = "italic 34px Georgia, serif";
+    cursor = drawWrappedText(ctx, `“${question.trim()}”`, W / 2, cursor + 20, pw - 220, 46) + 30;
+  }
 
-  const cardTop = Math.max(questionBottom + 60, 460);
-  const gap = 24, marginX = 80;
-  const cardW = (W - marginX * 2 - gap * 3) / 4;
-  const cardH = cardW * (155 / 91);
+  // cards row
+  const cardW = 208, cardH = Math.round(cardW * 155 / 91), gap = 14;
+  const totalW = cardW * 4 + gap * 3;
+  const startX = (W - totalW) / 2;
+  const cardTop = Math.max(cursor, py + 350);
+  const cy = cardTop + cardH / 2;
+  const tilts = [-4, -1.6, 1.6, 4];
   cards.forEach((card, index) => {
-    const x = marginX + index * (cardW + gap);
-    const y = cardTop;
+    const cx = startX + index * (cardW + gap) + cardW / 2;
     ctx.save();
-    roundRectPath(ctx, x, y, cardW, cardH, 10);
-    ctx.clip();
-    ctx.fillStyle = "#121b1f";
-    ctx.fillRect(x, y, cardW, cardH);
-    if (card.reversed) {
-      ctx.translate(x + cardW / 2, y + cardH / 2);
-      ctx.rotate(Math.PI);
-      ctx.drawImage(images[index], -cardW / 2, -cardH / 2, cardW, cardH);
-    } else {
-      ctx.drawImage(images[index], x, y, cardW, cardH);
-    }
+    ctx.translate(cx, cy);
+    ctx.rotate(tilts[index] * Math.PI / 180);
+    ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 20; ctx.shadowOffsetY = 12;
+    roundRectPath(ctx, -cardW / 2, -cardH / 2, cardW, cardH, 8);
+    ctx.fillStyle = "#121b1f"; ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.save();
+    roundRectPath(ctx, -cardW / 2, -cardH / 2, cardW, cardH, 8); ctx.clip();
+    if (card.reversed) ctx.rotate(Math.PI);
+    ctx.drawImage(images[index], -cardW / 2, -cardH / 2, cardW, cardH);
     ctx.restore();
-    ctx.strokeStyle = "rgba(223,189,120,.65)";
-    ctx.lineWidth = 2;
-    roundRectPath(ctx, x, y, cardW, cardH, 10);
-    ctx.stroke();
-
-    ctx.fillStyle = "#94743e";
-    ctx.font = "600 15px ui-sans-serif, system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(POSITIONS[index].toUpperCase(), x + cardW / 2, y + cardH + 34);
-    ctx.fillStyle = "#f5e8c8";
-    ctx.font = "600 17px Georgia, serif";
-    wrapCanvasText(ctx, `${card.name}${card.reversed ? " (R)" : ""}`, cardW + 16).slice(0, 2).forEach((line, li) => {
-      ctx.fillText(line, x + cardW / 2, y + cardH + 60 + li * 22);
-    });
+    ctx.strokeStyle = theme.accent; ctx.lineWidth = 3;
+    roundRectPath(ctx, -cardW / 2, -cardH / 2, cardW, cardH, 8); ctx.stroke();
+    ctx.restore();
   });
 
-  const boxTop = cardTop + cardH + 150;
-  const boxHeight = 340;
-  ctx.strokeStyle = "rgba(229,202,139,.5)";
-  ctx.fillStyle = "rgba(16,45,54,.55)";
-  ctx.lineWidth = 2;
-  roundRectPath(ctx, 90, boxTop, W - 180, boxHeight, 20);
-  ctx.fill();
-  ctx.stroke();
+  let contentBottom = cy + cardH / 2 + 30;
+  if (showNames) {
+    ctx.fillStyle = theme.ink;
+    contentBottom += 20;
+    cards.forEach((card, index) => {
+      const cx = startX + index * (cardW + gap) + cardW / 2;
+      ctx.font = "600 22px Georgia, serif";
+      const lines = wrapCanvasText(ctx, card.name, cardW + 6).slice(0, 2);
+      lines.forEach((line, li) => ctx.fillText(line, cx, contentBottom + li * 26));
+      if (card.reversed) {
+        ctx.fillStyle = theme.accent; ctx.font = "600 14px ui-sans-serif, system-ui, sans-serif";
+        ctx.fillText(t("reversed").toUpperCase(), cx, contentBottom + lines.length * 26 + 4);
+        ctx.fillStyle = theme.ink;
+      }
+    });
+    contentBottom += 78;
+  }
 
-  ctx.fillStyle = "#94743e";
-  ctx.font = "600 18px ui-sans-serif, system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("THE SHORT ANSWER", W / 2, boxTop + 56);
+  // short-answer parchment label
+  const salW = 720, salX = W / 2 - salW / 2;
+  ctx.font = "italic 600 40px Georgia, serif";
+  const salLines = wrapCanvasText(ctx, summary.trim(), salW - 120);
+  const salH = 70 + salLines.length * 52 + 40;
+  const salY = Math.min(contentBottom + 30, py + ph - 380 - salH);
+  drawParchment(ctx, salX, salY, salW, salH);
+  drawTape(ctx, salX + salW - 40, salY + 6, 120, 40, 0.34);
+  drawSparkle(ctx, salX + 8, salY + 12, 20, theme.accent);
+  ctx.fillStyle = theme.labelInk;
+  ctx.font = "italic 600 40px Georgia, serif";
+  salLines.forEach((line, li) => ctx.fillText(line, W / 2, salY + 90 + li * 52));
 
-  ctx.fillStyle = "#f4dfaa";
-  ctx.font = "italic 600 38px Georgia, serif";
-  drawWrappedText(ctx, summary.trim(), W / 2, boxTop + 130, W - 280, 50);
-
-  ctx.fillStyle = "#8ea8a2";
-  ctx.font = "16px ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText("A reflective, imaginative reading — not a prediction.", W / 2, H - 60);
-
-  return canvas;
+  // brand footer
+  ctx.fillStyle = theme.accent;
+  ctx.font = "600 24px Georgia, serif";
+  ctx.save(); ctx.letterSpacing = "4px";
+  ctx.fillText(`✦  ${t("THE HEART CUT")}  ✦`, W / 2, py + ph - 42);
+  ctx.restore();
 }
-async function shareReadingImage(button) {
+let shareImageCache = { key: null, images: null };
+async function ensureShareImages(cards) {
+  const key = cards.map((card) => `${card.id}:${card.reversed}`).join("|");
+  if (shareImageCache.key === key && shareImageCache.images) return shareImageCache.images;
+  const images = await Promise.all(cards.map((card) => loadImage(cardImagePath(card))));
+  shareImageCache = { key, images };
+  return images;
+}
+async function paintSharePreview() {
+  if (!state.share?.open) return;
+  const canvas = document.querySelector("#share-preview");
+  if (!canvas) return;
   const cards = readingCards();
   if (cards.length !== 4) return;
-  const summary = state.aiSummary || personalSummary(cards);
-  const originalLabel = button?.textContent;
-  if (button) { button.disabled = true; button.textContent = "Preparing image…"; }
   try {
-    const canvas = await buildShareCanvas(state.question, cards, summary);
+    const images = await ensureShareImages(cards);
+    if (!state.share.open) return;
+    drawShareArtwork(canvas, {
+      cards, images, question: state.question,
+      summary: state.aiSummary || personalSummary(cards),
+      theme: state.share.theme, showNames: state.share.showNames, includeQuestion: state.share.includeQuestion
+    });
+  } catch { /* artwork will simply stay blank if a card image fails */ }
+}
+async function exportShareImage(mode, button) {
+  const canvas = document.querySelector("#share-preview");
+  if (!canvas || !canvas.width) { showToast("The preview is not ready yet."); return; }
+  const originalLabel = button?.textContent;
+  if (button) { button.disabled = true; button.textContent = t("Preparing…"); }
+  try {
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-    if (!blob) throw new Error("Could not render the image.");
+    if (!blob) throw new Error("render failed");
+    const summary = state.aiSummary || personalSummary(readingCards());
     const file = new File([blob], "heart-cut-reading.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    if (mode === "share" && navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: "The Heart Cut", text: summary });
     } else {
       const url = URL.createObjectURL(blob);
@@ -782,13 +989,25 @@ async function shareReadingImage(button) {
       link.href = url; link.download = "heart-cut-reading.png";
       document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
-      showToast("Image saved — share it to your story.");
+      showToast(t("Image saved — share it to your story."));
     }
   } catch (error) {
-    if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
+    if (error?.name !== "AbortError") showToast(t("Couldn't create the share image."));
   } finally {
     if (button) { button.disabled = false; button.textContent = originalLabel; }
   }
+}
+function renderShareScreen() {
+  if (!state.share?.open) return "";
+  const swatch = (key) => {
+    const th = SHARE_THEMES[key];
+    const orb = th.orbType === "sun"
+      ? `radial-gradient(circle at 74% 30%, ${th.orb[0]} 0 7%, transparent 8%)`
+      : `radial-gradient(circle at 26% 28%, ${th.orb[0]} 0 8%, transparent 9%)`;
+    const bg = `${orb}, linear-gradient(160deg, ${th.panel[0]}, ${th.panel[1]})`;
+    return `<button class="share-theme ${state.share.theme === key ? "selected" : ""}" data-action="share-theme" data-theme="${key}"><span class="swatch" style="background:${bg}"></span><span>${t(th.label)}</span></button>`;
+  };
+  return `<div class="share-scrim" role="dialog" aria-modal="true" aria-labelledby="share-title"><div class="share-screen"><div class="share-topbar"><button class="share-back" data-action="close-share" aria-label="${t("Back")}">←</button><h2 id="share-title">${t("Make it yours")}</h2></div><div class="share-preview-frame"><canvas id="share-preview" width="1080" height="1920" role="img" aria-label="${t("Preview of your shareable reading")}"></canvas></div><div class="share-themes">${SHARE_THEME_ORDER.map(swatch).join("")}</div><div class="share-toggles"><label class="share-toggle" for="share-names"><strong>${t("Show card names")}</strong><input id="share-names" type="checkbox" ${state.share.showNames ? "checked" : ""}></label><label class="share-toggle" for="share-question"><strong>${t("Include question")}</strong><input id="share-question" type="checkbox" ${state.share.includeQuestion ? "checked" : ""}></label></div><div class="share-actions-row"><button class="seal-button" data-action="share-continue">${t("Continue to share")}</button><button class="share-save" data-action="share-save">${t("Save image")}</button></div></div></div>`;
 }
 async function requestAIInterpretation() {
   if (location.protocol === "file:") {
@@ -878,10 +1097,11 @@ function render() {
   else if (state.stage === "question") markup = renderQuestion();
   else if (state.stage === "reading") markup = renderReading();
   else markup = renderRitual();
-  app.innerHTML = `${markup}${renderAd()}${renderSettings()}${debugPanel()}`;
+  app.innerHTML = `${markup}${renderAd()}${renderSettings()}${renderShareScreen()}${debugPanel()}`;
   updatePageLanguage();
   paintCardArt();
   bindGestures();
+  paintSharePreview();
   persist();
 }
 
@@ -1294,7 +1514,11 @@ function act(action, element) {
     return;
   }
   if (action === "share-copy") { const text = `${state.question}\n\n${readingCards().map((card, index) => `${POSITIONS[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`; navigator.clipboard?.writeText(text).then(() => showToast("Reading copied."), () => showToast("Copy is unavailable in this browser.")); return; }
-  if (action === "share-image") { void shareReadingImage(element); return; }
+  if (action === "share-image") { state.share.open = true; interaction(); render(); return; }
+  if (action === "close-share") { state.share.open = false; render(); return; }
+  if (action === "share-theme") { state.share.theme = element.dataset.theme; interaction(); render(); return; }
+  if (action === "share-continue") { void exportShareImage("share", element); return; }
+  if (action === "share-save") { void exportShareImage("save", element); return; }
 }
 
 app.addEventListener("click", (event) => {
@@ -1362,6 +1586,14 @@ app.addEventListener("input", (event) => {
     state.settings.music = event.target.checked;
     if (state.settings.music) startBackgroundMusic(); else stopBackgroundMusic();
     persist();
+    return;
+  }
+  if (event.target.id === "share-names") {
+    state.share.showNames = event.target.checked; paintSharePreview();
+    return;
+  }
+  if (event.target.id === "share-question") {
+    state.share.includeQuestion = event.target.checked; paintSharePreview();
     return;
   }
   if (event.target.id === "question-input") {
