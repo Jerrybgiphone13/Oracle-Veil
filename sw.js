@@ -1,5 +1,14 @@
-const CACHE = "heart-cut-v13";
-const ASSETS = ["./", "./index.html", "./styles.css?v=13", "./app.js?v=13", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "heart-cut-v15";
+const SFX_ASSETS = [
+  "./assets/audio/shuffle/1.ogg", "./assets/audio/shuffle/2.ogg", "./assets/audio/shuffle/3.ogg", "./assets/audio/shuffle/4.ogg",
+  "./assets/audio/shuffle/5.ogg", "./assets/audio/shuffle/6.ogg", "./assets/audio/shuffle/7.ogg", "./assets/audio/shuffle/8.ogg",
+  "./assets/audio/cut/1.ogg", "./assets/audio/cut/2.ogg", "./assets/audio/cut/3.ogg", "./assets/audio/cut/4.ogg",
+  "./assets/audio/gather/1.ogg", "./assets/audio/gather/2.ogg", "./assets/audio/gather/3.ogg", "./assets/audio/gather/4.ogg",
+  "./assets/audio/spread/1.ogg", "./assets/audio/spread/2.ogg",
+  "./assets/audio/take/1.ogg", "./assets/audio/take/2.ogg",
+  "./assets/audio/flip/1.ogg", "./assets/audio/flip/2.ogg"
+];
+const ASSETS = ["./", "./index.html", "./styles.css?v=15", "./app.js?v=15", "./manifest.webmanifest", "./icon.svg", ...SFX_ASSETS];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));

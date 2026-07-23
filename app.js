@@ -69,7 +69,8 @@ function escapeHTML(value = "") { return String(value).replace(/[&<>'"]/g, (char
 // Localization. t(en) returns the current-language string, falling back to the English source.
 const I18N = {
   fr: {
-    "Settings": "Réglages", "Language": "Langue", "Sound effects": "Effets sonores",
+    "Settings": "Réglages", "Language": "Langue", "Sound effects": "Effets sonores", "Volume": "Volume",
+    "Card, shuffle, and transition sounds.": "Sons de carte, de mélange et de transition.",
     "Controls every card, shuffle, and transition sound.": "Contrôle chaque son de carte, de mélange et de transition.",
     "Background music": "Musique de fond", "Save settings": "Enregistrer les réglages", "Selected:": "Choisi :",
     "A quiet ritual for the heart": "Un rituel paisible pour le cœur",
@@ -118,7 +119,8 @@ const I18N = {
     "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture"
   },
   ru: {
-    "Settings": "Настройки", "Language": "Язык", "Sound effects": "Звуковые эффекты",
+    "Settings": "Настройки", "Language": "Язык", "Sound effects": "Звуковые эффекты", "Volume": "Громкость",
+    "Card, shuffle, and transition sounds.": "Звуки карт, тасования и переходов.",
     "Controls every card, shuffle, and transition sound.": "Управляет всеми звуками карт, тасования и переходов.",
     "Background music": "Фоновая музыка", "Save settings": "Сохранить настройки", "Selected:": "Выбрано:",
     "A quiet ritual for the heart": "Тихий ритуал для сердца",
@@ -167,7 +169,8 @@ const I18N = {
     "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание"
   },
   zh: {
-    "Settings": "设置", "Language": "语言", "Sound effects": "音效",
+    "Settings": "设置", "Language": "语言", "Sound effects": "音效", "Volume": "音量",
+    "Card, shuffle, and transition sounds.": "卡牌、洗牌与过渡音效。",
     "Controls every card, shuffle, and transition sound.": "控制所有卡牌、洗牌与过渡音效。",
     "Background music": "背景音乐", "Save settings": "保存设置", "Selected:": "已选择：",
     "A quiet ritual for the heart": "献给心灵的静谧仪式",
@@ -276,7 +279,7 @@ function createState() {
     aiLoading: false,
     aiText: null,
     aiError: null,
-    settings: { language: "en", volume: 65, music: false, haptics: true, simplified: false },
+    settings: { language: "en", volume: 65, sfxEnabled: true, music: false, haptics: true, simplified: false },
     debug: false,
     performance: { interactions: 0, lastGesture: 0 }
   };
@@ -285,6 +288,7 @@ function normalizeSettings(settings = {}) {
   return {
     language: ["en", "fr", "ru", "zh"].includes(settings.language) ? settings.language : "en",
     volume: clamp(Number(settings.volume ?? 65), 0, 100),
+    sfxEnabled: settings.sfxEnabled !== false,
     music: Boolean(settings.music),
     haptics: settings.haptics !== false,
     simplified: Boolean(settings.simplified)
@@ -322,19 +326,44 @@ function interaction() { state.performance.interactions += 1; state.performance.
 function buzz(pattern = 10) {
   if (state.settings.haptics && navigator.vibrate) navigator.vibrate(pattern);
 }
-function sound(kind = "paper", intensity = .18) {
-  if (state.settings.volume <= 0 || !window.AudioContext && !window.webkitAudioContext) return;
+// Recorded sound effects (CC0, public domain — Kenney "Casino Audio" pack; see assets/audio/LICENSE.txt).
+// Each category holds several near-identical takes of one physical action; a random take plays
+// each time so a repeated gesture (e.g. sweeping several cards) doesn't sound mechanically identical.
+const SFX_VARIANTS = {
+  shuffle: 8, cut: 4, gather: 4, spread: 2, take: 2, flip: 2
+};
+const SFX_TONES = { flip: { type: "sine", frequency: 280 }, cut: { type: "triangle", frequency: 125 }, gather: { type: "triangle", frequency: 125 } };
+function sfxUrl(kind) {
+  const count = SFX_VARIANTS[kind] || 1;
+  const pick = 1 + Math.floor(Math.random() * count);
+  return `./assets/audio/${kind}/${pick}.ogg`;
+}
+function synthSound(kind, intensity) {
+  if (!window.AudioContext && !window.webkitAudioContext) return;
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     const ctx = new Ctx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = kind === "flip" ? "sine" : "triangle";
-    osc.frequency.value = kind === "flip" ? 280 : kind === "settle" ? 125 : 170;
+    const tone = SFX_TONES[kind] || { type: "triangle", frequency: 170 };
+    osc.type = tone.type;
+    osc.frequency.value = tone.frequency;
     gain.gain.setValueAtTime(intensity * state.settings.volume / 100, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .12);
     osc.connect(gain).connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .13);
   } catch { /* audio remains optional */ }
+}
+function sound(kind = "shuffle", intensity = .18) {
+  if (!state.settings.sfxEnabled || state.settings.volume <= 0) return;
+  // Prefer a recorded sample (randomized per category); fall back to a synthesized tone if it can't load.
+  try {
+    const audio = new Audio(sfxUrl(kind));
+    audio.volume = clamp(intensity * state.settings.volume / 100, 0, 1);
+    audio.playbackRate = .94 + Math.random() * .12; // tiny pitch variance so repeats feel physical, not looped
+    audio.addEventListener("error", () => synthSound(kind, intensity), { once: true });
+    const played = audio.play();
+    if (played?.catch) played.catch(() => synthSound(kind, intensity));
+  } catch { synthSound(kind, intensity); }
 }
 // Music is deliberately independent of the "Sound effects" volume: that slider only scales sound().
 function setMusicLevel() {
@@ -646,7 +675,7 @@ function renderAd() {
 function renderSettings() {
   if (!settingsOpen) return "";
   const languageNames = { en: "English", fr: "Français", ru: "Русский", zh: "中文" };
-  return `<div class="settings-scrim" role="dialog" aria-modal="true" aria-labelledby="settings-title"><section class="settings-panel"><div class="settings-heading"><div><p class="eyebrow">The Heart Cut</p><h2 id="settings-title">${t("Settings")}</h2></div><button class="settings-close" data-action="close-settings" aria-label="Close settings">×</button></div><label class="settings-field" for="settings-language"><span>${t("Language")}</span><select id="settings-language"><option value="en" ${state.settings.language === "en" ? "selected" : ""}>English</option><option value="fr" ${state.settings.language === "fr" ? "selected" : ""}>Français</option><option value="ru" ${state.settings.language === "ru" ? "selected" : ""}>Русский</option><option value="zh" ${state.settings.language === "zh" ? "selected" : ""}>中文</option></select><small id="settings-language-value">${t("Selected:")} ${languageNames[state.settings.language]}</small></label><label class="settings-field" for="settings-volume"><span>${t("Sound effects")} <output id="settings-volume-value">${state.settings.volume}%</output></span><input id="settings-volume" type="range" min="0" max="100" value="${state.settings.volume}"><small>${t("Controls every card, shuffle, and transition sound.")}</small></label><label class="settings-toggle" for="settings-music"><input id="settings-music" type="checkbox" ${state.settings.music ? "checked" : ""}><span><strong>${t("Background music")}</strong><small>“Sunset” — Kai Engel · CC BY 4.0</small></span></label><button class="seal-button settings-done" data-action="close-settings">${t("Save settings")}</button></section></div>`;
+  return `<div class="settings-scrim" role="dialog" aria-modal="true" aria-labelledby="settings-title"><section class="settings-panel"><div class="settings-heading"><div><p class="eyebrow">The Heart Cut</p><h2 id="settings-title">${t("Settings")}</h2></div><button class="settings-close" data-action="close-settings" aria-label="Close settings">×</button></div><label class="settings-field" for="settings-language"><span>${t("Language")}</span><select id="settings-language"><option value="en" ${state.settings.language === "en" ? "selected" : ""}>English</option><option value="fr" ${state.settings.language === "fr" ? "selected" : ""}>Français</option><option value="ru" ${state.settings.language === "ru" ? "selected" : ""}>Русский</option><option value="zh" ${state.settings.language === "zh" ? "selected" : ""}>中文</option></select><small id="settings-language-value">${t("Selected:")} ${languageNames[state.settings.language]}</small></label><label class="settings-toggle" for="settings-sfx"><input id="settings-sfx" type="checkbox" ${state.settings.sfxEnabled ? "checked" : ""}><span><strong>${t("Sound effects")}</strong><small>${t("Card, shuffle, and transition sounds.")}</small></span></label><label class="settings-field" for="settings-volume"><span>${t("Volume")} <output id="settings-volume-value">${state.settings.volume}%</output></span><input id="settings-volume" type="range" min="0" max="100" value="${state.settings.volume}" ${state.settings.sfxEnabled ? "" : "disabled"}><small>${t("Controls every card, shuffle, and transition sound.")}</small></label><label class="settings-toggle" for="settings-music"><input id="settings-music" type="checkbox" ${state.settings.music ? "checked" : ""}><span><strong>${t("Background music")}</strong><small>“Sunset” — Kai Engel · CC BY 4.0</small></span></label><button class="seal-button settings-done" data-action="close-settings">${t("Save settings")}</button></section></div>`;
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
@@ -755,6 +784,10 @@ function bindShuffle(surface) {
     card.style.setProperty("--r", `${piece.r}deg`);
     card.style.setProperty("--z", piece.z);
     card.classList.add("held");
+    // One "shuffle" sample per card the very moment it starts moving — not per gesture — so the
+    // number of sounds heard tracks the number of cards actually swept, like a real deck. A wide
+    // wave can catch many cards in the same instant, so stagger them into a cascade, not one blast.
+    if (!touched.has(index)) setTimeout(() => sound("shuffle", clamp(.08 + falloff * .09, .06, .2)), Math.random() * 80);
     touched.add(index);
   };
   const centerOf = (index) => {
@@ -811,7 +844,7 @@ function bindShuffle(surface) {
     const passes = clamp(Math.round(count / 3), 1, 4);
     for (let i = 0; i < passes; i += 1) reorderDeck(dxTotal >= 0 ? distance : -distance, dyTotal, distance);
     state.shuffleMoves += clamp(count, 1, 6);
-    interaction(); buzz([8, 16, 10]); sound("paper", clamp(.1 + distance / 700, .1, .24));
+    interaction(); buzz([8, 16, 10]);
     updateShuffleStatus();
   };
   surface.addEventListener("pointerup", finish);
@@ -833,7 +866,7 @@ function animateDeckCut(pieces, done) {
   deck.classList.add(pieces === 2 ? "splitting-two" : "splitting-three");
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([9, 20, 9]);
-  sound("settle", .2);
+  sound("cut", .2);
   setTimeout(() => { done(); transitioning = false; render(); }, 720);
 }
 function createDefaultSpread() { return { start: { x: 13, y: 64 }, end: { x: 85, y: 56 }, bend: { x: 0, y: -17 }, rotation: 34 }; }
@@ -873,7 +906,7 @@ function bindSpread(surface) {
     if (preview) preview.innerHTML = spreadPreviewMarkup(state.spread, state.deck.length, true);
     deck.classList.add("spread-source-away");
     transitioning = true;
-    interaction(); buzz([7, 17, 7]); sound("paper", clamp(.1 + distance / 1000, .1, .22));
+    interaction(); buzz([7, 17, 7]); sound("spread", clamp(.1 + distance / 1000, .1, .22));
     setTimeout(() => { state.stage = "choose"; transitioning = false; render(); }, 620);
   };
   deck.addEventListener("pointerdown", (event) => {
@@ -901,7 +934,7 @@ function animateShuffleGather() {
   transitioning = true;
   surface.classList.add("gathering");
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
-  buzz([7, 14, 9]); sound("settle", .18);
+  buzz([7, 14, 9]); sound("gather", .18);
   setTimeout(() => { state.stage = "cutOne"; transitioning = false; interaction(); render(); }, 760);
 }
 function animateRitualDraw() {
@@ -910,7 +943,7 @@ function animateRitualDraw() {
   transitioning = true;
   surface.classList.add("drawing-hidden");
   document.querySelectorAll('[data-action="take-ritual"]').forEach((button) => { button.disabled = true; });
-  buzz([6, 12, 8]); sound("paper", .14);
+  buzz([6, 12, 8]); sound("take", .14);
   setTimeout(() => {
     const lifted = state.piles[0];
     const ritual = lifted?.pop();
@@ -948,7 +981,7 @@ function animateTwoPileJoin() {
   field.classList.add("joining");
   convergePiles(field, (pile) => pile.classList.contains("chosen") ? 0 : 1);
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
-  buzz([8, 18, 11]); sound("settle", .2);
+  buzz([8, 18, 11]); sound("gather", .2);
   setTimeout(() => {
     const other = state.twoTop === 0 ? 1 : 0;
     state.deck = [...(state.piles[state.twoTop] || []), ...(state.piles[other] || [])];
@@ -966,7 +999,7 @@ function animateThreePileJoin() {
   field.classList.add("stacking");
   convergePiles(field, (pile) => Number(pile.style.getPropertyValue("--order")) || 0);
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
-  buzz([7, 18, 11]); sound("settle", .2);
+  buzz([7, 18, 11]); sound("gather", .2);
   setTimeout(() => {
     state.deck = state.assemblyOrder.flatMap((index) => state.piles[index]);
     state.piles = [];
@@ -983,7 +1016,7 @@ function animateAssistedSpread() {
   preview.innerHTML = spreadPreviewMarkup(state.spread, state.deck.length, true);
   deck.classList.add("spread-source-away");
   transitioning = true;
-  interaction(); sound("paper", .16);
+  interaction(); sound("spread", .16);
   setTimeout(() => { state.stage = "choose"; transitioning = false; render(); }, 620);
 }
 function animatePickCard(element, id) {
@@ -1002,7 +1035,7 @@ function animatePickCard(element, id) {
   ], { duration: 460, easing: "cubic-bezier(.2,.75,.2,1)", fill: "forwards" });
   animation.finished.catch(() => {}).then(() => {
     state.selectedIds.push(id);
-    transitioning = false; interaction(); buzz(12); sound("paper", .17); render();
+    transitioning = false; interaction(); buzz(12); sound("take", .17); render();
   });
 }
 
@@ -1023,6 +1056,7 @@ function act(action, element) {
     const layout = state.shuffleLayout;
     const focus = layout[Math.floor(Math.random() * layout.length)];
     const dir = Math.random() < .5 ? -1 : 1;
+    let moved = 0;
     layout.forEach((piece) => {
       const dist = Math.hypot(piece.x - focus.x, piece.y - focus.y);
       if (dist < 32) {
@@ -1030,23 +1064,27 @@ function act(action, element) {
         piece.x = clamp(piece.x + dir * 30 * f, 10, 90);
         piece.y = clamp(piece.y + (dir * 12 - 6) * f, 24, 80);
         piece.r = Number((piece.r + dir * 26 * f).toFixed(2));
+        moved += 1;
       }
     });
     reorderDeck(dir * 60, 20, 90);
-    state.shuffleMoves += 2; interaction(); buzz([7, 15, 9]); sound("paper", .16); render();
+    state.shuffleMoves += 2; interaction(); buzz([7, 15, 9]);
+    // Same "one sound per card moved" rule as the manual drag, since this button simulates a wave too.
+    for (let i = 0; i < moved; i += 1) sound("shuffle", .08 + Math.random() * .08);
+    render();
     return;
   }
   if (action === "shuffle-done") { animateShuffleGather(); return; }
   if (action === "make-first-cut") { const cut = clamp(Number(state.cutDraft) || Math.round(state.deck.length * .46), 9, state.deck.length - 9); animateDeckCut(2, () => { const source = state.deck; state.firstCut = cut; state.piles = [source.slice(0, cut), source.slice(cut)]; state.deck = []; state.twoTop = null; state.stage = "ritualCard"; interaction(); }); return; }
   if (action === "take-ritual") { animateRitualDraw(); return; }
-  if (action === "choose-two-top") { state.twoTop = Number(element.dataset.pileIndex); interaction(); buzz(7); sound("paper", .1); render(); return; }
+  if (action === "choose-two-top") { state.twoTop = Number(element.dataset.pileIndex); interaction(); buzz(7); sound("take", .1); render(); return; }
   if (action === "join-two") { animateTwoPileJoin(); return; }
   if (action === "place-three-cut") {
     let cut = clamp(Number(state.threeCutDraft) || Math.round(state.deck.length * .3), 9, state.deck.length - 9);
     if (state.threeCuts.length === 0) {
       state.threeCuts = [cut];
       state.threeCutDraft = cut < state.deck.length / 2 ? Math.round(state.deck.length * .7) : Math.round(state.deck.length * .3);
-      interaction(); buzz(9); sound("paper", .13); render();
+      interaction(); buzz(9); sound("cut", .13); render();
     } else {
       const first = state.threeCuts[0];
       if (Math.abs(cut - first) < 12) cut = clamp(cut < first ? first - 12 : first + 12, 9, state.deck.length - 9);
@@ -1055,7 +1093,7 @@ function act(action, element) {
     }
     return;
   }
-  if (action === "choose-pile") { const index = Number(element.dataset.pileIndex); if (state.assemblyOrder.includes(index)) { state.assemblyOrder = state.assemblyOrder.filter((item) => item !== index); } else if (state.assemblyOrder.length < 3) { state.assemblyOrder.push(index); buzz(7); sound("paper", .1); } interaction(); render(); return; }
+  if (action === "choose-pile") { const index = Number(element.dataset.pileIndex); if (state.assemblyOrder.includes(index)) { state.assemblyOrder = state.assemblyOrder.filter((item) => item !== index); } else if (state.assemblyOrder.length < 3) { state.assemblyOrder.push(index); buzz(7); sound("take", .1); } interaction(); render(); return; }
   if (action === "reassemble-three") { animateThreePileJoin(); return; }
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
@@ -1150,6 +1188,11 @@ app.addEventListener("input", (event) => {
   if (event.target.id === "settings-language") {
     state.settings.language = event.target.value;
     updatePageLanguage(); persist(); render();
+    return;
+  }
+  if (event.target.id === "settings-sfx") {
+    state.settings.sfxEnabled = event.target.checked;
+    persist(); render();
     return;
   }
   if (event.target.id === "settings-music") {
