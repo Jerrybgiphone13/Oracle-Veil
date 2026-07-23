@@ -116,7 +116,7 @@ const I18N = {
     "Reversed": "Renversée", "Upright": "À l'endroit",
     "Four cards, gathered beneath one sky.": "Quatre cartes, réunies sous un même ciel.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Le tarot est proposé ici comme un outil de réflexion et d'imagination — non comme une prédiction factuelle ou un conseil professionnel.",
-    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture"
+    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture", "Share as an image": "Partager en image"
   },
   ru: {
     "Settings": "Настройки", "Language": "Язык", "Sound effects": "Звуковые эффекты", "Volume": "Громкость",
@@ -166,7 +166,7 @@ const I18N = {
     "Reversed": "Перевёрнутая", "Upright": "Прямая",
     "Four cards, gathered beneath one sky.": "Четыре карты под одним небом.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Таро предлагается здесь как инструмент размышления и воображения — не как фактическое предсказание или профессиональный совет.",
-    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание"
+    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание", "Share as an image": "Поделиться как изображением"
   },
   zh: {
     "Settings": "设置", "Language": "语言", "Sound effects": "音效", "Volume": "音量",
@@ -216,7 +216,7 @@ const I18N = {
     "Reversed": "逆位", "Upright": "正位",
     "Four cards, gathered beneath one sky.": "四张牌，共聚于同一片天空之下。",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "此处的塔罗是一种用于反思与想象的工具——并非事实预测或专业建议。",
-    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读"
+    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读", "Share as an image": "分享为图片"
   }
 };
 function t(source) {
@@ -278,6 +278,7 @@ function createState() {
     aiUnlocked: false,
     aiLoading: false,
     aiText: null,
+    aiSummary: null,
     aiError: null,
     settings: { language: "en", volume: 65, sfxEnabled: true, music: false, haptics: true, simplified: false },
     debug: false,
@@ -630,6 +631,165 @@ ${connection.name} describes the space between you. Look for the practical evide
 
 For the Path Ahead, ${ahead.name} offers a next small experiment rather than a verdict. Try one honest conversation, one boundary, or one act of self-care that brings your daily experience closer to the kind of love you want to practice. Let what happens next inform you.`;
 }
+function personalSummary(cards) {
+  const [, , connection, ahead] = cards;
+  return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
+}
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function wrapCanvasText(ctx, text, maxWidth) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (ctx.measureText(candidate).width > maxWidth && line) { lines.push(line); line = word; } else { line = candidate; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function drawWrappedText(ctx, text, cx, y, maxWidth, lineHeight) {
+  const lines = wrapCanvasText(ctx, text, maxWidth);
+  lines.forEach((line, index) => ctx.fillText(line, cx, y + index * lineHeight));
+  return y + lines.length * lineHeight;
+}
+async function buildShareCanvas(question, cards, summary) {
+  const W = 1080, H = 1920;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  const images = await Promise.all(cards.map((card) => loadImage(cardImagePath(card))));
+
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, "#08151d");
+  bgGrad.addColorStop(1, "#102d36");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+  const vignette = ctx.createRadialGradient(W / 2, H * .42, H * .15, W / 2, H * .42, H * .75);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,.45)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = "rgba(229,202,139,.45)";
+  ctx.lineWidth = 2;
+  roundRectPath(ctx, 36, 36, W - 72, H - 72, 28);
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#f4dfaa";
+  ctx.font = "600 30px Georgia, serif";
+  ctx.fillText("✦ THE HEART CUT ✦", W / 2, 150);
+  ctx.fillStyle = "#94743e";
+  ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
+  ctx.save(); ctx.letterSpacing = "3px"; ctx.fillText("A LOVE READING", W / 2, 192); ctx.restore();
+
+  ctx.fillStyle = "#f5e8c8";
+  ctx.font = "italic 42px Georgia, serif";
+  const questionBottom = drawWrappedText(ctx, `“${question.trim()}”`, W / 2, 300, W - 220, 54);
+
+  const cardTop = Math.max(questionBottom + 60, 460);
+  const gap = 24, marginX = 80;
+  const cardW = (W - marginX * 2 - gap * 3) / 4;
+  const cardH = cardW * (155 / 91);
+  cards.forEach((card, index) => {
+    const x = marginX + index * (cardW + gap);
+    const y = cardTop;
+    ctx.save();
+    roundRectPath(ctx, x, y, cardW, cardH, 10);
+    ctx.clip();
+    ctx.fillStyle = "#121b1f";
+    ctx.fillRect(x, y, cardW, cardH);
+    if (card.reversed) {
+      ctx.translate(x + cardW / 2, y + cardH / 2);
+      ctx.rotate(Math.PI);
+      ctx.drawImage(images[index], -cardW / 2, -cardH / 2, cardW, cardH);
+    } else {
+      ctx.drawImage(images[index], x, y, cardW, cardH);
+    }
+    ctx.restore();
+    ctx.strokeStyle = "rgba(223,189,120,.65)";
+    ctx.lineWidth = 2;
+    roundRectPath(ctx, x, y, cardW, cardH, 10);
+    ctx.stroke();
+
+    ctx.fillStyle = "#94743e";
+    ctx.font = "600 15px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(POSITIONS[index].toUpperCase(), x + cardW / 2, y + cardH + 34);
+    ctx.fillStyle = "#f5e8c8";
+    ctx.font = "600 17px Georgia, serif";
+    wrapCanvasText(ctx, `${card.name}${card.reversed ? " (R)" : ""}`, cardW + 16).slice(0, 2).forEach((line, li) => {
+      ctx.fillText(line, x + cardW / 2, y + cardH + 60 + li * 22);
+    });
+  });
+
+  const boxTop = cardTop + cardH + 150;
+  const boxHeight = 340;
+  ctx.strokeStyle = "rgba(229,202,139,.5)";
+  ctx.fillStyle = "rgba(16,45,54,.55)";
+  ctx.lineWidth = 2;
+  roundRectPath(ctx, 90, boxTop, W - 180, boxHeight, 20);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#94743e";
+  ctx.font = "600 18px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("THE SHORT ANSWER", W / 2, boxTop + 56);
+
+  ctx.fillStyle = "#f4dfaa";
+  ctx.font = "italic 600 38px Georgia, serif";
+  drawWrappedText(ctx, summary.trim(), W / 2, boxTop + 130, W - 280, 50);
+
+  ctx.fillStyle = "#8ea8a2";
+  ctx.font = "16px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("A reflective, imaginative reading — not a prediction.", W / 2, H - 60);
+
+  return canvas;
+}
+async function shareReadingImage(button) {
+  const cards = readingCards();
+  if (cards.length !== 4) return;
+  const summary = state.aiSummary || personalSummary(cards);
+  const originalLabel = button?.textContent;
+  if (button) { button.disabled = true; button.textContent = "Preparing image…"; }
+  try {
+    const canvas = await buildShareCanvas(state.question, cards, summary);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("Could not render the image.");
+    const file = new File([blob], "heart-cut-reading.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "The Heart Cut", text: summary });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = "heart-cut-reading.png";
+      document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      showToast("Image saved — share it to your story.");
+    }
+  } catch (error) {
+    if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
+  } finally {
+    if (button) { button.disabled = false; button.textContent = originalLabel; }
+  }
+}
 async function requestAIInterpretation() {
   if (location.protocol === "file:") {
     state.aiLoading = false;
@@ -649,8 +809,9 @@ async function requestAIInterpretation() {
       })
     });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok || typeof payload.text !== "string") throw new Error(payload.error || "The interpretation service is unavailable.");
+    if (!response.ok || typeof payload.text !== "string" || typeof payload.summary !== "string") throw new Error(payload.error || "The interpretation service is unavailable.");
     state.aiText = payload.text.trim();
+    state.aiSummary = payload.summary.trim();
     state.aiError = null;
   } catch (error) {
     state.aiError = error instanceof Error ? error.message : "The interpretation service is unavailable.";
@@ -661,10 +822,11 @@ async function requestAIInterpretation() {
 }
 function renderReading() {
   const cards = readingCards();
+  const summary = state.aiSummary || personalSummary(cards);
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">Listening to the cards…</p>`
-    : `<p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} The prototype reading remains available below as a fallback.</p>` : ""}`;
-  return world(`<section class="scene reading"><div class="parchment"><p class="eyebrow">The Heart Cut · your reading</p><h2>${t("Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(POSITIONS[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(POSITIONS[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">Personal interpretation</p><h3>A reflection for the path in front of you</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">A closer reflection</p><h3>Would you like a personal interpretation?</h3><p>Watch a short ad to unlock a reflection based on your exact question and all four cards.</p><button class="seal-button" data-action="unlock-ai">Generate my personal interpretation</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button></div></div></section>`);
+    : `<p class="ai-summary">${escapeHTML(summary)}</p><p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} The prototype reading remains available below as a fallback.</p>` : ""}`;
+  return world(`<section class="scene reading"><div class="parchment"><p class="eyebrow">The Heart Cut · your reading</p><h2>${t("Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(POSITIONS[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(POSITIONS[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">Personal interpretation</p><h3>A reflection for the path in front of you</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">A closer reflection</p><h3>Would you like a personal interpretation?</h3><p>Watch a short ad to unlock a reflection based on your exact question and all four cards.</p><button class="seal-button" data-action="unlock-ai">Generate my personal interpretation</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button><button class="text-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`);
 }
 function renderAd() {
   if (!state.ad) return "";
@@ -1116,7 +1278,7 @@ function act(action, element) {
     const ad = state.ad; state.ad = null; persist();
     unmountAd(); buzz([7, 18, 12]); sound("flip", .18);
     if (ad.intent === "interpretation") {
-      state.aiUnlocked = true; state.aiLoading = true; state.aiText = null; state.aiError = null;
+      state.aiUnlocked = true; state.aiLoading = true; state.aiText = null; state.aiSummary = null; state.aiError = null;
       interaction(); render(); void requestAIInterpretation();
     } else {
       flipRevealCard(ad.cardId);
@@ -1132,6 +1294,7 @@ function act(action, element) {
     return;
   }
   if (action === "share-copy") { const text = `${state.question}\n\n${readingCards().map((card, index) => `${POSITIONS[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`; navigator.clipboard?.writeText(text).then(() => showToast("Reading copied."), () => showToast("Copy is unavailable in this browser.")); return; }
+  if (action === "share-image") { void shareReadingImage(element); return; }
 }
 
 app.addEventListener("click", (event) => {
