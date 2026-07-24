@@ -326,7 +326,8 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
 .pile-field .pile.chosen { transform:translateY(-1rem); filter:brightness(1.14); }
 .pile-field .pile.chosen::after { border-color:var(--gold-bright); background:rgba(229,190,112,.08); }
 .order-badge { position:absolute; z-index:9; right:-.8rem; top:-.8rem; display:grid; place-items:center; width:2rem; height:2rem; border-radius:50%; background:var(--gold-bright); color:var(--ink); font-family:var(--serif); box-shadow:0 5px 13px rgba(0,0,0,.36); }
-.ritual-draw-card { left:25%; top:50%; z-index:2; transform:translate(-50%,-38%) rotate(-1deg); transition:transform .64s cubic-bezier(.2,.75,.2,1),filter .25s ease; }
+/* A single card slid from under the lifted packet — sized well below a full pile so it doesn't dwarf them. */
+.ritual-draw-card { left:25%; top:50%; z-index:2; transform:translate(-50%,-38%) rotate(-1deg) scale(.62); transition:transform .64s cubic-bezier(.2,.75,.2,1),filter .25s ease; }
 .drawing-hidden .pile-field .pile:first-child { transform:translateY(-2.6rem) rotate(-2deg); transition:transform .56s cubic-bezier(.2,.75,.2,1); }
 .drawing-hidden .ritual-draw-card { z-index:9; transform:translate(calc(-50% + min(8.5rem,24vw)),8.8rem) rotate(4deg) scale(.58); filter:brightness(1.18); }
 .hidden-heart-slot { position:absolute; z-index:6; left:50%; bottom:1.35rem; translate:-50% 0; width:7rem; height:8rem; display:grid; place-items:center; border:1px dashed rgba(230,199,130,.42); border-radius:48%; color:var(--gold); text-align:center; }
