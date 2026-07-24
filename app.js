@@ -1394,6 +1394,17 @@ function bindShuffle(surface) {
       if (dist < rad) nudge(index, dx, dy, (1 - dist / rad) * 1.4);
     });
   };
+  let pendingMove = null, moveRaf = 0;
+  const processMove = () => {
+    moveRaf = 0;
+    if (!active || !pendingMove) return;
+    const now = pendingMove; pendingMove = null;
+    const dx = now.x - last.x;
+    const dy = now.y - last.y;
+    if (Math.hypot(dx, dy) < 1.5) return;
+    wave(now.x, now.y, dx, dy);
+    last = now;
+  };
   surface.addEventListener("pointerdown", (event) => {
     if (transitioning) return;
     pileBox = pile.getBoundingClientRect();
@@ -1401,20 +1412,20 @@ function bindShuffle(surface) {
     start = { x: event.clientX, y: event.clientY };
     last = start;
     touched = new Set();
+    pile.classList.add("shuffling"); // instant, layout-free response while sweeping
     capturePointer(surface, event);
   });
   surface.addEventListener("pointermove", (event) => {
     if (!active) return;
-    const now = { x: event.clientX, y: event.clientY };
-    const dx = now.x - last.x;
-    const dy = now.y - last.y;
-    if (Math.hypot(dx, dy) < 1.5) return;
-    wave(now.x, now.y, dx, dy);
-    last = now;
+    pendingMove = { x: event.clientX, y: event.clientY }; // coalesce to one wave per frame
+    if (!moveRaf) moveRaf = requestAnimationFrame(processMove);
   });
   const finish = (event) => {
     if (!active) return;
     active = false;
+    if (moveRaf) { cancelAnimationFrame(moveRaf); moveRaf = 0; }
+    pendingMove = null;
+    pile.classList.remove("shuffling");
     const px = Number.isFinite(event.clientX) ? event.clientX : last.x;
     const py = Number.isFinite(event.clientY) ? event.clientY : last.y;
     if (!touched.size) {
@@ -1461,8 +1472,7 @@ function animateDeckCut(pieces, done) {
   setTimeout(() => { done(); transitioning = false; render(); }, 720);
 }
 function createDefaultSpread() { return { start: { x: 13, y: 64 }, end: { x: 85, y: 56 }, bend: { x: 0, y: -17 }, rotation: 34 }; }
-function spreadFromPoints(surface, points) {
-  const rect = surface.getBoundingClientRect();
+function spreadFromPoints(rect, points) {
   const normal = points.map((point) => ({ x: (point.x - rect.left) / rect.width * 100, y: (point.y - rect.top) / rect.height * 100 }));
   const start = normal[0], end = normal[normal.length - 1], mid = normal[Math.floor(normal.length / 2)];
   const linearMid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
@@ -1480,7 +1490,20 @@ function bindSpread(surface) {
   const deck = surface.querySelector(".deck"); if (!deck) return;
   const preview = surface.querySelector(".spread-preview-layer");
   let points = [];
+  let rect = null;             // cached once per gesture — no getBoundingClientRect per move
+  let pending = null, raf = 0; // coalesce pointermove work to one update per animation frame
+  const stopRaf = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } pending = null; };
+  const processMove = () => {
+    raf = 0;
+    if (!points.length || transitioning || !pending) return;
+    const { x, y } = pending; pending = null;
+    const start = points[0];
+    const distance = Math.hypot(x - start.x, y - start.y);
+    deck.style.transform = `translate(${(x - start.x) * .16}px, ${(y - start.y) * .11}px) rotate(${(x - start.x) * .06}deg)`;
+    if (distance > 14 && preview) preview.innerHTML = spreadPreviewMarkup(spreadFromPoints(rect, points), clamp(Math.round(distance / 9), 6, 28));
+  };
   const finishSpread = (event) => {
+    stopRaf();
     if (!points.length || transitioning) return;
     points.push({ x: event.clientX, y: event.clientY });
     const a = points[0], b = points[points.length - 1];
@@ -1493,7 +1516,7 @@ function bindSpread(surface) {
       showToast(t("Sweep a little farther so the cards have room to open."));
       return;
     }
-    state.spread = spreadFromPoints(surface, points);
+    state.spread = spreadFromPoints(rect, points);
     if (preview) preview.innerHTML = spreadPreviewMarkup(state.spread, state.deck.length, true);
     deck.classList.add("spread-source-away");
     transitioning = true;
@@ -1502,6 +1525,7 @@ function bindSpread(surface) {
   };
   deck.addEventListener("pointerdown", (event) => {
     points = [{ x: event.clientX, y: event.clientY }];
+    rect = surface.getBoundingClientRect();
     capturePointer(deck, event);
     deck.classList.add("is-grabbing");
     window.addEventListener("pointerup", finishSpread, { once: true });
@@ -1510,11 +1534,8 @@ function bindSpread(surface) {
   deck.addEventListener("pointermove", (event) => {
     if (!points.length || transitioning) return;
     if (points.length < 60) points.push({ x: event.clientX, y: event.clientY });
-    const start = points[0];
-    const distance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
-    deck.style.transform = `translate(${(event.clientX - start.x) * .16}px, ${(event.clientY - start.y) * .11}px) rotate(${(event.clientX - start.x) * .06}deg)`;
-    deck.classList.add("is-grabbing");
-    if (distance > 14 && preview) preview.innerHTML = spreadPreviewMarkup(spreadFromPoints(surface, points), clamp(Math.round(distance / 9), 6, 32));
+    pending = { x: event.clientX, y: event.clientY };
+    if (!raf) raf = requestAnimationFrame(processMove);
   });
   deck.addEventListener("pointerup", finishSpread);
 }

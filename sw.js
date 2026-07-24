@@ -1,4 +1,4 @@
-const CACHE = "heart-cut-v26";
+const CACHE = "heart-cut-v27";
 const SFX_ASSETS = [
   "./assets/audio/shuffle/1.ogg", "./assets/audio/shuffle/2.ogg", "./assets/audio/shuffle/3.ogg", "./assets/audio/shuffle/4.ogg",
   "./assets/audio/shuffle/5.ogg", "./assets/audio/shuffle/6.ogg", "./assets/audio/shuffle/7.ogg", "./assets/audio/shuffle/8.ogg",
@@ -8,7 +8,7 @@ const SFX_ASSETS = [
   "./assets/audio/take/1.ogg", "./assets/audio/take/2.ogg",
   "./assets/audio/flip/1.ogg", "./assets/audio/flip/2.ogg"
 ];
-const ASSETS = ["./", "./index.html", "./styles.css?v=26", "./app.js?v=26", "./manifest.webmanifest", "./icon.svg", ...SFX_ASSETS];
+const ASSETS = ["./", "./index.html", "./styles.css?v=27", "./app.js?v=27", "./manifest.webmanifest", "./icon.svg", ...SFX_ASSETS];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));

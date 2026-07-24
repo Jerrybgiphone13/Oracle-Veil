@@ -284,7 +284,10 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
   cursor: grab;
 }
 .shuffle-card::after { font-size: 1.8rem !important; }
-.shuffle-card.held { cursor: grabbing; filter: brightness(1.18); transition: filter .15s ease; box-shadow: 0 12px 0 #775d31, 0 18px 30px rgba(0,0,0,.6); }
+/* While actively sweeping, drop the left/top transition so cards follow the finger instantly
+   (animating left/top runs layout on the main thread — the source of the shuffle lag). */
+.scatter-pile.shuffling .shuffle-card { transition: filter .12s ease; }
+.shuffle-card.held { cursor: grabbing; filter: brightness(1.18); transition: filter .15s ease; box-shadow: 0 9px 16px rgba(0,0,0,.55); }
 .physical-instruction { position: absolute; z-index: 100; top: .85rem; left: 50%; translate: -50% 0; width: min(90%, 30rem); text-align: center; color: var(--paper-light); font-family: var(--serif); pointer-events: none; text-shadow: 0 2px 8px #06131c; transition: opacity .3s ease; }
 .physical-instruction.quiet { opacity: .58; }
 .shuffle-table.gathering .shuffle-card { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) rotate(0deg) scale(1.03); transition-duration: .66s; transition-delay: calc(var(--z) * 4ms); }
