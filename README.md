@@ -1,6 +1,6 @@
 # The Heart Cut — prototype
 
-A self-contained, mobile-first PWA prototype for a tactile love-tarot ritual. It uses no third-party dependencies and can be run from any static web server.
+A self-contained, mobile-first PWA prototype for tactile love and career tarot rituals. It uses no third-party dependencies and can be run from any static web server.
 
 ## Run it
 
@@ -17,6 +17,8 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 
 ## Ritual implemented
 
+### Love
+
 1. Choose Love and write a question.
 2. Shuffle a loose, overlapping table pile by dragging, turning, dropping, or tapping individual cards. Each move also changes the real 78-card order.
 3. Gather the cards, then use a side-on view and brass marker to choose the exact first cut. The two packets visibly separate before settling in centered positions.
@@ -25,6 +27,16 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 6. Sweep a path across the deck to create the spread. Cards follow the pointer during the gesture; speed and curvature change the final geometry.
 7. Select three existing face-down cards, reveal any of the four in any order, and receive the single configurable mock ad checkpoint on the first reveal.
 8. Read the basic spread, then unlock a mocked personal interpretation through a second mock ad checkpoint.
+
+### Career — the Constellation Ladder
+
+1. Choose the locked Career path and pass through the configurable entry ad checkpoint.
+2. Pick a Career-specific question or write your own.
+3. Wake three "embers" in a 21-card constellation; the chosen cards genuinely move to the top of the deck.
+4. Turn a brass compass toward Mastery, Visibility, Security, or Reinvention.
+5. Build a five-rung path by choosing between two deterministic stepping-stones at every level.
+6. Reveal five cards: Current Ground, Your Unclaimed Strength, The Friction, Your Leverage, and The Next Bold Move.
+7. Read the full reflection with the closer interpretation already unlocked by the entry passage.
 
 The lower-left `⌘` seal opens the development diagnostics panel. It exposes the stage, seed, pile boundaries, selected IDs, deck order, orientation, and a guided-interaction fallback. It is deliberately visible for prototype review and should be feature-flagged or removed for production.
 

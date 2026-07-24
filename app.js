@@ -2,6 +2,10 @@ const app = document.querySelector("#app");
 const STORAGE_KEY = "heart-cut-prototype-v2";
 const AD_CONFIG = { firstReveal: true, unlockInterpretation: true, minimumWatchMs: 1100 };
 const INTERPRETATION_ENDPOINT = "/api/interpretation";
+// Kept in lockstep with the app-shell version by both deployment scripts.
+// Card art is otherwise cached for a long time, so an unversioned URL can leave
+// one previously viewed card stuck on obsolete artwork after the deck changes.
+const CARD_ART_VERSION = "28";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -13,8 +17,10 @@ const SUITS = [
   ["Wands", "♨"], ["Cups", "♧"], ["Swords", "✣"], ["Pentacles", "✦"]
 ];
 const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Page", "Knight", "Queen", "King"];
-const STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
-const POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
+const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
+const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
+const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
+const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
 
 const CARD_NOTES = {
   "The Lovers": ["choice", "alignment", "honest intimacy"],
@@ -393,6 +399,84 @@ const I18N = {
     "Reveal": "揭示"
   }
 };
+
+// Career has its own five-card ritual. Keeping its vocabulary grouped here makes
+// the new path complete in every language without disturbing the established Love copy.
+Object.assign(I18N.fr, {
+  "Two paths are ready tonight. Career opens after a brief sponsored passage.": "Deux voies sont prêtes ce soir. La Carrière s’ouvre après un bref passage sponsorisé.",
+  "watch to enter": "regarder pour entrer",
+  "Career Compass": "Boussole de carrière",
+  "What part of your working life is asking to move?": "Quelle part de votre vie professionnelle demande à évoluer ?",
+  "Name the tension, opportunity, or direction you want to explore. Open questions leave room for a useful reflection.": "Nommez la tension, l’occasion ou la direction à explorer. Une question ouverte laisse place à une réflexion utile.",
+  "What strength am I ready to be known for?": "Pour quelle force suis-je prêt·e à être reconnu·e ?",
+  "What is keeping me from my next career chapter?": "Qu’est-ce qui me retient avant mon prochain chapitre professionnel ?",
+  "Where should I focus my energy at work?": "Où devrais-je concentrer mon énergie au travail ?",
+  "What opportunity am I not seeing yet?": "Quelle occasion ne vois-je pas encore ?",
+  "Enter the Career ritual": "Entrer dans le rituel de carrière",
+  "Career ritual": "Rituel de carrière",
+  "Wake the embers in your deck.": "Réveillez les braises de votre jeu.",
+  "Touch three cards that feel alive. They will become the sparks beneath your path.": "Touchez trois cartes qui semblent vivantes. Elles deviendront les étincelles sous votre chemin.",
+  "Set the direction of your ambition.": "Donnez une direction à votre ambition.",
+  "Turn the brass compass toward the quality your next chapter needs.": "Tournez la boussole de laiton vers la qualité dont votre prochain chapitre a besoin.",
+  "Build your constellation ladder.": "Construisez votre échelle de constellation.",
+  "At every rung, choose the stepping-stone that feels like yours.": "À chaque barreau, choisissez la pierre qui vous ressemble.",
+  "Turn over the path you have built.": "Retournez le chemin que vous avez construit.",
+  "Five cards now hold the arc from where you stand to your next bold move.": "Cinq cartes dessinent l’arc entre votre position actuelle et votre prochain geste audacieux.",
+  "embers awake": "braises éveillées", "Touch any three cards. There is no wrong constellation.": "Touchez trois cartes. Il n’existe pas de mauvaise constellation.",
+  "Raise the constellation": "Élever la constellation", "Mastery": "Maîtrise", "Visibility": "Visibilité", "Security": "Stabilité", "Reinvention": "Réinvention",
+  "Your compass points toward": "Votre boussole pointe vers", "Seal this direction": "Sceller cette direction",
+  "Choose one of the two stepping-stones.": "Choisissez l’une des deux pierres.", "Your path is complete. The skyline is ready.": "Votre chemin est complet. L’horizon est prêt.",
+  "Read the skyline": "Lire l’horizon", "Five cards, a constellation for the work ahead.": "Cinq cartes, une constellation pour le travail à venir.",
+  "Current Ground": "Terrain actuel", "Your Unclaimed Strength": "Votre force inexploitée", "The Friction": "La friction", "Your Leverage": "Votre levier", "The Next Bold Move": "Le prochain geste audacieux",
+  "A short passage before the Career ritual": "Un bref passage avant le rituel de carrière", "The next horizon<br>is taking shape.": "Le prochain horizon<br>prend forme.",
+  "Unlock the Career path": "Ouvrir la voie Carrière", "Watch this brief sponsored moment to open the Career ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de carrière."
+});
+Object.assign(I18N.ru, {
+  "Two paths are ready tonight. Career opens after a brief sponsored passage.": "Сегодня готовы два пути. Карьера откроется после короткой рекламной паузы.",
+  "watch to enter": "посмотреть и войти", "Career Compass": "Карьерный компас",
+  "What part of your working life is asking to move?": "Какая часть вашей рабочей жизни просит перемен?",
+  "Name the tension, opportunity, or direction you want to explore. Open questions leave room for a useful reflection.": "Назовите напряжение, возможность или направление, которое хотите исследовать. Открытый вопрос оставит место для полезного размышления.",
+  "What strength am I ready to be known for?": "Какой сильной стороной я готов(а) стать известен(на)?",
+  "What is keeping me from my next career chapter?": "Что удерживает меня от следующей главы карьеры?",
+  "Where should I focus my energy at work?": "На чём мне сосредоточить энергию в работе?",
+  "What opportunity am I not seeing yet?": "Какую возможность я пока не замечаю?",
+  "Enter the Career ritual": "Войти в карьерный ритуал", "Career ritual": "Карьерный ритуал",
+  "Wake the embers in your deck.": "Разбудите угли в колоде.", "Touch three cards that feel alive. They will become the sparks beneath your path.": "Коснитесь трёх живых карт. Они станут искрами под вашим путём.",
+  "Set the direction of your ambition.": "Задайте направление амбиции.", "Turn the brass compass toward the quality your next chapter needs.": "Поверните латунный компас к качеству, нужному вашей следующей главе.",
+  "Build your constellation ladder.": "Постройте лестницу созвездия.", "At every rung, choose the stepping-stone that feels like yours.": "На каждой ступени выберите камень, который кажется вашим.",
+  "Turn over the path you have built.": "Откройте построенный вами путь.", "Five cards now hold the arc from where you stand to your next bold move.": "Пять карт держат дугу от вашей нынешней точки до следующего смелого шага.",
+  "embers awake": "угля пробуждены", "Touch any three cards. There is no wrong constellation.": "Коснитесь любых трёх карт. Неверного созвездия нет.",
+  "Raise the constellation": "Поднять созвездие", "Mastery": "Мастерство", "Visibility": "Заметность", "Security": "Устойчивость", "Reinvention": "Обновление",
+  "Your compass points toward": "Ваш компас указывает на", "Seal this direction": "Закрепить направление",
+  "Choose one of the two stepping-stones.": "Выберите один из двух камней.", "Your path is complete. The skyline is ready.": "Ваш путь завершён. Горизонт готов.",
+  "Read the skyline": "Прочесть горизонт", "Five cards, a constellation for the work ahead.": "Пять карт — созвездие для предстоящей работы.",
+  "Current Ground": "Текущая опора", "Your Unclaimed Strength": "Ваша неприсвоенная сила", "The Friction": "Сопротивление", "Your Leverage": "Ваш рычаг", "The Next Bold Move": "Следующий смелый шаг",
+  "A short passage before the Career ritual": "Короткий переход перед карьерным ритуалом", "The next horizon<br>is taking shape.": "Новый горизонт<br>обретает форму.",
+  "Unlock the Career path": "Открыть путь Карьеры", "Watch this brief sponsored moment to open the Career ritual.": "Посмотрите эту короткую рекламную паузу, чтобы открыть карьерный ритуал."
+});
+Object.assign(I18N.zh, {
+  "Two paths are ready tonight. Career opens after a brief sponsored passage.": "今夜已有两条路径准备就绪。职业主题将在一段简短赞助内容后开启。",
+  "watch to enter": "观看后进入", "Career Compass": "职业罗盘",
+  "What part of your working life is asking to move?": "你的职业生活中，哪一部分正在呼唤改变？",
+  "Name the tension, opportunity, or direction you want to explore. Open questions leave room for a useful reflection.": "写下你想探索的张力、机会或方向。开放式问题会为有益的映照留出空间。",
+  "What strength am I ready to be known for?": "我已准备好因哪种优势而被看见？",
+  "What is keeping me from my next career chapter?": "是什么阻挡我进入职业生涯的下一章？",
+  "Where should I focus my energy at work?": "我应该把工作精力集中在哪里？",
+  "What opportunity am I not seeing yet?": "还有什么机会是我尚未看见的？",
+  "Enter the Career ritual": "进入职业仪式", "Career ritual": "职业仪式",
+  "Wake the embers in your deck.": "唤醒牌组中的余烬。", "Touch three cards that feel alive. They will become the sparks beneath your path.": "触碰三张充满生命力的牌。它们将成为道路下方的火花。",
+  "Set the direction of your ambition.": "为你的抱负设定方向。", "Turn the brass compass toward the quality your next chapter needs.": "将黄铜罗盘转向下一章最需要的品质。",
+  "Build your constellation ladder.": "搭建你的星座阶梯。", "At every rung, choose the stepping-stone that feels like yours.": "在每一级，选择最像属于你的那块踏脚石。",
+  "Turn over the path you have built.": "翻开你亲手搭建的道路。", "Five cards now hold the arc from where you stand to your next bold move.": "五张牌连接你此刻的立足点与下一个大胆行动。",
+  "embers awake": "枚余烬已唤醒", "Touch any three cards. There is no wrong constellation.": "触碰任意三张牌。没有错误的星座。",
+  "Raise the constellation": "升起星座", "Mastery": "精进", "Visibility": "被看见", "Security": "稳定", "Reinvention": "重塑",
+  "Your compass points toward": "你的罗盘指向", "Seal this direction": "封印这个方向",
+  "Choose one of the two stepping-stones.": "从两块踏脚石中选择一块。", "Your path is complete. The skyline is ready.": "你的道路已经完成。天际线正等待解读。",
+  "Read the skyline": "解读天际线", "Five cards, a constellation for the work ahead.": "五张牌，为前方事业连成一座星座。",
+  "Current Ground": "当下立足点", "Your Unclaimed Strength": "尚未认领的力量", "The Friction": "阻力", "Your Leverage": "你的杠杆", "The Next Bold Move": "下一个大胆行动",
+  "A short passage before the Career ritual": "进入职业仪式前的短暂通道", "The next horizon<br>is taking shape.": "下一片地平线<br>正在成形。",
+  "Unlock the Career path": "解锁职业路径", "Watch this brief sponsored moment to open the Career ritual.": "观看这段简短赞助内容，即可开启职业仪式。"
+});
 function t(source) {
   const lang = state?.settings?.language || "en";
   if (lang === "en") return source;
@@ -449,6 +533,12 @@ function createState() {
     threeCutDraft: 23,
     twoTop: null,
     ad: null,
+    career: {
+      emberIds: [],
+      compass: 88,
+      candidateIds: [],
+      selectedIds: []
+    },
     shareTheme: "midnight",
     aiUnlocked: false,
     aiLoading: false,
@@ -505,11 +595,16 @@ function persist() {
 }
 window.addEventListener("pagehide", persistNow);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistNow(); });
-function stageIndex() { return Math.max(0, STAGES.indexOf(state.stage)); }
+function ritualStages() { return state.category === "Career" ? CAREER_STAGES : LOVE_STAGES; }
+function readingPositions() { return state.category === "Career" ? CAREER_POSITIONS : LOVE_POSITIONS; }
+function stageIndex() { return Math.max(0, ritualStages().indexOf(state.stage)); }
 function cardById(id) {
   return state.ritualCard?.id === id ? state.ritualCard : state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
 }
-function readingCards() { return [state.ritualCardId, ...state.selectedIds].map(cardById).filter(Boolean); }
+function readingCards() {
+  const ids = state.category === "Career" ? state.career.selectedIds : [state.ritualCardId, ...state.selectedIds];
+  return ids.map(cardById).filter(Boolean);
+}
 function interaction() { state.performance.interactions += 1; state.performance.lastGesture = Date.now(); persist(); }
 
 function buzz(pattern = 10) {
@@ -634,7 +729,7 @@ function cardImagePath(card) {
   const artworkName = card.name === "Two of Cups"
     ? "two_of_cups_reconstructed"
     : card.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
-  return `./assets/tarot/${artworkName}.png`;
+  return `./assets/tarot/${artworkName}.png?v=${CARD_ART_VERSION}`;
 }
 // Warm the browser cache for a card's (large) artwork the moment it's known, so the
 // later face-up flip paints instantly instead of waiting on a fresh network fetch.
@@ -651,7 +746,7 @@ function preloadCardArt(cards) {
   });
 }
 function cardImage(card) {
-  return `<img class="card-image" src="${cardImagePath(card)}" alt="" draggable="false" loading="lazy" decoding="async" data-name="${escapeHTML(card.name)}" data-mark="${card.mark}">`;
+  return `<img class="card-image" src="${cardImagePath(card)}" width="91" height="155" alt="" draggable="false" decoding="async" data-name="${escapeHTML(card.name)}" data-mark="${card.mark}">`;
 }
 function cardFace(card, extra = "") {
   return `<button class="card face image-face ${card.reversed ? "reversed" : ""} ${extra}" aria-label="${escapeHTML(card.name)}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}">${cardImage(card)}</button>`;
@@ -670,7 +765,7 @@ function paintCardArt() {
 
 function progress() {
   const current = stageIndex();
-  return `<div class="stage-progress" aria-label="Ritual progress">${STAGES.map((stage, index) => `<i class="${index < current ? "done" : index === current ? "active" : ""}" title="${stage}"></i>`).join("")}</div>`;
+  return `<div class="stage-progress" aria-label="Ritual progress">${ritualStages().map((stage, index) => `<i class="${index < current ? "done" : index === current ? "active" : ""}" title="${stage}"></i>`).join("")}</div>`;
 }
 function topbar() {
   return `<header class="topbar"><button class="brand" data-action="home" aria-label="Return to the opening">The Heart Cut</button>
@@ -684,12 +779,25 @@ function renderStart() {
   return world(`<section class="scene hero"><div><p class="eyebrow">${t("A quiet ritual for the heart")}</p><h1>${t("Enter the<br>celestial book.")}</h1><p class="lede">${t("A reading begins with the deck in your hands. The question can wait until you feel its weight.")}</p></div><div class="hero-deck-wrap"><div class="hero-deck">${deckBackStack("")}</div></div><button class="seal-button" data-action="begin">${t("Open the ritual")}</button></section>`, "start-world");
 }
 function renderCategory() {
-  const categories = [["Love", "♡", true], ["Career", "⌁"], ["Money", "✦"], ["Decision", "⚭"], ["Friendship / Family", "⌇"], ["Personal Growth", "☾"], ["General Future", "☉"]];
-  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Each reading has its own little choreography. Love is ready tonight.")}</p></div><div class="category-grid">${categories.map(([name, symbol, available]) => `<button class="category ${available ? "available" : ""}" ${available ? "data-action=choose-love" : "disabled"}><span class="symbol">${symbol}</span><span>${t(name)}</span><small>${available ? t("begin") : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
+  const categories = [
+    { name: "Love", symbol: "♡", action: "choose-love", note: "begin" },
+    { name: "Career", symbol: "⌁", action: "choose-career", note: "watch to enter", locked: true },
+    { name: "Money", symbol: "✦" }, { name: "Decision", symbol: "⚭" },
+    { name: "Friendship / Family", symbol: "⌇" }, { name: "Personal Growth", symbol: "☾" },
+    { name: "General Future", symbol: "☉" }
+  ];
+  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Two paths are ready tonight. Career opens after a brief sponsored passage.")}</p></div><div class="category-grid">${categories.map(({ name, symbol, action, note, locked }) => `<button class="category ${action ? "available" : ""} ${locked ? "locked" : ""}" ${action ? `data-action="${action}"` : "disabled"}>${locked ? `<span class="category-lock" aria-hidden="true"><i></i></span>` : ""}<span class="symbol">${symbol}</span><span>${t(name)}</span><small>${action ? t(note) : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
 }
 function renderQuestion() {
-  const examples = ["Where is this relationship going?", "What should I understand about this person?", "What is blocking my love life?", "What energy surrounds this connection?"];
-  return world(`<section class="scene"><div class="parchment"><p class="eyebrow">The Heart Cut · ${t("Love")}</p><h2>${t("What does your heart wish to understand?")}</h2><p>${t("Give the question enough room to breathe. It does not need to be yes or no.")}</p><textarea id="question-input" class="question-box" maxlength="340" placeholder="${t("Write here…")}">${escapeHTML(state.question)}</textarea><ul class="examples">${examples.map((ex) => `<li><button data-example="${escapeHTML(t(ex))}">${t(ex)}</button></li>`).join("")}</ul><div class="question-actions"><button class="back-link" data-action="back-category">${t("Choose another path")}</button><button class="seal-button" data-action="question-next" ${state.question.trim().length < 4 ? "disabled" : ""}>${t("Place the question")}</button></div></div></section>`);
+  const career = state.category === "Career";
+  const examples = career
+    ? ["What strength am I ready to be known for?", "What is keeping me from my next career chapter?", "Where should I focus my energy at work?", "What opportunity am I not seeing yet?"]
+    : ["Where is this relationship going?", "What should I understand about this person?", "What is blocking my love life?", "What energy surrounds this connection?"];
+  const title = career ? "What part of your working life is asking to move?" : "What does your heart wish to understand?";
+  const lede = career
+    ? "Name the tension, opportunity, or direction you want to explore. Open questions leave room for a useful reflection."
+    : "Give the question enough room to breathe. It does not need to be yes or no.";
+  return world(`<section class="scene"><div class="parchment ${career ? "career-parchment" : ""}"><p class="eyebrow">The Heart Cut · ${t(career ? "Career Compass" : "Love")}</p><h2>${t(title)}</h2><p>${t(lede)}</p><textarea id="question-input" class="question-box" maxlength="340" placeholder="${t("Write here…")}">${escapeHTML(state.question)}</textarea><ul class="examples">${examples.map((ex) => `<li><button data-example="${escapeHTML(t(ex))}">${t(ex)}</button></li>`).join("")}</ul><div class="question-actions"><button class="back-link" data-action="back-category">${t("Choose another path")}</button><button class="seal-button ${career ? "career-seal" : ""}" data-action="question-next" ${state.question.trim().length < 4 ? "disabled" : ""}>${t(career ? "Enter the Career ritual" : "Place the question")}</button></div></div></section>`);
 }
 function ritualTitle() {
   const copy = {
@@ -708,6 +816,7 @@ function ritualTitle() {
 }
 
 function renderRitual() {
+  if (state.category === "Career") return renderCareerRitual();
   let surface = "";
   let actions = "";
   if (state.stage === "shuffle") ({ surface, actions } = renderShuffle());
@@ -720,6 +829,102 @@ function renderRitual() {
   if (state.stage === "choose") ({ surface, actions } = renderChoose());
   if (state.stage === "reveal") ({ surface, actions } = renderReveal());
   return world(`<section class="scene ritual">${ritualTitle()}${surface}<div class="ritual-actions">${actions}</div></section>`);
+}
+
+function careerCompassTheme(degrees = state.career.compass) {
+  const angle = ((Number(degrees) % 360) + 360) % 360;
+  if (angle < 45 || angle >= 315) return "Mastery";
+  if (angle < 135) return "Visibility";
+  if (angle < 225) return "Security";
+  return "Reinvention";
+}
+function careerTitle() {
+  const copy = {
+    careerEmbers: ["Wake the embers in your deck.", "Touch three cards that feel alive. They will become the sparks beneath your path."],
+    careerCompass: ["Set the direction of your ambition.", "Turn the brass compass toward the quality your next chapter needs."],
+    careerLadder: ["Build your constellation ladder.", "At every rung, choose the stepping-stone that feels like yours."],
+    careerReveal: ["Turn over the path you have built.", "Five cards now hold the arc from where you stand to your next bold move."]
+  };
+  const [title, lede] = copy[state.stage] || ["Career Compass", ""];
+  return `<div class="ritual-head career-ritual-head">${progress()}<p class="eyebrow">${t("Career ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
+}
+function buildCareerCandidates() {
+  const source = [...state.deck];
+  const emberWeight = state.career.emberIds.reduce((sum, id) => sum + Math.max(0, state.deck.findIndex((card) => card.id === id)), 0);
+  const offset = Math.floor(state.career.compass / 360 * source.length + emberWeight) % source.length;
+  const stride = 5 + (emberWeight % 7);
+  const candidates = [];
+  for (let rung = 0; rung < 5; rung += 1) {
+    for (let fork = 0; fork < 2; fork += 1) {
+      const index = (offset + rung * stride + fork * (11 + rung * 2)) % source.length;
+      candidates.push(source.splice(index, 1)[0].id);
+    }
+  }
+  return candidates;
+}
+function renderCareerRitual() {
+  let view = { surface: "", actions: "" };
+  if (state.stage === "careerEmbers") view = renderCareerEmbers();
+  if (state.stage === "careerCompass") view = renderCareerCompass();
+  if (state.stage === "careerLadder") view = renderCareerLadder();
+  if (state.stage === "careerReveal") view = renderCareerReveal();
+  return world(`<section class="scene ritual career-ritual">${careerTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "career-world");
+}
+function renderCareerEmbers() {
+  const chosen = new Set(state.career.emberIds);
+  const cards = state.deck.slice(0, 21);
+  const field = cards.map((card, index) => {
+    const ring = index % 3;
+    const angle = (index / cards.length) * Math.PI * 2 - Math.PI / 2;
+    const rx = [31, 25, 18][ring], ry = [31, 25, 18][ring];
+    const x = 50 + Math.cos(angle) * rx;
+    const y = 51 + Math.sin(angle) * ry;
+    const rotation = angle * 180 / Math.PI + 90 + (ring - 1) * 7;
+    const awake = chosen.has(card.id);
+    return `<button class="career-ember-card card back ${awake ? "awake" : ""}" data-action="career-ember" data-card-id="${card.id}" aria-pressed="${awake}" aria-label="${awake ? "Awake ember" : "Wake this card"}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%;--r:${rotation.toFixed(2)}deg;--z:${index + 1}"></button>`;
+  }).join("");
+  return {
+    surface: `<div class="table-surface career-ember-surface"><div class="career-orbit" aria-label="A constellation of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div><span class="piles-guide">${state.career.emberIds.length}/3 ${t("embers awake")}</span></div>`,
+    actions: `<p class="status-note">${t("Touch any three cards. There is no wrong constellation.")}</p><button class="seal-button career-seal" data-action="career-raise" ${state.career.emberIds.length === 3 ? "" : "disabled"}>${t("Raise the constellation")}</button>`
+  };
+}
+function renderCareerCompass() {
+  const theme = careerCompassTheme();
+  return {
+    surface: `<div class="table-surface career-compass-surface" style="--needle:${state.career.compass}deg"><div class="career-compass" role="img" aria-label="${t("Your compass points toward")} ${t(theme)}"><span class="compass-label north">${t("Mastery")}</span><span class="compass-label east">${t("Visibility")}</span><span class="compass-label south">${t("Security")}</span><span class="compass-label west">${t("Reinvention")}</span><div class="compass-rings"><i class="compass-needle"></i><b>✦</b></div></div><label class="career-dial-label" for="career-compass-range">${t("Your compass points toward")} <output id="career-compass-value">${t(theme)}</output></label><input class="career-dial" id="career-compass-range" type="range" min="0" max="359" value="${state.career.compass}" aria-label="${t("Set the direction of your ambition.")}"></div>`,
+    actions: `<p class="status-note">${t("Turn the brass compass toward the quality your next chapter needs.")}</p><button class="seal-button career-seal" data-action="career-seal-compass">${t("Seal this direction")}</button>`
+  };
+}
+function renderCareerLadder() {
+  const selected = state.career.selectedIds;
+  const current = selected.length;
+  const rungs = CAREER_POSITIONS.map((position, index) => {
+    const complete = index < current;
+    const active = index === current;
+    const pair = state.career.candidateIds.slice(index * 2, index * 2 + 2);
+    const cards = complete
+      ? `<span class="career-step-card card back selected" aria-hidden="true"></span>`
+      : active
+        ? pair.map((id, fork) => `<button class="career-step-card card back" data-action="career-choose-step" data-card-id="${id}" aria-label="Choose ${fork + 1} for ${t(position)}"></button>`).join("")
+        : `<i class="career-step-placeholder"></i><i class="career-step-placeholder"></i>`;
+    return `<div class="career-rung ${complete ? "complete" : ""} ${active ? "active" : ""}" style="--rung:${index}"><span class="career-rung-number">0${index + 1}</span><span class="career-rung-label">${t(position)}</span><div class="career-rung-cards">${cards}</div></div>`;
+  }).reverse().join("");
+  const done = selected.length === CAREER_POSITIONS.length;
+  return {
+    surface: `<div class="table-surface career-ladder-surface"><div class="career-ladder" aria-label="Five-rung career constellation">${rungs}</div><span class="piles-guide">${selected.length}/5</span></div>`,
+    actions: `<p class="status-note">${t(done ? "Your path is complete. The skyline is ready." : "Choose one of the two stepping-stones.")}</p>${done ? `<button class="seal-button career-seal" data-action="career-to-reveal">${t("Read the skyline")}</button>` : ""}`
+  };
+}
+function renderCareerReveal() {
+  const cards = readingCards();
+  preloadCardArt(cards);
+  return {
+    surface: `<div class="reveal-layout career-reveal-layout">${cards.map((card, index) => {
+      const revealed = state.revealedIds.includes(card.id);
+      return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(CAREER_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(CAREER_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    }).join("")}</div>`,
+    actions: revealActions()
+  };
 }
 function renderShuffle() {
   const ready = state.shuffleMoves >= 3;
@@ -794,7 +999,7 @@ function renderChoose() {
   }).join("")}</div><div class="draw-dock"><span class="dock-title">${t("Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div></div>`, actions: `<p class="status-note">${drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray.")}</p><button class="seal-button" data-action="to-reveal" ${drawn === 3 ? "" : "disabled"}>${t("Place the four cards")}</button>` };
 }
 function revealActions() {
-  const done = state.revealedIds.length === 4;
+  const done = state.revealedIds.length === readingPositions().length;
   return `<p class="status-note">${done ? t("The reading is ready to be gathered.") : t("There is no required order.")}</p>${done ? `<button class="seal-button" data-action="open-reading">${t("Gather the reading")}</button>` : ""}`;
 }
 function renderReveal() {
@@ -803,22 +1008,38 @@ function renderReveal() {
   return { surface: `<div class="reveal-layout">${cards.map((card, index) => {
     const revealed = state.revealedIds.includes(card.id);
     const pending = state.ad?.cardId === card.id;
-    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(LOVE_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(LOVE_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
   }).join("")}</div>`, actions: revealActions() };
 }
 
 function cardKeywords(card) {
-  if (CARD_NOTES[card.name]) return CARD_NOTES[card.name];
-  const suitWords = {
-    Wands: ["desire", "momentum", "courage"], Cups: ["feeling", "connection", "receptivity"],
-    Swords: ["clarity", "truth", "a necessary thought"], Pentacles: ["grounding", "value", "what can grow"],
-    "Major Arcana": ["a larger pattern", "inner change", "attention"]
-  };
+  if (state.category !== "Career" && CARD_NOTES[card.name]) return CARD_NOTES[card.name];
+  const suitWords = state.category === "Career"
+    ? {
+        Wands: ["initiative", "momentum", "visibility"], Cups: ["collaboration", "instinct", "shared values"],
+        Swords: ["strategy", "communication", "a clear decision"], Pentacles: ["craft", "resources", "sustainable growth"],
+        "Major Arcana": ["a defining chapter", "leadership", "purpose"]
+      }
+    : {
+        Wands: ["desire", "momentum", "courage"], Cups: ["feeling", "connection", "receptivity"],
+        Swords: ["clarity", "truth", "a necessary thought"], Pentacles: ["grounding", "value", "what can grow"],
+        "Major Arcana": ["a larger pattern", "inner change", "attention"]
+      };
   const words = suitWords[card.suit] || suitWords["Major Arcana"];
   return card.reversed ? ["turned inward", ...words.slice(0, 2)] : words;
 }
 function positionMeaning(position, card) {
   const upright = card.reversed ? "turned inward or delayed" : "available to meet directly";
+  if (state.category === "Career") {
+    const careerSnippets = {
+      "Current Ground": `${card.name} describes the ground beneath your working life now: ${upright}. Notice the conditions you are actually building from.`,
+      "Your Unclaimed Strength": `${card.name} points to an ability, standard, or point of view that deserves more deliberate ownership.`,
+      "The Friction": `${card.name} names the productive tension in the path. Meet it as information about what must change, not as a verdict on your ability.`,
+      "Your Leverage": `${card.name} highlights a person, practice, or resource that can multiply your effort when you use it with intention.`,
+      "The Next Bold Move": `${card.name} offers a concrete direction for the next experiment. Keep it small enough to begin and visible enough to learn from.`
+    };
+    return careerSnippets[position];
+  }
   const snippets = {
     "Hidden Heart": `Under the question, ${card.name} suggests an influence that is ${upright}. Notice what has been felt before it has been named.`,
     "You": `In your own position, ${card.name} points to the way you are meeting this situation: ${upright}.`,
@@ -828,6 +1049,7 @@ function positionMeaning(position, card) {
   return snippets[position];
 }
 function personalInterpretation(cards) {
+  if (state.category === "Career") return careerPersonalInterpretation(cards);
   const [hidden, you, connection, ahead] = cards;
   const reversed = cards.filter((card) => card.reversed).length;
   const question = state.question.trim() || "this question";
@@ -841,6 +1063,21 @@ ${connection.name} describes the space between you. Look for the practical evide
 
 For the Path Ahead, ${ahead.name} offers a next small experiment rather than a verdict. Try one honest conversation, one boundary, or one act of self-care that brings your daily experience closer to the kind of love you want to practice. Let what happens next inform you.`;
 }
+function careerPersonalInterpretation(cards) {
+  const [ground, strength, friction, leverage, next] = cards;
+  const reversed = cards.filter((card) => card.reversed).length;
+  const question = state.question.trim() || "this career question";
+  const direction = careerCompassTheme();
+  return `Your question — “${question}” — is being read through the compass of ${direction.toLowerCase()}. Treat the cards as a way to frame choices and experiments, not as a fixed forecast.
+
+${ground.name} marks your Current Ground: the real conditions, habits, and expectations you are standing on. ${strength.name} sits one rung higher as Your Unclaimed Strength, inviting you to name an ability you may be using quietly instead of owning visibly.
+
+${friction.name} describes The Friction. It may be a constraint, an outdated role, or the cost of a direction that no longer fits. ${reversed ? `With ${reversed} reversed card${reversed > 1 ? "s" : ""}, part of the work may be internal: confidence, timing, or a belief that needs testing against present evidence.` : "The spread is asking for direct observation and a clear conversation with reality."}
+
+${leverage.name} is Your Leverage—the relationship, system, practice, or resource that makes effort travel farther. Do not only ask what you can push through alone; ask what becomes possible when support is designed into the plan.
+
+For The Next Bold Move, ${next.name} favors one visible experiment. Choose a step you can take within the next seven days: make the request, show the work, learn the skill, or close one door with intention. Let the response become data for the rung after that.`;
+}
 // First sentence of a longer interpretation, for a one-line share/summary line.
 function firstSentence(text) {
   const s = String(text || "").replace(/\s+/g, " ").trim();
@@ -850,6 +1087,10 @@ function firstSentence(text) {
   return sentence;
 }
 function personalSummary(cards) {
+  if (state.category === "Career") {
+    const [, strength, , leverage, next] = cards;
+    return `${strength.name} is the strength to own; ${leverage.name} helps ${next.name} become your next visible move.`;
+  }
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
 }
@@ -990,11 +1231,12 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.fillStyle = SHARE_INK;
   ctx.fillText(q, 540, 571);
 
-  // Four cards, fanned, town skyline resting beneath them
-  const cw = 238, ch = 397;
-  const lefts = [40, 295, 548, 801];
-  const tops = [664, 640, 646, 671];
-  const angles = [-5, -1, 2, 5];
+  // Love keeps its four-card fan; Career uses five slimmer stepping-stones.
+  const career = cards.length === 5;
+  const cw = career ? 188 : 238, ch = career ? 314 : 397;
+  const lefts = career ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
+  const tops = career ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
+  const angles = career ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
   cards.forEach((card, index) => {
     drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });
@@ -1025,7 +1267,7 @@ function resetShareCache() { shareCanvasCache = {}; shareDataUrlCache = {}; shar
 async function shareCanvasFor(theme) {
   if (shareCanvasCache[theme]) return shareCanvasCache[theme];
   const cards = readingCards();
-  if (cards.length !== 4) throw new Error("The reading is incomplete.");
+  if (cards.length !== readingPositions().length) throw new Error("The reading is incomplete.");
   const summary = state.aiSummary || personalSummary(cards);
   const canvas = await buildShareCanvas(state.question, cards, summary, theme);
   shareCanvasCache[theme] = canvas;
@@ -1203,7 +1445,7 @@ function renderSharePage() {
 async function requestAIInterpretation() {
   if (location.protocol === "file:") {
     state.aiLoading = false;
-    state.aiError = "Live interpretation needs the local server. Open the app through the command in README.md.";
+    state.aiError = state.category === "Career" ? null : "Live interpretation needs the local server. Open the app through the command in README.md.";
     persist(); render();
     return;
   }
@@ -1212,9 +1454,10 @@ async function requestAIInterpretation() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        topic: state.category,
         question: state.question,
         cards: readingCards().map((card, index) => ({
-          position: POSITIONS[index], name: card.name, orientation: card.reversed ? "reversed" : "upright"
+          position: readingPositions()[index], name: card.name, orientation: card.reversed ? "reversed" : "upright"
         }))
       })
     });
@@ -1227,28 +1470,35 @@ async function requestAIInterpretation() {
     state.aiSummary = givenSummary || firstSentence(state.aiText) || personalSummary(readingCards());
     state.aiError = null;
   } catch (error) {
-    state.aiError = error instanceof Error ? error.message : "The interpretation service is unavailable.";
+    // Career's entrance ad already unlocks the complete built-in reflection.
+    // If an API is not configured on a static host, keep that experience seamless.
+    state.aiError = state.category === "Career" ? null : error instanceof Error ? error.message : "The interpretation service is unavailable.";
   } finally {
     state.aiLoading = false;
     persist(); render();
   }
 }
 function readingShareText() {
-  return `${state.question}\n\n${readingCards().map((card, index) => `${POSITIONS[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`;
+  return `${state.question}\n\n${readingCards().map((card, index) => `${readingPositions()[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`;
 }
 function renderReading() {
   const cards = readingCards();
+  const positions = readingPositions();
+  const career = state.category === "Career";
   const summary = state.aiSummary || personalSummary(cards);
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
     : `<p class="ai-summary">${escapeHTML(summary)}</p><p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} ${t("The prototype reading remains available below as a fallback.")}</p>` : ""}`;
-  return world(`<section class="scene reading"><div class="parchment"><p class="eyebrow">The Heart Cut · ${t("your reading")}</p><h2>${t("Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(POSITIONS[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(POSITIONS[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${t("Watch a short ad to unlock a reflection based on your exact question and all four cards.")}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`);
+  return world(`<section class="scene reading ${career ? "career-reading" : ""}"><div class="parchment"><p class="eyebrow">The Heart Cut · ${t("your reading")}</p><h2>${t(career ? "Five cards, a constellation for the work ahead." : "Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${t("Watch a short ad to unlock a reflection based on your exact question and all four cards.")}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : "");
 }
 function renderAd() {
   if (!state.ad) return "";
   const ready = state.ad.ready;
-  const title = state.ad.intent === "interpretation" ? t("A quiet pause before the closer reading") : t("A small doorway in the ritual");
-  return `<div class="ad-scrim" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card" tabindex="-1"><p class="ad-tag">${t("Mock sponsored moment")}</p><div class="ad-illustration">${t("The sky keeps<br>its own counsel.")}</div><h2>${title}</h2><p>${t("This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.")}</p><div class="ad-footer"><span>${ready ? t("You may continue") : t("The door opens in a breath…")}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? t("Continue") : t("Please wait")}</button></div></section></div>`;
+  const careerEntry = state.ad.intent === "career-entry";
+  const title = careerEntry ? t("Unlock the Career path") : state.ad.intent === "interpretation" ? t("A quiet pause before the closer reading") : t("A small doorway in the ritual");
+  const illustration = careerEntry ? t("The next horizon<br>is taking shape.") : t("The sky keeps<br>its own counsel.");
+  const copy = careerEntry ? t("Watch this brief sponsored moment to open the Career ritual.") : t("This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.");
+  return `<div class="ad-scrim ${careerEntry ? "career-ad" : ""}" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card" tabindex="-1"><p class="ad-tag">${t("Mock sponsored moment")}</p><div class="ad-illustration">${illustration}</div><h2>${title}</h2><p>${copy}</p><div class="ad-footer"><span>${ready ? t("You may continue") : t(careerEntry ? "A short passage before the Career ritual" : "The door opens in a breath…")}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? t("Continue") : t("Please wait")}</button></div></section></div>`;
 }
 function renderSettings() {
   if (!settingsOpen) return "";
@@ -1257,7 +1507,8 @@ function renderSettings() {
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
-  return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${state.selectedIds.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/4<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
+  const chosen = state.category === "Career" ? state.career.selectedIds : state.selectedIds;
+  return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
 function mountAd() {
@@ -1669,9 +1920,28 @@ function act(action, element) {
   if (transitioning) return;
   if (action === "home" || action === "back-start") { state.stage = "start"; render(); return; }
   if (action === "begin") { state.stage = "category"; interaction(); render(); return; }
-  if (action === "choose-love") { state.stage = "question"; interaction(); render(); return; }
+  if (action === "choose-love") { state.category = "Love"; state.question = ""; state.stage = "question"; interaction(); render(); return; }
+  if (action === "choose-career") {
+    state.category = "Career";
+    state.question = "";
+    state.ad = { intent: "career-entry", ready: false };
+    mountAd(); interaction();
+    setTimeout(() => { if (state.ad?.intent === "career-entry") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
+    return;
+  }
   if (action === "back-category") { state.stage = "category"; render(); return; }
-  if (action === "question-next") { if (state.question.trim().length < 4) return; state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle"; interaction(); buzz(12); render(); return; }
+  if (action === "question-next") {
+    if (state.question.trim().length < 4) return;
+    if (state.category === "Career") {
+      state.career = { emberIds: [], compass: 88, candidateIds: [], selectedIds: [] };
+      state.revealedIds = [];
+      state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      state.stage = "careerEmbers";
+    } else {
+      state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
+    }
+    interaction(); buzz(12); render(); return;
+  }
   if (action === "open-settings") { settingsOpen = true; render(); document.querySelector(".settings-close")?.focus(); return; }
   if (action === "close-settings") { settingsOpen = false; persistNow(); render(); document.querySelector(".settings-button")?.focus(); return; }
   if (action === "toggle-debug") { state.debug = !state.debug; render(); return; }
@@ -1723,10 +1993,45 @@ function act(action, element) {
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
   if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return; }
+  if (action === "career-ember") {
+    const id = element.dataset.cardId;
+    const selected = state.career.emberIds;
+    if (selected.includes(id)) state.career.emberIds = selected.filter((cardId) => cardId !== id);
+    else if (selected.length < 3) { state.career.emberIds.push(id); buzz(8); sound("take", .1); }
+    interaction(); render(); return;
+  }
+  if (action === "career-raise") {
+    if (state.career.emberIds.length !== 3) return;
+    const embers = state.career.emberIds.map(cardById).filter(Boolean);
+    const emberSet = new Set(state.career.emberIds);
+    state.deck = [...embers, ...state.deck.filter((card) => !emberSet.has(card.id))];
+    state.stage = "careerCompass";
+    interaction(); buzz([8, 18, 10]); sound("gather", .18); render(); return;
+  }
+  if (action === "career-seal-compass") {
+    state.career.candidateIds = buildCareerCandidates();
+    state.career.selectedIds = [];
+    state.stage = "careerLadder";
+    interaction(); buzz([7, 15, 7]); sound("cut", .16); render(); return;
+  }
+  if (action === "career-choose-step") {
+    const rung = state.career.selectedIds.length;
+    const choices = state.career.candidateIds.slice(rung * 2, rung * 2 + 2);
+    const id = element.dataset.cardId;
+    if (rung >= CAREER_POSITIONS.length || !choices.includes(id)) return;
+    state.career.selectedIds.push(id);
+    preloadCardArt(cardById(id));
+    interaction(); buzz(11); sound("take", .15); render(); return;
+  }
+  if (action === "career-to-reveal") {
+    if (state.career.selectedIds.length !== CAREER_POSITIONS.length) return;
+    preloadCardArt(readingCards()); state.revealedIds = []; state.stage = "careerReveal";
+    interaction(); sound("spread", .18); render(); return;
+  }
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
     if (state.revealedIds.includes(id) || state.ad) return;
-    if (AD_CONFIG.firstReveal && state.revealedIds.length === 0) {
+    if (state.category === "Love" && AD_CONFIG.firstReveal && state.revealedIds.length === 0) {
       state.ad = { intent: "reveal", cardId: id, ready: false };
       element.classList.add("flip-pending");
       mountAd(); interaction();
@@ -1743,12 +2048,24 @@ function act(action, element) {
     if (ad.intent === "interpretation") {
       state.aiUnlocked = true; state.aiLoading = true; state.aiText = null; state.aiSummary = null; state.aiError = null;
       interaction(); render(); void requestAIInterpretation();
+    } else if (ad.intent === "career-entry") {
+      state.stage = "question";
+      interaction(); render();
     } else {
       flipRevealCard(ad.cardId);
     }
     return;
   }
-  if (action === "open-reading") { state.stage = "reading"; interaction(); render(); return; }
+  if (action === "open-reading") {
+    state.stage = "reading";
+    if (state.category === "Career" && !state.aiUnlocked) {
+      state.aiUnlocked = true; state.aiLoading = true; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      interaction(); render(); void requestAIInterpretation();
+    } else {
+      interaction(); render();
+    }
+    return;
+  }
   if (action === "unlock-ai") {
     if (!AD_CONFIG.unlockInterpretation) { state.aiUnlocked = true; render(); return; }
     state.ad = { intent: "interpretation", ready: false };
@@ -1758,7 +2075,7 @@ function act(action, element) {
   }
   if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
   if (action === "share-reading") { if (navigator.share) navigator.share({ title: "The Heart Cut", text: readingShareText() }).catch(() => {}); return; }
-  if (action === "share-image") { if (readingCards().length !== 4) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
+  if (action === "share-image") { if (readingCards().length !== readingPositions().length) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
   if (action === "share-back") { shareSheetOpen = false; state.stage = "reading"; render(); return; }
   if (action === "share-theme") { const theme = element.dataset.theme; if (theme && theme !== state.shareTheme) { state.shareTheme = theme; sound("flip", .12); render(); } return; }
   if (action === "share-continue") { shareSheetOpen = true; sound("flip", .12); render(); document.querySelector(".share-tile")?.focus(); return; }
@@ -1840,6 +2157,18 @@ app.addEventListener("input", (event) => {
     state.question = event.target.value; persist();
     const button = document.querySelector('[data-action="question-next"]');
     if (button) button.disabled = state.question.trim().length < 4;
+    return;
+  }
+  if (event.target.id === "career-compass-range") {
+    state.career.compass = Number(event.target.value);
+    const surface = document.querySelector(".career-compass-surface");
+    const value = document.querySelector("#career-compass-value");
+    const compass = document.querySelector(".career-compass");
+    const theme = careerCompassTheme();
+    if (surface) surface.style.setProperty("--needle", `${state.career.compass}deg`);
+    if (value) value.textContent = t(theme);
+    if (compass) compass.setAttribute("aria-label", `${t("Your compass points toward")} ${t(theme)}`);
+    persist();
     return;
   }
   if (event.target.id === "first-cut-range") {

@@ -24,6 +24,9 @@ APP_ROOT="heartcut-app"                       # <-- must match the app's "Applic
 
 cd "$(dirname "$0")"
 
+# Refuse to upload an incomplete or wrongly proportioned deck.
+python3 scripts/check_card_assets.py
+
 # Your cPanel username lives in an untracked file (deploy.local) so `git pull`
 # never clobbers it and it never lands in the public repo. One-time setup:
 #   echo 'SSH_USER="your-cpanel-username"' > deploy.local
@@ -34,21 +37,23 @@ if [ "$SSH_USER" = "CPANEL_USERNAME" ]; then
   exit 1
 fi
 
-# ---- 1. Bump cache version (v=NN in index.html + sw.js, and the sw cache name) ----
+# ---- 1. Bump the app shell and card-art URL versions together ----
 CUR=$(grep -oE 'heart-cut-v[0-9]+' sw.js | head -1 | grep -oE '[0-9]+$')
 NEXT=$((CUR + 1))
 echo "Cache version v$CUR -> v$NEXT"
 # Portable in-place edit (works with both BSD sed on macOS and GNU sed).
-for f in index.html sw.js; do
-  sed "s/v=$CUR/v=$NEXT/g; s/heart-cut-v$CUR/heart-cut-v$NEXT/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+for f in index.html sw.js app.js; do
+  sed "s/v=$CUR/v=$NEXT/g; s/heart-cut-v$CUR/heart-cut-v$NEXT/g; s/CARD_ART_VERSION = \"$CUR\"/CARD_ART_VERSION = \"$NEXT\"/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 done
+python3 scripts/check_card_assets.py
 
 # ---- 2. Upload the app (keep server.mjs + package.json; never the key or git cruft) ----
 rsync -avz \
   --exclude '.git' --exclude '.gitignore' --exclude '.DS_Store' --exclude '**/.DS_Store' \
-  --exclude '.env*' --exclude 'node_modules' \
+  --exclude '.env*' --exclude 'deploy.local' --exclude 'node_modules' \
   --exclude 'README.md' --exclude 'deploy.sh' --exclude 'deploy-node.sh' \
-  --exclude '.htaccess' --exclude '_preview_sidedeck.html' --exclude 'cards.pages' --exclude 'key.txt' \
+  --exclude '.htaccess' --exclude '_preview_sidedeck.html' --exclude 'dev-*.html' \
+  --exclude 'cards.pages' --exclude 'key.txt' --exclude '*.zip' --exclude 'serve.py' --exclude 'scripts' \
   -e "ssh -p $SSH_PORT" \
   ./ "$SSH_USER@$SSH_HOST:$APP_ROOT/"
 

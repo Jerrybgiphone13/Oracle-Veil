@@ -1,0 +1,30 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+key.txt
+deploy.local
+
+# Local scratch / design assets (not part of the app)
+cards.pages
+_preview_sidedeck.html
+dev-*.html
+serve.py
+*.zip
+
+# Server-managed Apache/Passenger config — never deploy the local placeholder
+.htaccess
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
