@@ -1087,40 +1087,43 @@ async function exportShareImage(mode, button) {
     if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
   }
 }
-// A web page can't push an image straight into Instagram/TikTok's composer (only native
-// apps can, via their SDKs). So each tile opens that app directly — the app's deep link on
-// mobile, X's compose intent everywhere — and we save the image to the device at the same
-// time so the user just picks it in the app. The "More" tile still uses the OS share sheet,
-// which is the one path that hands the file across directly.
-const IS_MOBILE = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+// Landing the user in an app's post/story composer WITH the image is only possible on the
+// web via the Web Share API — Instagram and TikTok expose no web link into their composer,
+// and a deep link would just open the app's home. navigator.share hands the file to the OS
+// sheet; picking the app there opens it straight to "Add to story / post" with the image
+// loaded. Desktop (no app share target) saves the image and opens the platform's site
+// (X via its compose intent, which prefills the caption).
 const SHARE_PLATFORMS = {
-  instagram: { label: "Instagram", app: "instagram://story-camera", web: "https://www.instagram.com/" },
-  tiktok: { label: "TikTok", app: "snssdk1233://", web: "https://www.tiktok.com/" },
+  instagram: { label: "Instagram", web: "https://www.instagram.com/" },
+  tiktok: { label: "TikTok", web: "https://www.tiktok.com/upload" },
   x: { label: "X", web: "https://twitter.com/intent/tweet" }
 };
 function platformUrl(platform, caption) {
   if (platform === "x") return `${SHARE_PLATFORMS.x.web}?text=${encodeURIComponent(caption)}`;
   return SHARE_PLATFORMS[platform].web;
 }
+function canShareImageFile() {
+  if (!navigator.canShare || typeof File === "undefined") return false;
+  try { return navigator.canShare({ files: [new File([new Uint8Array(1)], "p.png", { type: "image/png" })] }); }
+  catch { return false; }
+}
 async function shareToPlatform(platform, button) {
   const meta = SHARE_PLATFORMS[platform];
   if (!meta) return;
   const caption = shareCaption();
-  // Open the destination inside the click gesture so a popup blocker doesn't eat it.
-  // X + desktop open a normal tab; mobile IG/TikTok deep-link into the app after the save.
-  const deepLink = platform !== "x" && IS_MOBILE ? meta.app : null;
-  const win = deepLink ? null : window.open(platformUrl(platform, caption), "_blank", "noopener");
+  const native = canShareImageFile();
+  // Desktop: no app share target — open the platform site inside the click gesture (so a
+  // popup blocker doesn't eat it) and save the image so it can be attached.
+  const win = native ? null : window.open(platformUrl(platform, caption), "_blank", "noopener");
   if (button) button.classList.add("busy");
   try {
     const { blob, file } = await shareImageFile(shareThemeId());
-    saveBlob(blob, file.name); // drop the image on the device so it can be selected in the app
-    showToast(`Image saved — add it to your ${meta.label} post.`);
-    if (deepLink) {
-      // Deep-link into the app; if it isn't installed, fall back to the website shortly after.
-      const timer = setTimeout(() => { location.href = meta.web; }, 1400);
-      window.addEventListener("pagehide", () => clearTimeout(timer), { once: true });
-      location.href = deepLink;
-      return; // navigating away — leave the sheet behind us
+    if (native) {
+      // Opens the app the user picks straight to its post/story composer with the image.
+      await navigator.share({ files: [file], title: "My Tarot Reading", text: caption });
+    } else {
+      saveBlob(blob, file.name);
+      showToast(`Image saved — add it to your ${meta.label} post.`);
     }
     shareSheetOpen = false; render();
   } catch (error) {
@@ -1162,8 +1165,8 @@ function renderSharePage() {
   const chips = SHARE_THEMES.map((theme) => `
     <button class="theme-choice" type="button" role="radio" aria-checked="${theme.id === themeId}" data-action="share-theme" data-theme="${theme.id}">
       <span class="theme-thumbnail">
-        <img src="./assets/share/themes/${theme.id}/thumbnail.png" alt="" loading="lazy" decoding="async" />
-        ${theme.id === themeId ? `<span class="selected-mark" aria-hidden="true">✓</span>` : ""}
+        <img class="theme-art" src="./assets/share/themes/${theme.id}/thumbnail.png" alt="" loading="lazy" decoding="async" />
+        ${theme.id === themeId ? `<img class="selected-mark" src="./assets/share/shared/selected-check.svg" alt="" aria-hidden="true" />` : ""}
       </span>
       <span class="theme-name">${theme.label}</span>
     </button>`).join("");
