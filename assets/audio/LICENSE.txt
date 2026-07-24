@@ -1,0 +1,24 @@
+Sound effects in this folder are sourced from the "Casino Audio" pack
+by Kenney Vleugels (www.kenney.nl):
+https://kenney.nl/assets/casino-audio
+
+License: Creative Commons Zero (CC0 1.0 Universal / public domain)
+http://creativecommons.org/publicdomain/zero/1.0/
+
+You may use these assets in personal and commercial projects, with no
+attribution required. Credit is appreciated but not mandatory.
+
+Files are grouped by category, matching the app's sound "kind" names.
+Each category holds several near-identical takes of the same physical
+action; the app picks one at random per play so repeated sounds don't
+feel identical. Numbers below map to <category>/<n>.ogg.
+
+  shuffle/ <- card-slide-1.ogg .. card-slide-8.ogg
+             (one shuffle sound plays per card that starts moving
+             during a shuffle gesture, so the amount of sound scales
+             with the amount of cards actually swept)
+  cut/     <- card-place-1.ogg .. card-place-4.ogg
+  gather/  <- card-shove-1.ogg .. card-shove-4.ogg
+  spread/  <- card-fan-1.ogg, card-fan-2.ogg
+  take/    <- cards-pack-take-out-1.ogg, cards-pack-take-out-2.ogg
+  flip/    <- cards-pack-open-1.ogg, cards-pack-open-2.ogg

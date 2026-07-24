@@ -69,7 +69,7 @@ function readBody(request) {
 }
 function promptFor({ question, cards }) {
   const list = cards.map((card) => `${card.position}: ${card.name} (${card.orientation})`).join("\n");
-  return `You are writing a concise, emotionally intelligent tarot reflection for a love reading. Tarot is reflective and uncertain, not predictive fact. Do not claim certainty, manipulate emotion, give medical/legal/financial advice, or state probabilities.\n\nQuestion:\n${question}\n\nCards:\n${list}\n\nWrite 4 short paragraphs: underlying theme, the reader's stance, connection dynamics, and one practical gentle next step. Refer to the exact cards naturally. Keep under 340 words.`;
+  return `You are writing a concise, emotionally intelligent tarot reflection for a love reading. Tarot is reflective and uncertain, not predictive fact. Do not claim certainty, manipulate emotion, give medical/legal/financial advice, or state probabilities.\n\nQuestion:\n${question}\n\nCards:\n${list}\n\nRespond with a JSON object with two fields:\n"summary": a single short, warm sentence (max 18 words) that reads like a gentle, direct answer to the question, suitable as a headline on its own — no hedging phrases like "the cards suggest".\n"reading": 4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step), referring to the exact cards naturally, under 340 words total.`;
 }
 async function interpret(request, response) {
   if (!process.env.GEMINI_API_KEY) return sendJSON(response, 503, { error: "GEMINI_API_KEY is not set on the server." });
@@ -84,13 +84,27 @@ async function interpret(request, response) {
       signal: AbortSignal.timeout(20_000),
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptFor({ question: input.question.trim().slice(0, 340), cards }) }] }],
-        generationConfig: { temperature: 0.75, maxOutputTokens: 2048, thinkingConfig: { thinkingBudget: 0 } }
+        generationConfig: {
+          temperature: 0.75,
+          maxOutputTokens: 2048,
+          thinkingConfig: { thinkingBudget: 0 },
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: { summary: { type: "STRING" }, reading: { type: "STRING" } },
+            required: ["summary", "reading"]
+          }
+        }
       })
     });
     const payload = await gemini.json().catch(() => ({}));
-    const text = payload?.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
-    if (!gemini.ok || !text) throw new Error(payload?.error?.message || "Gemini did not return an interpretation.");
-    sendJSON(response, 200, { text });
+    const raw = payload?.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
+    if (!gemini.ok || !raw) throw new Error(payload?.error?.message || "Gemini did not return an interpretation.");
+    const parsed = JSON.parse(raw);
+    const summary = String(parsed.summary || "").trim();
+    const text = String(parsed.reading || "").trim();
+    if (!summary || !text) throw new Error("Gemini did not return an interpretation.");
+    sendJSON(response, 200, { summary, text });
   } catch (error) {
     const message = error instanceof Error && error.name === "TimeoutError"
       ? "The interpretation service took too long to respond. Please try again."
