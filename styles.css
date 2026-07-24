@@ -429,11 +429,14 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
 
 .share-layout { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); justify-content: center; align-items: center; gap: clamp(1.5rem, 5vw, 4.5rem); width: min(100%, 1200px); margin: 0 auto; padding: clamp(1rem, 3vh, 1.6rem) clamp(1.2rem, 4vw, 2.6rem); }
 .preview-region { display: grid; place-items: center; min-width: 0; height: 100%; }
-.story-canvas { position: relative; display: grid; place-items: center; height: min(calc(100dvh - 150px), 78vh); max-width: 100%; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background-color: #0a1a23; background-size: cover; background-position: center; box-shadow: 0 24px 52px rgba(0, 0, 0, .42); opacity: 0; transition: opacity .45s ease; animation: none; }
-.story-canvas.ready { opacity: 1; }
+.story-canvas { position: relative; display: grid; place-items: center; height: min(calc(100dvh - 150px), 78vh); max-width: 100%; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background-color: #0a1a23; background-size: cover; background-position: center; box-shadow: 0 24px 52px rgba(0, 0, 0, .42); }
+.story-canvas.ready { animation: story-img-in .45s ease; }
+.story-canvas.failed .story-spinner { display: none; }
 .story-canvas.failed::after { content: "Couldn't build the preview."; color: var(--cloud); font-family: var(--serif); font-size: .9rem; }
-.story-canvas.ready .story-spinner { display: none; }
-.story-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(229, 202, 139, .28); border-top-color: var(--gold-bright); animation: share-spin .8s linear infinite; }
+.story-canvas.ready .story-spinner { opacity: 0; }
+.story-spinner { display: grid; gap: .8rem; justify-items: center; color: var(--cloud); font-family: var(--serif); font-size: .8rem; letter-spacing: .04em; transition: opacity .25s ease; }
+.story-spinner::before { content: ""; width: 42px; height: 42px; border-radius: 50%; border: 3px solid rgba(229, 202, 139, .22); border-top-color: var(--gold-bright); animation: share-spin .8s linear infinite; }
+@keyframes story-img-in { from { opacity: .3; } to { opacity: 1; } }
 
 .customize-panel { align-self: center; width: 100%; padding: 1.3rem 1.2rem; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(145deg, rgba(16, 45, 54, .78), rgba(8, 21, 29, .74)); box-shadow: 0 24px 60px rgba(0, 0, 0, .28); backdrop-filter: blur(16px); }
 .customize-heading { margin: 0 0 1rem; font-family: var(--serif); font-size: 1.15rem; color: var(--paper-light); }

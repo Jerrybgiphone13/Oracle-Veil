@@ -449,7 +449,7 @@ function createState() {
     threeCutDraft: 23,
     twoTop: null,
     ad: null,
-    shareTheme: "paper-moon",
+    shareTheme: "midnight",
     aiUnlocked: false,
     aiLoading: false,
     aiText: null,
@@ -875,7 +875,7 @@ const SHARE_INK = "#071b24";
 const SHARE_SKYLINE_DY = { "paper-moon": 0, "golden-hour": 0, midnight: 196 };
 function shareThemeId() {
   const id = state.shareTheme;
-  return SHARE_THEMES.some((theme) => theme.id === id) ? id : "paper-moon";
+  return SHARE_THEMES.some((theme) => theme.id === id) ? id : "midnight";
 }
 
 // Shrink a font until `text` fits within maxWidth (keeps one long question/title on its line).
@@ -1069,7 +1069,7 @@ function renderSharePage() {
     <div class="share-layout">
       <section class="preview-region" aria-label="Tarot share preview">
         <div class="story-canvas" role="img" aria-label="${escapeHTML(cards[0]?.name || "Your reading")} tarot story preview">
-          <span class="story-spinner" aria-hidden="true"></span>
+          <span class="story-spinner" aria-hidden="true">Preparing your image…</span>
         </div>
       </section>
       <aside class="customize-panel" aria-label="Choose a look">
