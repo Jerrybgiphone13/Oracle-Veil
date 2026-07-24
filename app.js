@@ -1139,8 +1139,12 @@ const SHARE_ICONS = {
   save: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v10.4m0 0l-4.2-4.2M12 13.9l4.2-4.2M4.5 19.5h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   more: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="18.5" cy="12" r="1.9" fill="currentColor"/></svg>`
 };
+// Direct-to-composer sharing isn't reachable from a web page yet, so the per-app tiles are
+// disabled for now (flip to true to re-enable the Web Share API flow). Save / More still work.
+const PLATFORM_TILES_ENABLED = false;
 function shareTile(platform) {
-  return `<button class="share-tile ${platform}" type="button" data-action="share-platform" data-platform="${platform}"><span class="share-tile-icon">${SHARE_ICONS[platform]}</span><span class="share-tile-label">${SHARE_PLATFORMS[platform].label}</span></button>`;
+  const off = !PLATFORM_TILES_ENABLED;
+  return `<button class="share-tile ${platform}${off ? " is-disabled" : ""}" type="button"${off ? " disabled aria-disabled=\"true\"" : ` data-action="share-platform" data-platform="${platform}"`}><span class="share-tile-icon">${SHARE_ICONS[platform]}${off ? `<span class="share-tile-soon">Soon</span>` : ""}</span><span class="share-tile-label">${SHARE_PLATFORMS[platform].label}</span></button>`;
 }
 function renderShareSheet() {
   if (!shareSheetOpen) return "";
@@ -1149,7 +1153,7 @@ function renderShareSheet() {
     <section class="share-sheet" role="dialog" aria-modal="true" aria-label="Share your reading" data-action="share-sheet-keep">
       <span class="share-sheet-grip" aria-hidden="true"></span>
       <h3 class="share-sheet-title">Share your reading</h3>
-      <p class="share-sheet-sub">Post your card to a story or feed.</p>
+      <p class="share-sheet-sub">Save your card, then post it to your story or feed.</p>
       <div class="share-tiles">
         ${shareTile("instagram")}${shareTile("tiktok")}${shareTile("x")}
         <button class="share-tile save" type="button" data-action="share-save"><span class="share-tile-icon">${SHARE_ICONS.save}</span><span class="share-tile-label">Save</span></button>
