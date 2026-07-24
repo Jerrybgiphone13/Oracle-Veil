@@ -38,8 +38,8 @@ The lower-left `⌘` seal opens the development diagnostics panel. It exposes th
 - `state.ritualCardId`, `selectedIds`, and `revealedIds` always refer to those same persistent card objects; identity and orientation are never generated on reveal.
 - `STAGES` acts as the ritual state machine. Each stage only exposes the next valid manipulation.
 - `AD_CONFIG` isolates the two mock ad checkpoints, so an advertising SDK can replace the overlay without touching tarot state.
-- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the four selected card states to Gemini. The browser never receives or stores the key.
-- Face-up cards use the supplied 78-card artwork in `assets/tarot/`; deck data and rendering remain separated so the set can be swapped later.
+- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the four selected card states to Gemini. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
+- Face-up cards use the supplied 78-card artwork in `assets/tarot/`; deck data and rendering remain separated so the set can be swapped later. Images load lazily and fall back to a styled text face if a file is missing.
 
 ## Physics and procedural assistance
 
@@ -54,10 +54,12 @@ This is the right performance tradeoff for a 78-card mobile DOM prototype: it pr
 ## Accessibility and PWA notes
 
 - Buttons and cards have explicit labels; touch targets also work with a mouse/trackpad.
-- System reduced-motion preferences collapse decorative animation.
+- Stage changes move keyboard focus to the new heading; dialogs focus their controls, close on Escape, and toasts use a polite live region.
+- System reduced-motion preferences collapse decorative animation, including the JavaScript-driven card flight.
 - Guided mode provides a one-tap assisted spread while keeping the flow connected.
-- Sound and haptics are optional toggles; sound uses short browser-generated tones, not an autoplaying track.
-- `manifest.webmanifest` and `sw.js` make the prototype installable from a normal static HTTPS host.
+- Sound and haptics are optional toggles; sound uses short browser-generated tones (one shared AudioContext), not an autoplaying track.
+- Interface copy is available in English, French, Russian, and Chinese (Settings → Language).
+- `manifest.webmanifest` (SVG + PNG icons, including a maskable tile) and `sw.js` make the prototype installable from a normal static HTTPS host; the service worker serves card art cache-first and the app shell network-first.
 
 ## Production next steps
 

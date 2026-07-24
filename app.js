@@ -115,7 +115,65 @@ const I18N = {
     "Reversed": "Renversée", "Upright": "À l'endroit",
     "Four cards, gathered beneath one sky.": "Quatre cartes, réunies sous un même ciel.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Le tarot est proposé ici comme un outil de réflexion et d'imagination — non comme une prédiction factuelle ou un conseil professionnel.",
-    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture"
+    "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture",
+    "Share the reading": "Partager la lecture",
+    "Sweep across the loose cards to send a wave through the pile.": "Balayez les cartes éparses pour envoyer une onde à travers le tas.",
+    "Drag through the cards—a wave ripples across the pile": "Glissez à travers les cartes — une onde parcourt le tas",
+    "physical moves · keep mixing or gather them": "gestes physiques · continuez à mélanger ou rassemblez-les",
+    "The cards feel mixed. Gather them when you are ready.": "Les cartes semblent mélangées. Rassemblez-les quand vous êtes prêt·e.",
+    "more moves will loosen the order.": "mouvements de plus déferont l'ordre.",
+    "Side view · slide the brass marker up and down between the card edges": "Vue de côté · faites glisser le repère en laiton entre les tranches des cartes",
+    "a light upper packet": "un paquet supérieur léger",
+    "a deep upper packet": "un paquet supérieur épais",
+    "a balanced division": "une division équilibrée",
+    "The deck is shown from the side so every possible cut is reachable.": "Le jeu est montré de côté pour que chaque coupe soit accessible.",
+    "Move the marker, then lift the deck at that exact place.": "Déplacez le repère, puis soulevez le jeu à cet endroit précis.",
+    "lifted packet": "paquet soulevé", "resting packet": "paquet posé", "pile": "paquet", "cards": "cartes",
+    "one card waits here": "une carte attend ici",
+    "The card directly beneath the lifted packet becomes the Hidden Heart.": "La carte située juste sous le paquet soulevé devient le Cœur caché.",
+    "Tap the pile you want on top. Both piles will meet in the center.": "Touchez le paquet à placer dessus. Les deux paquets se rejoindront au centre.",
+    "Place the first marker": "Placez le premier repère",
+    "First marker set · choose a different place for the second": "Premier repère placé · choisissez un autre endroit pour le second",
+    "Choose the first break in the side of the deck.": "Choisissez la première cassure sur le côté du jeu.",
+    "Choose the second break. The two markers will form three piles.": "Choisissez la seconde cassure. Les deux repères formeront trois paquets.",
+    "of 3 chosen · numbers show the top-to-bottom order": "sur 3 choisis · les numéros indiquent l'ordre de haut en bas",
+    "Tap the pile that should return first (on top).": "Touchez le paquet qui revient en premier (dessus).",
+    "One touch fans every card into a reading arc": "Un toucher déploie chaque carte en arc de lecture",
+    "Open the spread and the cards fan across the table.": "Ouvrez le tirage et les cartes s'éventailent sur la table.",
+    "Drawn": "Tirées",
+    "Tap any face-down card. It will travel into the center tray.": "Touchez une carte face cachée. Elle voyagera vers le plateau central.",
+    "card has moved into the center tray.": "carte a rejoint le plateau central.",
+    "cards have moved into the center tray.": "cartes ont rejoint le plateau central.",
+    "The reading is ready to be gathered.": "La lecture est prête à être rassemblée.",
+    "There is no required order.": "Il n'y a pas d'ordre imposé.",
+    "A quiet pause before the closer reading": "Une pause paisible avant la lecture approfondie",
+    "A small doorway in the ritual": "Une petite porte dans le rituel",
+    "Mock sponsored moment": "Moment sponsorisé fictif",
+    "The sky keeps<br>its own counsel.": "Le ciel garde<br>son propre conseil.",
+    "This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.": "Cet espace réservé est volontairement séparé du rituel pour pouvoir remplacer le fournisseur publicitaire plus tard.",
+    "You may continue": "Vous pouvez continuer",
+    "The door opens in a breath…": "La porte s'ouvre dans un souffle…",
+    "Continue": "Continuer", "Please wait": "Veuillez patienter",
+    "your reading": "votre lecture",
+    "Personal interpretation": "Interprétation personnelle",
+    "A reflection for the path in front of you": "Une réflexion pour le chemin devant vous",
+    "A closer reflection": "Une réflexion plus intime",
+    "Would you like a personal interpretation?": "Souhaitez-vous une interprétation personnelle ?",
+    "Watch a short ad to unlock a reflection based on your exact question and all four cards.": "Regardez une courte publicité pour débloquer une réflexion basée sur votre question exacte et les quatre cartes.",
+    "Generate my personal interpretation": "Générer mon interprétation personnelle",
+    "Listening to the cards…": "À l'écoute des cartes…",
+    "The prototype reading remains available below as a fallback.": "La lecture du prototype reste disponible ci-dessous.",
+    "Sweep a little farther so the cards have room to open.": "Balayez un peu plus loin pour que les cartes aient la place de s'ouvrir.",
+    "Reading copied.": "Lecture copiée.",
+    "Copy is unavailable in this browser.": "La copie est indisponible dans ce navigateur.",
+    "Guided interaction mode is on.": "Mode d'interaction guidée activé.",
+    "Guided interaction mode is off.": "Mode d'interaction guidée désactivé.",
+    "Face-down tarot card": "Carte de tarot face cachée",
+    "Select a face-down card": "Choisir une carte face cachée",
+    "Move card": "Déplacer la carte",
+    "Draw the hidden card from beneath the lifted packet": "Tirer la carte cachée sous le paquet soulevé",
+    "Choose where to cut the deck": "Choisir où couper le jeu",
+    "Reveal": "Révéler"
   },
   ru: {
     "Settings": "Настройки", "Language": "Язык", "Sound effects": "Звуковые эффекты",
@@ -164,7 +222,65 @@ const I18N = {
     "Reversed": "Перевёрнутая", "Upright": "Прямая",
     "Four cards, gathered beneath one sky.": "Четыре карты под одним небом.",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Таро предлагается здесь как инструмент размышления и воображения — не как фактическое предсказание или профессиональный совет.",
-    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание"
+    "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание",
+    "Share the reading": "Поделиться гаданием",
+    "Sweep across the loose cards to send a wave through the pile.": "Проведите по разложенным картам, чтобы послать волну по стопке.",
+    "Drag through the cards—a wave ripples across the pile": "Проведите по картам — волна пройдёт по стопке",
+    "physical moves · keep mixing or gather them": "физических движений · продолжайте мешать или соберите их",
+    "The cards feel mixed. Gather them when you are ready.": "Карты перемешаны. Соберите их, когда будете готовы.",
+    "more moves will loosen the order.": "движений ещё — и порядок разомкнётся.",
+    "Side view · slide the brass marker up and down between the card edges": "Вид сбоку · двигайте латунную метку вверх и вниз между срезами карт",
+    "a light upper packet": "лёгкая верхняя стопка",
+    "a deep upper packet": "плотная верхняя стопка",
+    "a balanced division": "ровное разделение",
+    "The deck is shown from the side so every possible cut is reachable.": "Колода показана сбоку, чтобы любой срез был доступен.",
+    "Move the marker, then lift the deck at that exact place.": "Двигайте метку, затем снимите колоду точно в этом месте.",
+    "lifted packet": "снятая стопка", "resting packet": "оставшаяся стопка", "pile": "стопка", "cards": "карт",
+    "one card waits here": "здесь ждёт одна карта",
+    "The card directly beneath the lifted packet becomes the Hidden Heart.": "Карта прямо под снятой стопкой становится Скрытым сердцем.",
+    "Tap the pile you want on top. Both piles will meet in the center.": "Коснитесь стопки, которая ляжет сверху. Обе стопки сойдутся в центре.",
+    "Place the first marker": "Поставьте первую метку",
+    "First marker set · choose a different place for the second": "Первая метка стоит · выберите другое место для второй",
+    "Choose the first break in the side of the deck.": "Выберите первый разрыв на срезе колоды.",
+    "Choose the second break. The two markers will form three piles.": "Выберите второй разрыв. Две метки образуют три стопки.",
+    "of 3 chosen · numbers show the top-to-bottom order": "из 3 выбрано · номера показывают порядок сверху вниз",
+    "Tap the pile that should return first (on top).": "Коснитесь стопки, которая вернётся первой (сверху).",
+    "One touch fans every card into a reading arc": "Одно касание раскладывает все карты веером",
+    "Open the spread and the cards fan across the table.": "Раскройте расклад — карты веером лягут на стол.",
+    "Drawn": "Вытянуто",
+    "Tap any face-down card. It will travel into the center tray.": "Коснитесь любой карты рубашкой вверх. Она переместится в центральный лоток.",
+    "card has moved into the center tray.": "карта переместилась в центральный лоток.",
+    "cards have moved into the center tray.": "карты переместились в центральный лоток.",
+    "The reading is ready to be gathered.": "Гадание готово к сбору.",
+    "There is no required order.": "Порядок не имеет значения.",
+    "A quiet pause before the closer reading": "Тихая пауза перед подробным гаданием",
+    "A small doorway in the ritual": "Маленькая дверь в ритуале",
+    "Mock sponsored moment": "Демо-реклама",
+    "The sky keeps<br>its own counsel.": "Небо хранит<br>свой совет.",
+    "This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.": "Эта заглушка намеренно отделена от ритуала, чтобы рекламного провайдера можно было заменить позже.",
+    "You may continue": "Можно продолжить",
+    "The door opens in a breath…": "Дверь откроется через мгновение…",
+    "Continue": "Продолжить", "Please wait": "Пожалуйста, подождите",
+    "your reading": "ваше гадание",
+    "Personal interpretation": "Личное толкование",
+    "A reflection for the path in front of you": "Размышление о пути впереди",
+    "A closer reflection": "Более глубокое размышление",
+    "Would you like a personal interpretation?": "Хотите личное толкование?",
+    "Watch a short ad to unlock a reflection based on your exact question and all four cards.": "Посмотрите короткую рекламу, чтобы открыть размышление по вашему вопросу и всем четырём картам.",
+    "Generate my personal interpretation": "Создать моё личное толкование",
+    "Listening to the cards…": "Слушаем карты…",
+    "The prototype reading remains available below as a fallback.": "Демо-гадание ниже остаётся доступным.",
+    "Sweep a little farther so the cards have room to open.": "Проведите чуть дальше, чтобы картам хватило места раскрыться.",
+    "Reading copied.": "Гадание скопировано.",
+    "Copy is unavailable in this browser.": "Копирование недоступно в этом браузере.",
+    "Guided interaction mode is on.": "Режим управляемого взаимодействия включён.",
+    "Guided interaction mode is off.": "Режим управляемого взаимодействия выключен.",
+    "Face-down tarot card": "Карта таро рубашкой вверх",
+    "Select a face-down card": "Выбрать карту рубашкой вверх",
+    "Move card": "Переместить карту",
+    "Draw the hidden card from beneath the lifted packet": "Взять скрытую карту под снятой стопкой",
+    "Choose where to cut the deck": "Выбрать место среза колоды",
+    "Reveal": "Открыть"
   },
   zh: {
     "Settings": "设置", "Language": "语言", "Sound effects": "音效",
@@ -213,7 +329,65 @@ const I18N = {
     "Reversed": "逆位", "Upright": "正位",
     "Four cards, gathered beneath one sky.": "四张牌，共聚于同一片天空之下。",
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "此处的塔罗是一种用于反思与想象的工具——并非事实预测或专业建议。",
-    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读"
+    "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读",
+    "Share the reading": "分享解读",
+    "Sweep across the loose cards to send a wave through the pile.": "扫过散开的牌，让一道波浪穿过牌堆。",
+    "Drag through the cards—a wave ripples across the pile": "拖过牌面——涟漪将荡过整堆牌",
+    "physical moves · keep mixing or gather them": "次实际移动 · 继续混合或将它们聚拢",
+    "The cards feel mixed. Gather them when you are ready.": "牌已经洗匀。准备好后就将它们聚拢。",
+    "more moves will loosen the order.": "次移动即可松动牌序。",
+    "Side view · slide the brass marker up and down between the card edges": "侧视图 · 在牌缘之间上下滑动黄铜标记",
+    "a light upper packet": "较薄的上方牌叠",
+    "a deep upper packet": "较厚的上方牌叠",
+    "a balanced division": "均衡的划分",
+    "The deck is shown from the side so every possible cut is reachable.": "牌组以侧面展示，以便触及每个可能的切口。",
+    "Move the marker, then lift the deck at that exact place.": "移动标记，然后在该位置准确抬起牌组。",
+    "lifted packet": "被抬起的牌叠", "resting packet": "静置的牌叠", "pile": "牌堆", "cards": "张牌",
+    "one card waits here": "一张牌在此等候",
+    "The card directly beneath the lifted packet becomes the Hidden Heart.": "被抬起牌叠正下方的那张牌将成为隐秘之心。",
+    "Tap the pile you want on top. Both piles will meet in the center.": "点选你想置于上方的牌堆。两堆将在中央汇合。",
+    "Place the first marker": "放置第一个标记",
+    "First marker set · choose a different place for the second": "第一个标记已就位 · 请为第二个选择不同的位置",
+    "Choose the first break in the side of the deck.": "在牌组侧面选择第一个断口。",
+    "Choose the second break. The two markers will form three piles.": "选择第二个断口。两个标记将形成三堆。",
+    "of 3 chosen · numbers show the top-to-bottom order": "/3 已选 · 数字显示自上而下的顺序",
+    "Tap the pile that should return first (on top).": "点选应最先归位（置于顶部）的牌堆。",
+    "One touch fans every card into a reading arc": "一次触碰即可将所有牌展成解读弧",
+    "Open the spread and the cards fan across the table.": "开启牌阵，牌将在桌面上扇形铺开。",
+    "Drawn": "已抽",
+    "Tap any face-down card. It will travel into the center tray.": "点选任意一张面朝下的牌。它将移入中央牌托。",
+    "card has moved into the center tray.": "张牌已移入中央牌托。",
+    "cards have moved into the center tray.": "张牌已移入中央牌托。",
+    "The reading is ready to be gathered.": "解读已就绪，可以汇集。",
+    "There is no required order.": "没有规定的顺序。",
+    "A quiet pause before the closer reading": "深入解读前的片刻宁静",
+    "A small doorway in the ritual": "仪式中的一扇小门",
+    "Mock sponsored moment": "模拟赞助时刻",
+    "The sky keeps<br>its own counsel.": "天空自有<br>其主张。",
+    "This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.": "此占位内容刻意与仪式分离，以便日后替换广告提供商。",
+    "You may continue": "可以继续了",
+    "The door opens in a breath…": "门扉将在一次呼吸间开启…",
+    "Continue": "继续", "Please wait": "请稍候",
+    "your reading": "你的解读",
+    "Personal interpretation": "个人解读",
+    "A reflection for the path in front of you": "为你脚下之路的一次映照",
+    "A closer reflection": "更贴近的映照",
+    "Would you like a personal interpretation?": "你想要一份个人解读吗？",
+    "Watch a short ad to unlock a reflection based on your exact question and all four cards.": "观看一个简短广告，解锁基于你的问题与全部四张牌的映照。",
+    "Generate my personal interpretation": "生成我的个人解读",
+    "Listening to the cards…": "正在聆听牌意…",
+    "The prototype reading remains available below as a fallback.": "下方仍提供原型解读作为备选。",
+    "Sweep a little farther so the cards have room to open.": "再扫远一点，让牌有空间展开。",
+    "Reading copied.": "解读已复制。",
+    "Copy is unavailable in this browser.": "此浏览器无法复制。",
+    "Guided interaction mode is on.": "引导交互模式已开启。",
+    "Guided interaction mode is off.": "引导交互模式已关闭。",
+    "Face-down tarot card": "面朝下的塔罗牌",
+    "Select a face-down card": "选择一张面朝下的牌",
+    "Move card": "移动牌",
+    "Draw the hidden card from beneath the lifted packet": "从被抬起的牌叠下方抽出隐藏之牌",
+    "Choose where to cut the deck": "选择切牌的位置",
+    "Reveal": "揭示"
   }
 };
 function t(source) {
@@ -303,6 +477,7 @@ let state = loadState();
 let toastTimer;
 let transitioning = false;
 let settingsOpen = false;
+let lastFocusedStage = state.stage;
 const MUSIC_URL = "https://upload.wikimedia.org/wikipedia/commons/a/af/Kai_Engel_-_09_-_Sunset.ogg";
 const MUSIC_LEVEL = 0.5;
 let musicAudio;
@@ -311,7 +486,19 @@ let musicMaster;
 let musicNodes = [];
 let musicUsesSynth = false;
 
-function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+// Writes are debounced: gestures and drags call persist() many times per second,
+// and a synchronous localStorage write of the full state would jank every frame.
+let persistTimer;
+function persistNow() {
+  clearTimeout(persistTimer);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* storage can be unavailable (private mode) */ }
+}
+function persist() {
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persistNow, 250);
+}
+window.addEventListener("pagehide", persistNow);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistNow(); });
 function stageIndex() { return Math.max(0, STAGES.indexOf(state.stage)); }
 function cardById(id) {
   return state.ritualCard?.id === id ? state.ritualCard : state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
@@ -322,11 +509,22 @@ function interaction() { state.performance.interactions += 1; state.performance.
 function buzz(pattern = 10) {
   if (state.settings.haptics && navigator.vibrate) navigator.vibrate(pattern);
 }
-function sound(kind = "paper", intensity = .18) {
-  if (state.settings.volume <= 0 || !window.AudioContext && !window.webkitAudioContext) return;
+// A single shared AudioContext: creating one per sound leaks contexts and trips
+// the browser's context limit (and each new context adds startup latency).
+let sharedAudioContext;
+function audioContext() {
+  if (!window.AudioContext && !window.webkitAudioContext) return null;
   try {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new Ctx();
+    if (!sharedAudioContext) sharedAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (sharedAudioContext.state === "suspended") sharedAudioContext.resume().catch(() => {});
+    return sharedAudioContext;
+  } catch { return null; }
+}
+function sound(kind = "paper", intensity = .18) {
+  if (state.settings.volume <= 0) return;
+  const ctx = audioContext();
+  if (!ctx) return;
+  try {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = kind === "flip" ? "sine" : "triangle";
@@ -399,7 +597,12 @@ function showToast(message) {
   clearTimeout(toastTimer);
   const existing = document.querySelector(".toast");
   if (existing) existing.remove();
-  const toast = document.createElement("div"); toast.className = "toast"; toast.textContent = message; document.body.append(toast);
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+  toast.textContent = message;
+  document.body.append(toast);
   toastTimer = setTimeout(() => toast.remove(), 1900);
 }
 
@@ -413,15 +616,16 @@ function cardImagePath(card) {
     : card.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
   return `./assets/tarot/${artworkName}.png`;
 }
+function cardImage(card) {
+  return `<img class="card-image" src="${cardImagePath(card)}" alt="" draggable="false" loading="lazy" decoding="async" data-name="${escapeHTML(card.name)}" data-mark="${card.mark}">`;
+}
 function cardFace(card, extra = "") {
-  return `<button class="card face image-face ${card.reversed ? "reversed" : ""} ${extra}" aria-label="${escapeHTML(card.name)}${card.reversed ? ", reversed" : ", upright"}">
-    <img class="card-image" src="${cardImagePath(card)}" alt="" draggable="false">
-  </button>`;
+  return `<button class="card face image-face ${card.reversed ? "reversed" : ""} ${extra}" aria-label="${escapeHTML(card.name)}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}">${cardImage(card)}</button>`;
 }
 function faceInner(card) {
-  return `<img class="card-image" src="${cardImagePath(card)}" alt="" draggable="false">`;
+  return cardImage(card);
 }
-function cardBack(extra = "") { return `<button class="card back ${extra}" aria-label="Face-down tarot card"></button>`; }
+function cardBack(extra = "") { return `<button class="card back ${extra}" aria-label="${t("Face-down tarot card")}"></button>`; }
 function majorSymbol(name) {
   const symbols = { "The Lovers": "♥", "The Moon": "☾", "The Sun": "☉", "The Star": "✦", "The Tower": "⌁", "Death": "☠", "The World": "◎", "The Fool": "✧", "The High Priestess": "☽", "Wheel of Fortune": "☸", "Justice": "⚖", "Strength": "♌", "The Hermit": "◌" };
   return symbols[name] || "✦";
@@ -487,15 +691,15 @@ function renderShuffle() {
   const ready = state.shuffleMoves >= 3;
   const pieces = state.shuffleLayout?.length ? state.shuffleLayout : buildShuffleLayout(state.seed);
   return {
-    surface: `<div class="table-surface shuffle-table" id="shuffle-surface"><div class="scatter-pile" aria-label="A loose pile of face-down tarot cards">${pieces.map((piece, index) => `<button class="shuffle-card card back" data-shuffle-index="${index}" aria-label="Move card ${index + 1}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`).join("")}</div><p class="physical-instruction ${state.shuffleMoves ? "quiet" : ""}">Sweep across the loose cards to send a wave through the pile.</p><span class="piles-guide" id="shuffle-guide">${state.shuffleMoves ? `${state.shuffleMoves} physical move${state.shuffleMoves === 1 ? "" : "s"} · keep mixing or gather them` : "Drag through the cards—a wave ripples across the pile"}</span></div>`,
-    actions: `<p class="status-note" id="shuffle-status">${ready ? "The cards feel mixed. Gather them when you are ready." : `${3 - state.shuffleMoves} more move${3 - state.shuffleMoves === 1 ? "" : "s"} will loosen the order.`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
+    surface: `<div class="table-surface shuffle-table" id="shuffle-surface"><div class="scatter-pile" aria-label="A loose pile of face-down tarot cards">${pieces.map((piece, index) => `<button class="shuffle-card card back" data-shuffle-index="${index}" aria-label="${t("Move card")} ${index + 1}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`).join("")}</div><p class="physical-instruction ${state.shuffleMoves ? "quiet" : ""}">${t("Sweep across the loose cards to send a wave through the pile.")}</p><span class="piles-guide" id="shuffle-guide">${state.shuffleMoves ? `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}` : t("Drag through the cards—a wave ripples across the pile")}</span></div>`,
+    actions: `<p class="status-note" id="shuffle-status">${ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
   };
 }
 function cutMood(value, total) {
   const ratio = value / Math.max(1, total);
-  if (ratio < .34) return "a light upper packet";
-  if (ratio > .66) return "a deep upper packet";
-  return "a balanced division";
+  if (ratio < .34) return t("a light upper packet");
+  if (ratio > .66) return t("a deep upper packet");
+  return t("a balanced division");
 }
 function sideDeckMarkup(mode) {
   const total = state.deck.length;
@@ -505,10 +709,10 @@ function sideDeckMarkup(mode) {
   const boundaries = mode === "two" ? [draft] : [...settled, draft].sort((a, b) => a - b);
   const all = [0, ...boundaries, total];
   const segments = all.slice(0, -1).map((start, index) => `<div class="edge-segment segment-${index + 1}" style="top:${start / total * 100}%;height:${(all[index + 1] - start) / total * 100}%"></div>`).join("");
-  return `<div class="cut-workbench" data-cut-mode="${mode}" style="--cut-pos:${draft / total * 100}%"><p class="side-label">Side view · slide the brass marker up and down between the card edges</p><div class="cut-stage"><div class="side-deck" data-motion-key="main-deck">${segments}${markers}<i class="cut-marker active" aria-hidden="true"><span>✦</span></i></div><input class="cut-range" id="${mode === "two" ? "first-cut-range" : "three-cut-range"}" type="range" min="9" max="${total - 9}" value="${draft}" aria-label="Choose where to cut the deck"></div><p class="cut-reading" id="cut-reading">${cutMood(draft, total)}</p></div>`;
+  return `<div class="cut-workbench" data-cut-mode="${mode}" style="--cut-pos:${draft / total * 100}%"><p class="side-label">${t("Side view · slide the brass marker up and down between the card edges")}</p><div class="cut-stage"><div class="side-deck" data-motion-key="main-deck">${segments}${markers}<i class="cut-marker active" aria-hidden="true"><span>✦</span></i></div><input class="cut-range" id="${mode === "two" ? "first-cut-range" : "three-cut-range"}" type="range" min="9" max="${total - 9}" value="${draft}" aria-label="${t("Choose where to cut the deck")}"></div><p class="cut-reading" id="cut-reading">${cutMood(draft, total)}</p></div>`;
 }
 function renderCutOne() {
-  return { surface: `<div class="table-surface cut-table" id="cut-one-surface">${sideDeckMarkup("two")}<span class="piles-guide">The deck is shown from the side so every possible cut is reachable.</span></div>`, actions: `<p class="status-note">Move the marker, then lift the deck at that exact place.</p><button class="seal-button" data-action="make-first-cut">${t("Lift at this point")}</button>` };
+  return { surface: `<div class="table-surface cut-table" id="cut-one-surface">${sideDeckMarkup("two")}<span class="piles-guide">${t("The deck is shown from the side so every possible cut is reachable.")}</span></div>`, actions: `<p class="status-note">${t("Move the marker, then lift the deck at that exact place.")}</p><button class="seal-button" data-action="make-first-cut">${t("Lift at this point")}</button>` };
 }
 function stackLayers() {
   return `<div class="stack-card"></div><div class="stack-card"></div><div class="stack-card"></div><div class="stack-card"></div>`;
@@ -517,26 +721,26 @@ function pileMarkup(cards, key, label, options = {}) {
   const { action = "", selected = false, order = null, extra = "" } = options;
   const tag = action ? "button" : "div";
   const actionAttrs = action ? ` data-action="${action}" data-pile-index="${key}" aria-pressed="${selected}"` : "";
-  return `<${tag} class="pile ${extra} ${selected ? "chosen" : ""}" data-pile="${key}"${actionAttrs} style="--order:${order ?? 0}">${stackLayers()}${order !== null ? `<span class="order-badge">${order + 1}</span>` : ""}<span class="pile-label">${label} · ${cards.length} cards</span></${tag}>`;
+  return `<${tag} class="pile ${extra} ${selected ? "chosen" : ""}" data-pile="${key}"${actionAttrs} style="--order:${order ?? 0}">${stackLayers()}${order !== null ? `<span class="order-badge">${order + 1}</span>` : ""}<span class="pile-label">${label} · ${cards.length} ${t("cards")}</span></${tag}>`;
 }
 function renderRitualCard() {
   const top = state.piles[0] || [];
   const bottom = state.piles[1] || [];
-  return { surface: `<div class="table-surface centered-table" id="ritual-card-surface"><div class="pile-field two">${pileMarkup(top, "0", "lifted packet", { extra: "lifted" })}${pileMarkup(bottom, "1", "resting packet")}<button class="ritual-draw-card card back" data-action="take-ritual" aria-label="Draw the hidden card from beneath the lifted packet"></button></div><div class="hidden-heart-slot"><span>Hidden Heart</span><i>one card waits here</i></div></div>`, actions: `<p class="status-note">The card directly beneath the lifted packet becomes the Hidden Heart.</p><button class="seal-button" data-action="take-ritual">${t("Draw the hidden card")}</button>` };
+  return { surface: `<div class="table-surface centered-table" id="ritual-card-surface"><div class="pile-field two">${pileMarkup(top, "0", t("lifted packet"), { extra: "lifted" })}${pileMarkup(bottom, "1", t("resting packet"))}<button class="ritual-draw-card card back" data-action="take-ritual" aria-label="${t("Draw the hidden card from beneath the lifted packet")}"></button></div><div class="hidden-heart-slot"><span>${t("Hidden Heart")}</span><i>${t("one card waits here")}</i></div></div>`, actions: `<p class="status-note">${t("The card directly beneath the lifted packet becomes the Hidden Heart.")}</p><button class="seal-button" data-action="take-ritual">${t("Draw the hidden card")}</button>` };
 }
 function renderReassembleOne() {
-  return { surface: `<div class="table-surface centered-table" id="reassemble-one-surface"><div class="pile-field two choose-field">${pileMarkup(state.piles[0] || [], "0", "pile one", { action: "choose-two-top", selected: state.twoTop === 0 })}${pileMarkup(state.piles[1] || [], "1", "pile two", { action: "choose-two-top", selected: state.twoTop === 1 })}</div><div class="hidden-heart-slot filled"><span>Hidden Heart</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">Tap the pile you want on top. Both piles will meet in the center.</p><button class="seal-button" data-action="join-two" ${state.twoTop === null ? "disabled" : ""}>${t("Stack with this pile on top")}</button>` };
+  return { surface: `<div class="table-surface centered-table" id="reassemble-one-surface"><div class="pile-field two choose-field">${pileMarkup(state.piles[0] || [], "0", `${t("pile")} 1`, { action: "choose-two-top", selected: state.twoTop === 0 })}${pileMarkup(state.piles[1] || [], "1", `${t("pile")} 2`, { action: "choose-two-top", selected: state.twoTop === 1 })}</div><div class="hidden-heart-slot filled"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${t("Tap the pile you want on top. Both piles will meet in the center.")}</p><button class="seal-button" data-action="join-two" ${state.twoTop === null ? "disabled" : ""}>${t("Stack with this pile on top")}</button>` };
 }
 function renderCutThree() {
   const cuts = state.threeCuts.length;
-  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? "Place the first marker" : "First marker set · choose a different place for the second"}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? "Choose the first break in the side of the deck." : "Choose the second break. The two markers will form three piles."}</p><button class="seal-button" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
+  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? t("Place the first marker") : t("First marker set · choose a different place for the second")}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? t("Choose the first break in the side of the deck.") : t("Choose the second break. The two markers will form three piles.")}</p><button class="seal-button" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
 }
 function renderReassembleThree() {
   const selected = state.assemblyOrder;
-  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `pile ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div><div class="hidden-heart-slot filled compact"><span>Hidden Heart</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${selected.length ? `${selected.length} of 3 chosen · numbers show the top-to-bottom order` : "Tap the pile that should return first (on top)."}</p><button class="seal-button" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t("Stack in this order")}</button>` };
+  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `${t("pile")} ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div><div class="hidden-heart-slot filled compact"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${selected.length ? `${selected.length} ${t("of 3 chosen · numbers show the top-to-bottom order")}` : t("Tap the pile that should return first (on top).")}</p><button class="seal-button" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t("Stack in this order")}</button>` };
 }
 function renderSpread() {
-  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">One touch fans every card into a reading arc</span></div>`, actions: `<p class="status-note">Open the spread and the cards fan across the table.</p><button class="seal-button" data-action="assist-spread">${t("Open the spread")}</button>` };
+  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">${t("One touch fans every card into a reading arc")}</span></div>`, actions: `<p class="status-note">${t("Open the spread and the cards fan across the table.")}</p><button class="seal-button" data-action="assist-spread">${t("Open the spread")}</button>` };
 }
 function positionForSpread(index, total, path) {
   const t = index / Math.max(1, total - 1);
@@ -548,22 +752,23 @@ function positionForSpread(index, total, path) {
 function renderChoose() {
   const spread = state.spread || createDefaultSpread();
   const picked = new Set(state.selectedIds);
+  const drawn = state.selectedIds.length;
   return { surface: `<div class="table-surface"><div class="spread-layer">${state.deck.map((card, index) => {
     const p = positionForSpread(index, state.deck.length, spread);
     const isPicked = picked.has(card.id);
-    return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="Select a face-down card"></button></div>`;
-  }).join("")}</div><div class="draw-dock"><span class="dock-title">Drawn · ${state.selectedIds.length}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div></div>`, actions: `<p class="status-note">${state.selectedIds.length ? `${state.selectedIds.length} card${state.selectedIds.length === 1 ? " has" : "s have"} moved into the center tray.` : "Tap any face-down card. It will travel into the center tray."}</p><button class="seal-button" data-action="to-reveal" ${state.selectedIds.length === 3 ? "" : "disabled"}>${t("Place the four cards")}</button>` };
+    return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="${t("Select a face-down card")}"></button></div>`;
+  }).join("")}</div><div class="draw-dock"><span class="dock-title">${t("Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div></div>`, actions: `<p class="status-note">${drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray.")}</p><button class="seal-button" data-action="to-reveal" ${drawn === 3 ? "" : "disabled"}>${t("Place the four cards")}</button>` };
 }
 function revealActions() {
   const done = state.revealedIds.length === 4;
-  return `<p class="status-note">${done ? "The reading is ready to be gathered." : "There is no required order."}</p>${done ? `<button class="seal-button" data-action="open-reading">${t("Gather the reading")}</button>` : ""}`;
+  return `<p class="status-note">${done ? t("The reading is ready to be gathered.") : t("There is no required order.")}</p>${done ? `<button class="seal-button" data-action="open-reading">${t("Gather the reading")}</button>` : ""}`;
 }
 function renderReveal() {
   const cards = readingCards();
   return { surface: `<div class="reveal-layout">${cards.map((card, index) => {
     const revealed = state.revealedIds.includes(card.id);
     const pending = state.ad?.cardId === card.id;
-    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${card.reversed ? "reversed" : "upright"}` : `Reveal ${POSITIONS[index]}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
   }).join("")}</div>`, actions: revealActions() };
 }
 
@@ -630,18 +835,21 @@ async function requestAIInterpretation() {
     persist(); render();
   }
 }
+function readingShareText() {
+  return `${state.question}\n\n${readingCards().map((card, index) => `${POSITIONS[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`;
+}
 function renderReading() {
   const cards = readingCards();
   const interpretation = state.aiLoading
-    ? `<p class="ai-copy">Listening to the cards…</p>`
-    : `<p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} The prototype reading remains available below as a fallback.</p>` : ""}`;
-  return world(`<section class="scene reading"><div class="parchment"><p class="eyebrow">The Heart Cut · your reading</p><h2>${t("Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(POSITIONS[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(POSITIONS[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">Personal interpretation</p><h3>A reflection for the path in front of you</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">A closer reflection</p><h3>Would you like a personal interpretation?</h3><p>Watch a short ad to unlock a reflection based on your exact question and all four cards.</p><button class="seal-button" data-action="unlock-ai">Generate my personal interpretation</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button></div></div></section>`);
+    ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
+    : `<p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} ${t("The prototype reading remains available below as a fallback.")}</p>` : ""}`;
+  return world(`<section class="scene reading"><div class="parchment"><p class="eyebrow">The Heart Cut · ${t("your reading")}</p><h2>${t("Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(POSITIONS[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(POSITIONS[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${t("Watch a short ad to unlock a reflection based on your exact question and all four cards.")}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div></div></section>`);
 }
 function renderAd() {
   if (!state.ad) return "";
   const ready = state.ad.ready;
-  const title = state.ad.intent === "interpretation" ? "A quiet pause before the closer reading" : "A small doorway in the ritual";
-  return `<div class="ad-scrim" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card"><p class="ad-tag">Mock sponsored moment</p><div class="ad-illustration">The sky keeps<br>its own counsel.</div><h2>${title}</h2><p>This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.</p><div class="ad-footer"><span>${ready ? "You may continue" : "The door opens in a breath…"}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? "Continue" : "Please wait"}</button></div></section></div>`;
+  const title = state.ad.intent === "interpretation" ? t("A quiet pause before the closer reading") : t("A small doorway in the ritual");
+  return `<div class="ad-scrim" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card" tabindex="-1"><p class="ad-tag">${t("Mock sponsored moment")}</p><div class="ad-illustration">${t("The sky keeps<br>its own counsel.")}</div><h2>${title}</h2><p>${t("This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.")}</p><div class="ad-footer"><span>${ready ? t("You may continue") : t("The door opens in a breath…")}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? t("Continue") : t("Please wait")}</button></div></section></div>`;
 }
 function renderSettings() {
   if (!settingsOpen) return "";
@@ -656,6 +864,7 @@ function debugPanel() {
 function mountAd() {
   document.querySelector(".ad-scrim")?.remove();
   app.insertAdjacentHTML("beforeend", renderAd());
+  document.querySelector(".ad-card")?.focus({ preventScroll: true });
 }
 function unmountAd() { document.querySelector(".ad-scrim")?.remove(); }
 function markAdReady() {
@@ -663,8 +872,8 @@ function markAdReady() {
   if (!scrim) return;
   const button = scrim.querySelector('[data-action="dismiss-ad"]');
   const note = scrim.querySelector(".ad-footer span");
-  if (button) { button.disabled = false; button.textContent = "Continue"; }
-  if (note) note.textContent = "You may continue";
+  if (button) { button.disabled = false; button.textContent = t("Continue"); button.focus({ preventScroll: true }); }
+  if (note) note.textContent = t("You may continue");
 }
 function flipRevealCard(id) {
   const card = cardById(id);
@@ -674,7 +883,7 @@ function flipRevealCard(id) {
   button.classList.remove("flip-pending");
   button.classList.add("flipped");
   button.disabled = true;
-  button.setAttribute("aria-label", `${card.name}, ${card.reversed ? "reversed" : "upright"}`);
+  button.setAttribute("aria-label", `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}`);
   button.closest(".reveal-slot")?.querySelector(".orientation")?.classList.remove("is-hidden");
   interaction(); buzz([8, 20, 13]); sound("flip", .2);
   const actions = document.querySelector(".ritual-actions");
@@ -692,6 +901,16 @@ function render() {
   paintCardArt();
   bindGestures();
   persist();
+  // Announce stage changes by moving focus to the new heading (like a page change).
+  // Skipped while a dialog is open and on the very first paint.
+  if (state.stage !== lastFocusedStage && !settingsOpen && !state.ad) {
+    lastFocusedStage = state.stage;
+    const heading = app.querySelector(".world h1, .world h2");
+    if (heading) {
+      heading.setAttribute("tabindex", "-1");
+      heading.focus({ preventScroll: true });
+    }
+  }
 }
 
 function reorderDeck(dx, dy, distance) {
@@ -822,8 +1041,8 @@ function updateShuffleStatus() {
   const status = document.querySelector("#shuffle-status");
   const guide = document.querySelector("#shuffle-guide");
   const button = document.querySelector('[data-action="shuffle-done"]');
-  if (status) status.textContent = ready ? "The cards feel mixed. Gather them when you are ready." : `${3 - state.shuffleMoves} more move${3 - state.shuffleMoves === 1 ? "" : "s"} will loosen the order.`;
-  if (guide) guide.textContent = `${state.shuffleMoves} physical move${state.shuffleMoves === 1 ? "" : "s"} · keep mixing or gather them`;
+  if (status) status.textContent = ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`;
+  if (guide) guide.textContent = `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}`;
   if (button) button.disabled = !ready;
 }
 function animateDeckCut(pieces, done) {
@@ -866,7 +1085,7 @@ function bindSpread(surface) {
       deck.classList.remove("is-grabbing");
       deck.style.transform = "";
       if (preview) preview.innerHTML = "";
-      showToast("Sweep a little farther so the cards have room to open.");
+      showToast(t("Sweep a little farther so the cards have room to open."));
       return;
     }
     state.spread = spreadFromPoints(surface, points);
@@ -990,6 +1209,11 @@ function animatePickCard(element, id) {
   if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= 3) return;
   const dock = document.querySelector(".draw-dock");
   if (!dock) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    state.selectedIds.push(id);
+    interaction(); render();
+    return;
+  }
   transitioning = true;
   const from = element.getBoundingClientRect();
   const to = dock.getBoundingClientRect();
@@ -1014,10 +1238,10 @@ function act(action, element) {
   if (action === "choose-love") { state.stage = "question"; interaction(); render(); return; }
   if (action === "back-category") { state.stage = "category"; render(); return; }
   if (action === "question-next") { if (state.question.trim().length < 4) return; state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle"; interaction(); buzz(12); render(); return; }
-  if (action === "open-settings") { settingsOpen = true; render(); return; }
-  if (action === "close-settings") { settingsOpen = false; persist(); render(); return; }
+  if (action === "open-settings") { settingsOpen = true; render(); document.querySelector(".settings-close")?.focus(); return; }
+  if (action === "close-settings") { settingsOpen = false; persistNow(); render(); document.querySelector(".settings-button")?.focus(); return; }
   if (action === "toggle-debug") { state.debug = !state.debug; render(); return; }
-  if (action === "toggle-simplified") { state.settings.simplified = !state.settings.simplified; persist(); showToast(state.settings.simplified ? "Guided interaction mode is on." : "Guided interaction mode is off."); render(); return; }
+  if (action === "toggle-simplified") { state.settings.simplified = !state.settings.simplified; persistNow(); showToast(t(state.settings.simplified ? "Guided interaction mode is on." : "Guided interaction mode is off.")); render(); return; }
   if (action === "reset-reading" || action === "restart") { resetReading(); return; }
   if (action === "assist-shuffle") {
     const layout = state.shuffleLayout;
@@ -1093,7 +1317,8 @@ function act(action, element) {
     setTimeout(() => { if (state.ad?.intent === "interpretation") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
     return;
   }
-  if (action === "share-copy") { const text = `${state.question}\n\n${readingCards().map((card, index) => `${POSITIONS[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`; navigator.clipboard?.writeText(text).then(() => showToast("Reading copied."), () => showToast("Copy is unavailable in this browser.")); return; }
+  if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
+  if (action === "share-reading") { if (navigator.share) navigator.share({ title: "The Heart Cut", text: readingShareText() }).catch(() => {}); return; }
 }
 
 app.addEventListener("click", (event) => {
@@ -1191,6 +1416,29 @@ app.addEventListener("pointerdown", (event) => {
 window.addEventListener("pointermove", (event) => { if (cutDragDeck) pickCutFromPoint(cutDragDeck, event.clientY); });
 window.addEventListener("pointerup", () => { cutDragDeck = null; });
 window.addEventListener("pointercancel", () => { cutDragDeck = null; });
+
+// Escape closes the settings dialog (and a finished mock ad), like a native dialog.
+window.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  if (settingsOpen) {
+    settingsOpen = false;
+    persistNow(); render();
+    document.querySelector(".settings-button")?.focus();
+  } else if (state.ad?.ready) {
+    act("dismiss-ad", null);
+  }
+});
+
+// Artwork fallback: if a card image fails to load, swap in a styled text face
+// instead of leaving a broken image. (error events do not bubble — capture them.)
+app.addEventListener("error", (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains("card-image")) return;
+  const fallback = document.createElement("span");
+  fallback.className = "card-image-fallback";
+  fallback.innerHTML = `<strong>${escapeHTML(img.dataset.name || "Tarot")}</strong><i>${escapeHTML(img.dataset.mark || "✦")}</i>`;
+  img.replaceWith(fallback);
+}, true);
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 render();
