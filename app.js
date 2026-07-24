@@ -1087,38 +1087,44 @@ async function exportShareImage(mode, button) {
     if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
   }
 }
-// Instagram / TikTok / X can't receive an image straight from a web page, so we hand it
-// to the OS share sheet where the app appears (best on mobile), and fall back to saving
-// the image + opening the platform on desktop — the pattern most web share flows use.
+// A web page can't push an image straight into Instagram/TikTok's composer (only native
+// apps can, via their SDKs). So each tile opens that app directly — the app's deep link on
+// mobile, X's compose intent everywhere — and we save the image to the device at the same
+// time so the user just picks it in the app. The "More" tile still uses the OS share sheet,
+// which is the one path that hands the file across directly.
+const IS_MOBILE = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
 const SHARE_PLATFORMS = {
-  instagram: { label: "Instagram", open: () => "https://www.instagram.com/" },
-  tiktok: { label: "TikTok", open: () => "https://www.tiktok.com/upload" },
-  x: { label: "X", open: () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareCaption())}` }
+  instagram: { label: "Instagram", app: "instagram://story-camera", web: "https://www.instagram.com/" },
+  tiktok: { label: "TikTok", app: "snssdk1233://", web: "https://www.tiktok.com/" },
+  x: { label: "X", web: "https://twitter.com/intent/tweet" }
 };
-function canShareFiles() {
-  if (!navigator.canShare || typeof File === "undefined") return false;
-  try { return navigator.canShare({ files: [new File([new Uint8Array(1)], "p.png", { type: "image/png" })] }); }
-  catch { return false; }
+function platformUrl(platform, caption) {
+  if (platform === "x") return `${SHARE_PLATFORMS.x.web}?text=${encodeURIComponent(caption)}`;
+  return SHARE_PLATFORMS[platform].web;
 }
 async function shareToPlatform(platform, button) {
   const meta = SHARE_PLATFORMS[platform];
   if (!meta) return;
-  const theme = shareThemeId();
-  // Decide the path *before* any await: on desktop we open the platform in a new tab, and
-  // that window.open must run inside the click gesture or a popup blocker will eat it.
-  const useNativeShare = canShareFiles();
-  const win = useNativeShare ? null : window.open(meta.open(), "_blank", "noopener");
+  const caption = shareCaption();
+  // Open the destination inside the click gesture so a popup blocker doesn't eat it.
+  // X + desktop open a normal tab; mobile IG/TikTok deep-link into the app after the save.
+  const deepLink = platform !== "x" && IS_MOBILE ? meta.app : null;
+  const win = deepLink ? null : window.open(platformUrl(platform, caption), "_blank", "noopener");
   if (button) button.classList.add("busy");
   try {
-    const { blob, file } = await shareImageFile(theme);
-    if (useNativeShare) {
-      await navigator.share({ files: [file], title: "My Tarot Reading", text: shareCaption() });
-    } else {
-      saveBlob(blob, file.name);
-      showToast(`Image saved — add it to your post on ${meta.label}.`);
+    const { blob, file } = await shareImageFile(shareThemeId());
+    saveBlob(blob, file.name); // drop the image on the device so it can be selected in the app
+    showToast(`Image saved — add it to your ${meta.label} post.`);
+    if (deepLink) {
+      // Deep-link into the app; if it isn't installed, fall back to the website shortly after.
+      const timer = setTimeout(() => { location.href = meta.web; }, 1400);
+      window.addEventListener("pagehide", () => clearTimeout(timer), { once: true });
+      location.href = deepLink;
+      return; // navigating away — leave the sheet behind us
     }
     shareSheetOpen = false; render();
   } catch (error) {
+    if (win) win.close?.();
     if (button) button.classList.remove("busy");
     if (error?.name !== "AbortError") showToast("Couldn't prepare the image.");
   }
