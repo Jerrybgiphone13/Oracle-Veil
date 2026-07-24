@@ -460,6 +460,32 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
 
 @keyframes share-spin { to { transform: rotate(360deg); } }
 
+/* Share sheet — suggests Instagram / TikTok / X when you tap Continue to share */
+.primary-action.busy, .secondary-action.busy { opacity: .62; pointer-events: none; }
+.share-sheet-scrim { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background: rgba(3, 12, 18, .62); backdrop-filter: blur(3px); animation: share-scrim-in .2s ease; }
+.share-sheet { width: min(100%, 30rem); padding: 1.4rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom)); border: 1px solid var(--line); border-bottom: 0; border-radius: 22px 22px 0 0; background: linear-gradient(180deg, #123742, #0b2530); box-shadow: 0 -18px 52px rgba(0, 0, 0, .5); text-align: center; animation: share-sheet-up .3s cubic-bezier(.2, .8, .2, 1); }
+.share-sheet-grip { display: block; width: 42px; height: 4px; margin: 0 auto 1rem; border-radius: 999px; background: rgba(229, 202, 139, .35); }
+.share-sheet-title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 1.22rem; color: var(--paper-light); }
+.share-sheet-sub { margin: .3rem 0 1.3rem; font-size: .82rem; color: var(--cloud); }
+.share-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.1rem 1.25rem; }
+.share-tile { display: grid; justify-items: center; gap: .5rem; width: 4rem; padding: 0; border: 0; background: transparent; color: var(--paper-light); cursor: pointer; font: inherit; }
+.share-tile-icon { position: relative; display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; color: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, .34); transition: transform .15s ease; }
+.share-tile:hover .share-tile-icon { transform: translateY(-2px); }
+.share-tile:active .share-tile-icon { transform: scale(.93); }
+.share-tile-icon svg { width: 54%; height: 54%; }
+.share-tile-label { font-size: .78rem; color: var(--paper-light); }
+.share-tile.instagram .share-tile-icon { background: radial-gradient(circle at 30% 108%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.share-tile.tiktok .share-tile-icon { background: #010101; }
+.share-tile.x .share-tile-icon { background: #010101; }
+.share-tile.save .share-tile-icon, .share-tile.more .share-tile-icon { background: rgba(229, 202, 139, .14); color: var(--gold-bright); border: 1px solid var(--line); }
+.share-tile.busy { opacity: .6; pointer-events: none; }
+.share-tile.busy .share-tile-icon svg { opacity: .2; }
+.share-tile.busy .share-tile-icon::after { content: ""; position: absolute; width: 1.35rem; height: 1.35rem; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff; animation: share-spin .7s linear infinite; }
+.share-sheet-cancel { margin-top: 1.35rem; width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 12px; background: rgba(8, 30, 42, .5); color: var(--paper-light); font-size: 1rem; cursor: pointer; }
+.share-sheet-cancel:hover { border-color: var(--gold-bright); }
+@keyframes share-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes share-scrim-in { from { opacity: 0; } to { opacity: 1; } }
+
 @media (max-width: 820px) {
   .share-topbar { grid-template-columns: 44px 1fr 44px; }
   .share-brand, .share-exit { display: none; }

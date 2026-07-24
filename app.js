@@ -1001,10 +1001,12 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.textBaseline = "alphabetic";
   return canvas;
 }
-// Rendered share canvases are cached per theme so switching looks and re-tapping
-// Save/Share stays instant and every export matches the on-screen preview exactly.
+// Rendered share canvases (and their data URLs) are cached per theme so switching looks,
+// re-tapping Save/Share, and opening the share sheet stay instant and flash-free.
 let shareCanvasCache = {};
-function resetShareCache() { shareCanvasCache = {}; }
+let shareDataUrlCache = {};
+let shareSheetOpen = false;
+function resetShareCache() { shareCanvasCache = {}; shareDataUrlCache = {}; shareSheetOpen = false; }
 async function shareCanvasFor(theme) {
   if (shareCanvasCache[theme]) return shareCanvasCache[theme];
   const cards = readingCards();
@@ -1018,43 +1020,120 @@ async function mountSharePreview() {
   const frame = document.querySelector(".story-canvas");
   if (!frame) return;
   const theme = shareThemeId();
+  // Cached image: paint it synchronously so re-renders (e.g. opening the sheet) don't flash.
+  if (shareDataUrlCache[theme]) {
+    frame.style.backgroundImage = `url("${shareDataUrlCache[theme]}")`;
+    frame.classList.add("ready");
+    return;
+  }
   try {
     const canvas = await shareCanvasFor(theme);
     if (state.stage !== "share" || shareThemeId() !== theme) return;
     const url = canvas.toDataURL("image/png");
+    shareDataUrlCache[theme] = url;
     frame.style.backgroundImage = `url("${url}")`;
     frame.classList.add("ready");
   } catch {
     frame.classList.add("failed");
   }
 }
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url; link.download = filename;
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function shareImageFile(theme) {
+  const canvas = await shareCanvasFor(theme);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  if (!blob) throw new Error("Could not render the image.");
+  return { blob, file: new File([blob], `oracle-veil-${theme}.png`, { type: "image/png" }) };
+}
+function shareCaption() {
+  const summary = state.aiSummary || personalSummary(readingCards());
+  return `${summary}\n\n✦ My tarot reading from The Heart Cut · oracleveil.online`;
+}
+// "Save image" and the native "More" option.
 async function exportShareImage(mode, button) {
   const theme = shareThemeId();
-  const originalLabel = button?.textContent;
-  if (button) { button.disabled = true; button.textContent = mode === "save" ? "Saving…" : "Preparing…"; }
+  if (button) button.classList.add("busy");
   try {
-    const canvas = await shareCanvasFor(theme);
-    const summary = state.aiSummary || personalSummary(readingCards());
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-    if (!blob) throw new Error("Could not render the image.");
-    const file = new File([blob], `oracle-veil-${theme}.png`, { type: "image/png" });
-    const canShareFile = mode === "share" && navigator.canShare && navigator.canShare({ files: [file] });
-    if (canShareFile) {
-      await navigator.share({ files: [file], title: "My Tarot Reading", text: summary });
-      showToast("Your reading is ready to share.");
+    const { blob, file } = await shareImageFile(theme);
+    if (mode === "share" && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "My Tarot Reading", text: shareCaption() });
     } else {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url; link.download = file.name;
-      document.body.append(link); link.click(); link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      saveBlob(blob, file.name);
       showToast(mode === "share" ? "Sharing isn't available here, so the image was saved." : "Your image has been saved.");
     }
+    shareSheetOpen = false; render();
   } catch (error) {
+    if (button) button.classList.remove("busy");
     if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
-  } finally {
-    if (button) { button.disabled = false; button.textContent = originalLabel; }
   }
+}
+// Instagram / TikTok / X can't receive an image straight from a web page, so we hand it
+// to the OS share sheet where the app appears (best on mobile), and fall back to saving
+// the image + opening the platform on desktop — the pattern most web share flows use.
+const SHARE_PLATFORMS = {
+  instagram: { label: "Instagram", open: () => "https://www.instagram.com/" },
+  tiktok: { label: "TikTok", open: () => "https://www.tiktok.com/upload" },
+  x: { label: "X", open: () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareCaption())}` }
+};
+function canShareFiles() {
+  if (!navigator.canShare || typeof File === "undefined") return false;
+  try { return navigator.canShare({ files: [new File([new Uint8Array(1)], "p.png", { type: "image/png" })] }); }
+  catch { return false; }
+}
+async function shareToPlatform(platform, button) {
+  const meta = SHARE_PLATFORMS[platform];
+  if (!meta) return;
+  const theme = shareThemeId();
+  // Decide the path *before* any await: on desktop we open the platform in a new tab, and
+  // that window.open must run inside the click gesture or a popup blocker will eat it.
+  const useNativeShare = canShareFiles();
+  const win = useNativeShare ? null : window.open(meta.open(), "_blank", "noopener");
+  if (button) button.classList.add("busy");
+  try {
+    const { blob, file } = await shareImageFile(theme);
+    if (useNativeShare) {
+      await navigator.share({ files: [file], title: "My Tarot Reading", text: shareCaption() });
+    } else {
+      saveBlob(blob, file.name);
+      showToast(`Image saved — add it to your post on ${meta.label}.`);
+    }
+    shareSheetOpen = false; render();
+  } catch (error) {
+    if (button) button.classList.remove("busy");
+    if (error?.name !== "AbortError") showToast("Couldn't prepare the image.");
+  }
+}
+const SHARE_ICONS = {
+  instagram: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.25" fill="currentColor"/></svg>`,
+  tiktok: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.4 3h2.9a5.2 5.2 0 0 0 4.2 4.2v2.9a8 8 0 0 1-4.2-1.3v5.7a5.9 5.9 0 1 1-5.9-5.9c.3 0 .6 0 .9.05v3a2.9 2.9 0 1 0 2.1 2.8V3z" fill="currentColor"/></svg>`,
+  x: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.9 3h3.2l-7 8 8.2 10.9h-6.4l-5-6.5-5.8 6.5H1.9l7.5-8.6L1.6 3h6.6l4.5 6 5.6-6z" fill="currentColor"/></svg>`,
+  save: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v10.4m0 0l-4.2-4.2M12 13.9l4.2-4.2M4.5 19.5h15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  more: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="18.5" cy="12" r="1.9" fill="currentColor"/></svg>`
+};
+function shareTile(platform) {
+  return `<button class="share-tile ${platform}" type="button" data-action="share-platform" data-platform="${platform}"><span class="share-tile-icon">${SHARE_ICONS[platform]}</span><span class="share-tile-label">${SHARE_PLATFORMS[platform].label}</span></button>`;
+}
+function renderShareSheet() {
+  if (!shareSheetOpen) return "";
+  const more = navigator.share ? `<button class="share-tile more" type="button" data-action="share-native"><span class="share-tile-icon">${SHARE_ICONS.more}</span><span class="share-tile-label">More</span></button>` : "";
+  return `<div class="share-sheet-scrim" data-action="share-sheet-close">
+    <section class="share-sheet" role="dialog" aria-modal="true" aria-label="Share your reading" data-action="share-sheet-keep">
+      <span class="share-sheet-grip" aria-hidden="true"></span>
+      <h3 class="share-sheet-title">Share your reading</h3>
+      <p class="share-sheet-sub">Post your card to a story or feed.</p>
+      <div class="share-tiles">
+        ${shareTile("instagram")}${shareTile("tiktok")}${shareTile("x")}
+        <button class="share-tile save" type="button" data-action="share-save"><span class="share-tile-icon">${SHARE_ICONS.save}</span><span class="share-tile-label">Save</span></button>
+        ${more}
+      </div>
+      <button class="share-sheet-cancel" type="button" data-action="share-sheet-close">Cancel</button>
+    </section>
+  </div>`;
 }
 function renderSharePage() {
   const themeId = shareThemeId();
@@ -1090,6 +1169,7 @@ function renderSharePage() {
         <p class="share-privacy">Your full reading stays private.</p>
       </aside>
     </div>
+    ${renderShareSheet()}
   </div>`;
 }
 async function requestAIInterpretation() {
@@ -1629,9 +1709,13 @@ function act(action, element) {
   if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
   if (action === "share-reading") { if (navigator.share) navigator.share({ title: "The Heart Cut", text: readingShareText() }).catch(() => {}); return; }
   if (action === "share-image") { if (readingCards().length !== 4) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
-  if (action === "share-back") { state.stage = "reading"; render(); return; }
+  if (action === "share-back") { shareSheetOpen = false; state.stage = "reading"; render(); return; }
   if (action === "share-theme") { const theme = element.dataset.theme; if (theme && theme !== state.shareTheme) { state.shareTheme = theme; sound("flip", .12); render(); } return; }
-  if (action === "share-continue") { void exportShareImage("share", element); return; }
+  if (action === "share-continue") { shareSheetOpen = true; sound("flip", .12); render(); document.querySelector(".share-tile")?.focus(); return; }
+  if (action === "share-sheet-close") { shareSheetOpen = false; render(); return; }
+  if (action === "share-sheet-keep") return; // click inside the sheet — keep it open
+  if (action === "share-platform") { void shareToPlatform(element.dataset.platform, element); return; }
+  if (action === "share-native") { void exportShareImage("share", element); return; }
   if (action === "share-save") { void exportShareImage("save", element); return; }
 }
 
@@ -1743,6 +1827,9 @@ window.addEventListener("keydown", (event) => {
     settingsOpen = false;
     persistNow(); render();
     document.querySelector(".settings-button")?.focus();
+  } else if (shareSheetOpen) {
+    shareSheetOpen = false; render();
+    document.querySelector('[data-action="share-continue"]')?.focus();
   } else if (state.ad?.ready) {
     act("dismiss-ad", null);
   }
