@@ -826,6 +826,14 @@ ${connection.name} describes the space between you. Look for the practical evide
 
 For the Path Ahead, ${ahead.name} offers a next small experiment rather than a verdict. Try one honest conversation, one boundary, or one act of self-care that brings your daily experience closer to the kind of love you want to practice. Let what happens next inform you.`;
 }
+// First sentence of a longer interpretation, for a one-line share/summary line.
+function firstSentence(text) {
+  const s = String(text || "").replace(/\s+/g, " ").trim();
+  const match = s.match(/^.*?[.!?](\s|$)/);
+  let sentence = (match ? match[0] : s).trim();
+  if (sentence.length > 180) sentence = sentence.slice(0, 177).replace(/\s+\S*$/, "") + "…";
+  return sentence;
+}
 function personalSummary(cards) {
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
@@ -1103,9 +1111,12 @@ async function requestAIInterpretation() {
       })
     });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok || typeof payload.text !== "string" || typeof payload.summary !== "string") throw new Error(payload.error || "The interpretation service is unavailable.");
+    if (!response.ok || typeof payload.text !== "string" || !payload.text.trim()) throw new Error(payload.error || "The interpretation service is unavailable.");
     state.aiText = payload.text.trim();
-    state.aiSummary = payload.summary.trim();
+    // The server may omit a short "summary"; derive one from the interpretation so the
+    // reading and the share image still get a personal one-line takeaway.
+    const givenSummary = typeof payload.summary === "string" ? payload.summary.trim() : "";
+    state.aiSummary = givenSummary || firstSentence(state.aiText) || personalSummary(readingCards());
     state.aiError = null;
   } catch (error) {
     state.aiError = error instanceof Error ? error.message : "The interpretation service is unavailable.";
@@ -1439,9 +1450,13 @@ function convergePiles(field, depthFor) {
   const cy = fieldRect.top + fieldRect.height / 2;
   piles.forEach((pile, index) => {
     const rect = pile.getBoundingClientRect();
+    // On mobile the piles are shrunk with the CSS `scale` property, which is applied
+    // *outside* this inline translate — so a screen-pixel delta lands short. Divide by
+    // the element's real scale so the piles travel the full way onto the center and stack.
+    const scale = (pile.offsetWidth && rect.width / pile.offsetWidth) || 1;
     const depth = depths[index];
-    const dx = cx - (rect.left + rect.width / 2) + depth * 2;
-    const dy = cy - (rect.top + rect.height / 2) + depth * 3;
+    const dx = (cx - (rect.left + rect.width / 2)) / scale + depth * 2;
+    const dy = (cy - (rect.top + rect.height / 2)) / scale + depth * 3;
     pile.style.zIndex = String(20 - depth);
     pile.style.transform = `translate(${dx}px, ${dy}px)`;
   });
@@ -1503,8 +1518,11 @@ function animatePickCard(element, id) {
   transitioning = true;
   const from = element.getBoundingClientRect();
   const to = dock.getBoundingClientRect();
-  const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-  const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+  // Divide by the card's real scale so the flight lands on the dock on mobile too,
+  // where the spread cards are shrunk with the CSS `scale` property (see convergePiles).
+  const scale = (element.offsetWidth && from.width / element.offsetWidth) || 1;
+  const dx = (to.left + to.width / 2 - (from.left + from.width / 2)) / scale;
+  const dy = (to.top + to.height / 2 - (from.top + from.height / 2)) / scale;
   element.closest(".spread-card")?.classList.add("flying");
   const animation = element.animate([
     { transform: "translate(0, 0) rotate(0deg)", filter: "brightness(1)" },
