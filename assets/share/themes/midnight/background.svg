@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg" x1=".15" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#020f19"/>
+      <stop offset=".45" stop-color="#041b28"/>
+      <stop offset="1" stop-color="#020e18"/>
+    </linearGradient>
+    <radialGradient id="coolGlow" cx="19%" cy="12%" r="38%">
+      <stop offset="0" stop-color="#bbc4b7" stop-opacity=".11"/>
+      <stop offset=".55" stop-color="#264252" stop-opacity=".045"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".62" numOctaves="4" seed="31" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 .095"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <rect width="1080" height="1920" fill="url(#coolGlow)"/>
+  <rect width="1080" height="1920" fill="#6e8490" opacity=".1" filter="url(#paper)"/>
+</svg>

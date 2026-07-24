@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#061923"/>
+      <stop offset="0.52" stop-color="#082630"/>
+      <stop offset="1" stop-color="#061b24"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="22%" cy="13%" r="42%">
+      <stop offset="0" stop-color="#d9c18c" stop-opacity=".14"/>
+      <stop offset=".55" stop-color="#7b8d91" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="14" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+      <feComponentTransfer in="gray" result="faded">
+        <feFuncA type="table" tableValues="0 .105"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="faded" mode="soft-light"/>
+    </filter>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <rect width="1080" height="1920" fill="url(#moonGlow)"/>
+  <rect width="1080" height="1920" fill="#9ca7a4" opacity=".12" filter="url(#paper)"/>
+</svg>

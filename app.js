@@ -449,6 +449,7 @@ function createState() {
     threeCutDraft: 23,
     twoTop: null,
     ad: null,
+    shareTheme: "paper-moon",
     aiUnlocked: false,
     aiLoading: false,
     aiText: null,
@@ -862,127 +863,226 @@ function drawWrappedText(ctx, text, cx, y, maxWidth, lineHeight) {
   lines.forEach((line, index) => ctx.fillText(line, cx, y + index * lineHeight));
   return y + lines.length * lineHeight;
 }
-async function buildShareCanvas(question, cards, summary) {
+// The three celestial "story" looks a reader can pick before saving/sharing.
+const SHARE_THEMES = [
+  { id: "paper-moon", label: "Paper Moon" },
+  { id: "midnight", label: "Midnight" },
+  { id: "golden-hour", label: "Golden Hour" }
+];
+const SHARE_INK = "#071b24";
+// Each theme's skyline art ends at a different height, so pin the town to a common
+// bottom line (matching Golden Hour, the reference look) instead of letting Midnight float.
+const SHARE_SKYLINE_DY = { "paper-moon": 0, "golden-hour": 0, midnight: 196 };
+function shareThemeId() {
+  const id = state.shareTheme;
+  return SHARE_THEMES.some((theme) => theme.id === id) ? id : "paper-moon";
+}
+
+// Shrink a font until `text` fits within maxWidth (keeps one long question/title on its line).
+function fitFontPx(ctx, text, maxWidth, startPx, fontFor, minPx = 20) {
+  let px = startPx;
+  while (px > minPx) {
+    ctx.font = fontFor(px);
+    if (ctx.measureText(text).width <= maxWidth) break;
+    px -= 2;
+  }
+  return px;
+}
+
+// Draw one tarot card, fanned by `angle`, with a gold frame. The source image is
+// inset before drawing so the card scan's rough cream paper edge never reaches the
+// export — the gold frame then sits cleanly on the trimmed edge.
+function drawFramedShareCard(ctx, img, reversed, cx, cy, cw, ch, angle) {
+  const r = cw * 0.05;
+  const inset = 0.034;
+  const sx = img.naturalWidth * inset, sy = img.naturalHeight * inset;
+  const sw = img.naturalWidth * (1 - inset * 2), sh = img.naturalHeight * (1 - inset * 2);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate((angle * Math.PI) / 180);
+  // soft drop shadow so the cards lift off the sky
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.42)";
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = "#0d1b22";
+  roundRectPath(ctx, -cw / 2, -ch / 2, cw, ch, r);
+  ctx.fill();
+  ctx.restore();
+  // clip to the rounded card and paint the trimmed artwork (flipped when reversed)
+  ctx.save();
+  roundRectPath(ctx, -cw / 2, -ch / 2, cw, ch, r);
+  ctx.clip();
+  if (reversed) ctx.rotate(Math.PI);
+  ctx.drawImage(img, sx, sy, sw, sh, -cw / 2, -ch / 2, cw, ch);
+  ctx.restore();
+  // gold frame that hides the trimmed edge
+  ctx.strokeStyle = "rgba(229,210,162,.95)";
+  ctx.lineWidth = 8;
+  roundRectPath(ctx, -cw / 2 + 4, -ch / 2 + 4, cw - 8, ch - 8, r);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(139,104,53,.8)";
+  ctx.lineWidth = 2;
+  roundRectPath(ctx, -cw / 2 + 11, -ch / 2 + 11, cw - 22, ch - 22, r * 0.7);
+  ctx.stroke();
+  ctx.restore();
+}
+
+async function buildShareCanvas(question, cards, summary, theme = shareThemeId()) {
   const W = 1080, H = 1920;
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d");
-  const images = await Promise.all(cards.map((card) => loadImage(cardImagePath(card))));
+  const base = `./assets/share/themes/${theme}`;
+  // Composite the base from its own layers (background → town skyline → gold frame) so the
+  // town can be pinned to the bottom per theme, and always sits *under* the cards drawn next.
+  const [background, skyline, frame, titlePanel, questionPanel, quotePanel, ...images] = await Promise.all([
+    loadImage(`${base}/background.svg`),
+    loadImage(`${base}/skyline-overlay.png`),
+    loadImage(`${base}/celestial-frame-overlay.png`),
+    loadImage("./assets/share/shared/title-panel.png"),
+    loadImage("./assets/share/shared/question-panel.png"),
+    loadImage("./assets/share/shared/quote-panel.png"),
+    ...cards.map((card) => loadImage(cardImagePath(card)))
+  ]);
 
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-  bgGrad.addColorStop(0, "#08151d");
-  bgGrad.addColorStop(1, "#102d36");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-  const vignette = ctx.createRadialGradient(W / 2, H * .42, H * .15, W / 2, H * .42, H * .75);
-  vignette.addColorStop(0, "rgba(0,0,0,0)");
-  vignette.addColorStop(1, "rgba(0,0,0,.45)");
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.strokeStyle = "rgba(229,202,139,.45)";
-  ctx.lineWidth = 2;
-  roundRectPath(ctx, 36, 36, W - 72, H - 72, 28);
-  ctx.stroke();
-
+  ctx.drawImage(background, 0, 0, W, H);
+  ctx.drawImage(skyline, 0, SHARE_SKYLINE_DY[theme] || 0, W, H);
+  ctx.drawImage(frame, 0, 0, W, H);
   ctx.textAlign = "center";
-  ctx.fillStyle = "#f4dfaa";
-  ctx.font = "600 30px Georgia, serif";
-  ctx.fillText("✦ THE HEART CUT ✦", W / 2, 150);
-  ctx.fillStyle = "#94743e";
-  ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
-  ctx.save(); ctx.letterSpacing = "3px"; ctx.fillText("A LOVE READING", W / 2, 192); ctx.restore();
+  ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "#f5e8c8";
-  ctx.font = "italic 42px Georgia, serif";
-  const questionBottom = drawWrappedText(ctx, `“${question.trim()}”`, W / 2, 300, W - 220, 54);
+  // Title panel
+  ctx.drawImage(titlePanel, 212, 200, 656, 320);
+  ctx.fillStyle = SHARE_INK;
+  const titleFor = (px) => `${px}px Georgia, "Times New Roman", serif`;
+  ctx.font = titleFor(66);
+  ctx.fillText("MY TAROT", 540, 322);
+  ctx.fillText("READING", 540, 398);
 
-  const cardTop = Math.max(questionBottom + 60, 460);
-  const gap = 24, marginX = 80;
-  const cardW = (W - marginX * 2 - gap * 3) / 4;
-  const cardH = cardW * (155 / 91);
+  // Question panel (auto-fits the reader's own wording to a single line)
+  ctx.drawImage(questionPanel, 215, 505, 650, 131);
+  const q = question.trim();
+  fitFontPx(ctx, q, 588, 44, (px) => `italic ${px}px Georgia, "Times New Roman", serif`, 16);
+  ctx.fillStyle = SHARE_INK;
+  ctx.fillText(q, 540, 571);
+
+  // Four cards, fanned, town skyline resting beneath them
+  const cw = 238, ch = 397;
+  const lefts = [40, 295, 548, 801];
+  const tops = [664, 640, 646, 671];
+  const angles = [-5, -1, 2, 5];
   cards.forEach((card, index) => {
-    const x = marginX + index * (cardW + gap);
-    const y = cardTop;
-    ctx.save();
-    roundRectPath(ctx, x, y, cardW, cardH, 10);
-    ctx.clip();
-    ctx.fillStyle = "#121b1f";
-    ctx.fillRect(x, y, cardW, cardH);
-    if (card.reversed) {
-      ctx.translate(x + cardW / 2, y + cardH / 2);
-      ctx.rotate(Math.PI);
-      ctx.drawImage(images[index], -cardW / 2, -cardH / 2, cardW, cardH);
-    } else {
-      ctx.drawImage(images[index], x, y, cardW, cardH);
-    }
-    ctx.restore();
-    ctx.strokeStyle = "rgba(223,189,120,.65)";
-    ctx.lineWidth = 2;
-    roundRectPath(ctx, x, y, cardW, cardH, 10);
-    ctx.stroke();
-
-    ctx.fillStyle = "#94743e";
-    ctx.font = "600 15px ui-sans-serif, system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(POSITIONS[index].toUpperCase(), x + cardW / 2, y + cardH + 34);
-    ctx.fillStyle = "#f5e8c8";
-    ctx.font = "600 17px Georgia, serif";
-    wrapCanvasText(ctx, `${card.name}${card.reversed ? " (R)" : ""}`, cardW + 16).slice(0, 2).forEach((line, li) => {
-      ctx.fillText(line, x + cardW / 2, y + cardH + 60 + li * 22);
-    });
+    drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });
 
-  const boxTop = cardTop + cardH + 150;
-  const boxHeight = 340;
-  ctx.strokeStyle = "rgba(229,202,139,.5)";
-  ctx.fillStyle = "rgba(16,45,54,.55)";
-  ctx.lineWidth = 2;
-  roundRectPath(ctx, 90, boxTop, W - 180, boxHeight, 20);
-  ctx.fill();
-  ctx.stroke();
+  // Quote panel with the short answer, auto-fit to at most three lines
+  ctx.drawImage(quotePanel, 240, 1245, 600, 318);
+  ctx.fillStyle = SHARE_INK;
+  let aPx = 50, lines;
+  while (aPx >= 30) {
+    ctx.font = `italic ${aPx}px Georgia, "Times New Roman", serif`;
+    lines = wrapCanvasText(ctx, summary.trim(), 460);
+    if (lines.length <= 3) break;
+    aPx -= 3;
+  }
+  const lh = aPx * 1.22;
+  const startY = 1404 - ((lines.length - 1) * lh) / 2;
+  lines.forEach((line, index) => ctx.fillText(line, 540, startY + index * lh));
 
-  ctx.fillStyle = "#94743e";
-  ctx.font = "600 18px ui-sans-serif, system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("THE SHORT ANSWER", W / 2, boxTop + 56);
-
-  ctx.fillStyle = "#f4dfaa";
-  ctx.font = "italic 600 38px Georgia, serif";
-  drawWrappedText(ctx, summary.trim(), W / 2, boxTop + 130, W - 280, 50);
-
-  ctx.fillStyle = "#8ea8a2";
-  ctx.font = "16px ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText("A reflective, imaginative reading — not a prediction.", W / 2, H - 60);
-
+  ctx.textBaseline = "alphabetic";
   return canvas;
 }
-async function shareReadingImage(button) {
+// Rendered share canvases are cached per theme so switching looks and re-tapping
+// Save/Share stays instant and every export matches the on-screen preview exactly.
+let shareCanvasCache = {};
+function resetShareCache() { shareCanvasCache = {}; }
+async function shareCanvasFor(theme) {
+  if (shareCanvasCache[theme]) return shareCanvasCache[theme];
   const cards = readingCards();
-  if (cards.length !== 4) return;
+  if (cards.length !== 4) throw new Error("The reading is incomplete.");
   const summary = state.aiSummary || personalSummary(cards);
-  const originalLabel = button?.textContent;
-  if (button) { button.disabled = true; button.textContent = "Preparing image…"; }
+  const canvas = await buildShareCanvas(state.question, cards, summary, theme);
+  shareCanvasCache[theme] = canvas;
+  return canvas;
+}
+async function mountSharePreview() {
+  const frame = document.querySelector(".story-canvas");
+  if (!frame) return;
+  const theme = shareThemeId();
   try {
-    const canvas = await buildShareCanvas(state.question, cards, summary);
+    const canvas = await shareCanvasFor(theme);
+    if (state.stage !== "share" || shareThemeId() !== theme) return;
+    const url = canvas.toDataURL("image/png");
+    frame.style.backgroundImage = `url("${url}")`;
+    frame.classList.add("ready");
+  } catch {
+    frame.classList.add("failed");
+  }
+}
+async function exportShareImage(mode, button) {
+  const theme = shareThemeId();
+  const originalLabel = button?.textContent;
+  if (button) { button.disabled = true; button.textContent = mode === "save" ? "Saving…" : "Preparing…"; }
+  try {
+    const canvas = await shareCanvasFor(theme);
+    const summary = state.aiSummary || personalSummary(readingCards());
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
     if (!blob) throw new Error("Could not render the image.");
-    const file = new File([blob], "heart-cut-reading.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: "The Heart Cut", text: summary });
+    const file = new File([blob], `oracle-veil-${theme}.png`, { type: "image/png" });
+    const canShareFile = mode === "share" && navigator.canShare && navigator.canShare({ files: [file] });
+    if (canShareFile) {
+      await navigator.share({ files: [file], title: "My Tarot Reading", text: summary });
+      showToast("Your reading is ready to share.");
     } else {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = url; link.download = "heart-cut-reading.png";
+      link.href = url; link.download = file.name;
       document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
-      showToast("Image saved — share it to your story.");
+      showToast(mode === "share" ? "Sharing isn't available here, so the image was saved." : "Your image has been saved.");
     }
   } catch (error) {
     if (error?.name !== "AbortError") showToast("Couldn't create the share image.");
   } finally {
     if (button) { button.disabled = false; button.textContent = originalLabel; }
   }
+}
+function renderSharePage() {
+  const themeId = shareThemeId();
+  const cards = readingCards();
+  const chips = SHARE_THEMES.map((theme) => `
+    <button class="theme-choice" type="button" role="radio" aria-checked="${theme.id === themeId}" data-action="share-theme" data-theme="${theme.id}">
+      <span class="theme-thumbnail">
+        <img src="./assets/share/themes/${theme.id}/thumbnail.png" alt="" loading="lazy" decoding="async" />
+        ${theme.id === themeId ? `<span class="selected-mark" aria-hidden="true">✓</span>` : ""}
+      </span>
+      <span class="theme-name">${theme.label}</span>
+    </button>`).join("");
+  return `<div class="share-page world" data-theme="${themeId}">
+    <header class="share-topbar">
+      <button class="share-back" type="button" data-action="share-back" aria-label="Back to the reading"><span aria-hidden="true">←</span></button>
+      <div class="share-brand">✦ THE HEART CUT ✦</div>
+      <h1 class="share-title">Make it yours</h1>
+      <button class="share-exit text-button" type="button" data-action="share-back">Exit</button>
+    </header>
+    <div class="share-layout">
+      <section class="preview-region" aria-label="Tarot share preview">
+        <div class="story-canvas" role="img" aria-label="${escapeHTML(cards[0]?.name || "Your reading")} tarot story preview">
+          <span class="story-spinner" aria-hidden="true"></span>
+        </div>
+      </section>
+      <aside class="customize-panel" aria-label="Choose a look">
+        <h2 class="customize-heading">Choose a look</h2>
+        <div class="theme-grid" role="radiogroup" aria-label="Share style">${chips}</div>
+        <div class="share-actions">
+          <button class="primary-action" type="button" data-action="share-continue"><span>Continue to share</span><span class="button-sparkle" aria-hidden="true">✦</span></button>
+          <button class="secondary-action" type="button" data-action="share-save">Save image</button>
+        </div>
+        <p class="share-privacy">Your full reading stays private.</p>
+      </aside>
+    </div>
+  </div>`;
 }
 async function requestAIInterpretation() {
   if (location.protocol === "file:") {
@@ -1075,11 +1175,13 @@ function render() {
   else if (state.stage === "category") markup = renderCategory();
   else if (state.stage === "question") markup = renderQuestion();
   else if (state.stage === "reading") markup = renderReading();
+  else if (state.stage === "share") markup = renderSharePage();
   else markup = renderRitual();
   app.innerHTML = `${markup}${renderAd()}${renderSettings()}${debugPanel()}`;
   updatePageLanguage();
   paintCardArt();
   bindGestures();
+  if (state.stage === "share") void mountSharePreview();
   persist();
   // Announce stage changes by moving focus to the new heading (like a page change).
   // Skipped while a dialog is open and on the very first paint.
@@ -1508,7 +1610,11 @@ function act(action, element) {
   }
   if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
   if (action === "share-reading") { if (navigator.share) navigator.share({ title: "The Heart Cut", text: readingShareText() }).catch(() => {}); return; }
-  if (action === "share-image") { void shareReadingImage(element); return; }
+  if (action === "share-image") { if (readingCards().length !== 4) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
+  if (action === "share-back") { state.stage = "reading"; render(); return; }
+  if (action === "share-theme") { const theme = element.dataset.theme; if (theme && theme !== state.shareTheme) { state.shareTheme = theme; sound("flip", .12); render(); } return; }
+  if (action === "share-continue") { void exportShareImage("share", element); return; }
+  if (action === "share-save") { void exportShareImage("save", element); return; }
 }
 
 app.addEventListener("click", (event) => {
