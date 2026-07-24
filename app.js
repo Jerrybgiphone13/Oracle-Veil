@@ -636,6 +636,20 @@ function cardImagePath(card) {
     : card.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
   return `./assets/tarot/${artworkName}.png`;
 }
+// Warm the browser cache for a card's (large) artwork the moment it's known, so the
+// later face-up flip paints instantly instead of waiting on a fresh network fetch.
+const preloadedArt = new Set();
+function preloadCardArt(cards) {
+  (Array.isArray(cards) ? cards : [cards]).forEach((card) => {
+    if (!card) return;
+    const src = cardImagePath(card);
+    if (preloadedArt.has(src)) return;
+    preloadedArt.add(src);
+    const img = new Image();
+    img.decoding = "async";
+    img.src = src;
+  });
+}
 function cardImage(card) {
   return `<img class="card-image" src="${cardImagePath(card)}" alt="" draggable="false" loading="lazy" decoding="async" data-name="${escapeHTML(card.name)}" data-mark="${card.mark}">`;
 }
@@ -785,6 +799,7 @@ function revealActions() {
 }
 function renderReveal() {
   const cards = readingCards();
+  preloadCardArt(cards); // ensure art is warming even on a reload straight into this stage
   return { surface: `<div class="reveal-layout">${cards.map((card, index) => {
     const revealed = state.revealedIds.includes(card.id);
     const pending = state.ad?.cardId === card.id;
@@ -1510,7 +1525,7 @@ function animateRitualDraw() {
   setTimeout(() => {
     const lifted = state.piles[0];
     const ritual = lifted?.pop();
-    if (ritual) { state.ritualCardId = ritual.id; state.ritualCard = ritual; state.stage = "reassembleOne"; }
+    if (ritual) { state.ritualCardId = ritual.id; state.ritualCard = ritual; preloadCardArt(ritual); state.stage = "reassembleOne"; }
     transitioning = false; interaction(); render();
   }, 680);
 }
@@ -1588,6 +1603,7 @@ function animateAssistedSpread() {
 }
 function animatePickCard(element, id) {
   if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= 3) return;
+  preloadCardArt(cardById(id)); // start loading the art now, while it flies to the dock
   const dock = document.querySelector(".draw-dock");
   if (!dock) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -1672,7 +1688,7 @@ function act(action, element) {
   if (action === "reassemble-three") { animateThreePileJoin(); return; }
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
-  if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; state.stage = "reveal"; interaction(); render(); return; }
+  if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return; }
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
     if (state.revealedIds.includes(id) || state.ad) return;
