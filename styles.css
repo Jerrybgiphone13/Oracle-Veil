@@ -67,6 +67,7 @@ button { touch-action: manipulation; }
   z-index: 8;
   opacity: .18;
   mix-blend-mode: soft-light;
+  transform: translateZ(0);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
 }
 
@@ -529,11 +530,148 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
 .decision-passed-card::after { font-size:.95rem; }
 .decision-passed.beside { margin:1.6rem auto 0; }
 
-.decision-reveal-layout { width:min(100%,52rem); }
+.decision-reveal-layout { width:min(100%,15rem); grid-template-columns:minmax(0,1fr); }
 .decision-ad .ad-illustration { background:radial-gradient(circle at 50% 30%,#e6dcff 0 3%,transparent 4%),linear-gradient(200deg,transparent 0 54%,rgba(203,190,245,.2) 55%),repeating-linear-gradient(72deg,transparent 0 26px,rgba(178,163,232,.26) 27px 28px),#1d1740; }
 .decision-reading .meaning { border-top-color:rgba(140,124,196,.42); }
 
-.deck, .pile, .spread-card, .reading-card { position: absolute; transform-style: preserve-3d; will-change: transform; }
+/* Decision follows one continuous physical arc: shuffle, cut, riffle, spread, choose, reveal. */
+.decision-cut-surface .cut-marker {
+  background:#d9cdf8;
+  box-shadow:0 0 0 1px rgba(6,18,24,.5),0 0 15px rgba(201,187,243,.82);
+}
+.decision-cut-surface .cut-marker span { background:#d9cdf8; }
+.decision-fuse-surface { overflow:hidden; }
+.decision-fuse-field { top:46%; z-index:4; }
+.decision-fuse-field .pile:first-child { transform:rotate(-2.2deg); }
+.decision-fuse-field .pile:nth-child(2) { transform:rotate(2.2deg); }
+.decision-fuse-field.decision-riffling .pile {
+  transition:transform .72s cubic-bezier(.2,.8,.2,1),opacity .42s ease .38s,filter .28s ease;
+  filter:brightness(1.12);
+  opacity:.12;
+}
+.decision-fuse-field.decision-riffling .pile:first-child { transform:translateX(2.5rem) rotate(5deg) scale(.9); }
+.decision-fuse-field.decision-riffling .pile:nth-child(2) { transform:translateX(-2.5rem) rotate(-5deg) scale(.9); }
+.decision-riffle-stream {
+  position:absolute;
+  z-index:8;
+  inset:0;
+  pointer-events:none;
+  perspective:900px;
+}
+.decision-riffle-card {
+  left:50%;
+  top:46%;
+  width:clamp(3.9rem,10vw,5.3rem);
+  height:clamp(5.7rem,14.7vw,7.8rem);
+  opacity:0;
+  transform:translate(-50%,-50%) translateX(var(--from)) rotate(var(--tilt)) rotateY(20deg) scale(.72);
+  box-shadow:0 2px 0 rgba(196,169,105,.75),0 12px 20px rgba(0,0,0,.38);
+}
+.decision-riffle-card::after { font-size:2rem; }
+.decision-fuse-surface.decision-fusing .decision-riffle-card {
+  animation:decisionRiffleCard .68s cubic-bezier(.18,.82,.2,1) both;
+  animation-delay:calc(var(--i) * 24ms);
+}
+@keyframes decisionRiffleCard {
+  0% {
+    opacity:0;
+    transform:translate(-50%,-50%) translateX(var(--from)) translateY(-.8rem) rotate(var(--tilt)) rotateY(22deg) scale(.72);
+  }
+  20% { opacity:1; }
+  64% {
+    opacity:1;
+    transform:translate(-50%,-50%) translateX(var(--near)) translateY(calc(var(--settle) - 1.25rem)) rotate(var(--counter-tilt)) rotateY(-8deg) scale(.86);
+  }
+  100% {
+    opacity:1;
+    transform:translate(-50%,-50%) translateX(0) translateY(var(--settle)) rotate(0) rotateY(0) scale(.86);
+  }
+}
+.decision-fuse-sigil {
+  position:absolute;
+  z-index:2;
+  left:50%;
+  top:44%;
+  translate:-50% -50%;
+  display:grid;
+  place-items:center;
+  width:5.2rem;
+  aspect-ratio:1;
+  border:1px solid rgba(214,203,248,.35);
+  border-radius:50%;
+  color:rgba(221,210,255,.72);
+  font:1.35rem var(--serif);
+  box-shadow:0 0 34px rgba(161,137,224,.18),inset 0 0 22px rgba(161,137,224,.12);
+  animation:decisionFuseBreathe 2.4s ease-in-out infinite;
+}
+.decision-fuse-surface.decision-fusing .decision-fuse-sigil {
+  animation:decisionFuseSeal .92s cubic-bezier(.18,.82,.2,1) .2s both;
+}
+@keyframes decisionFuseBreathe {
+  50% { transform:scale(1.08); box-shadow:0 0 42px rgba(187,165,239,.28),inset 0 0 26px rgba(161,137,224,.17); }
+}
+@keyframes decisionFuseSeal {
+  0% { transform:scale(.8) rotate(-10deg); opacity:.45; }
+  65% { transform:scale(1.36) rotate(5deg); opacity:1; box-shadow:0 0 60px rgba(221,210,255,.58); }
+  100% { transform:scale(.35) rotate(0); opacity:0; }
+}
+.decision-choose-surface { min-height:clamp(23rem,54vh,34rem); overflow:hidden; }
+.decision-choose-surface .spread-card:not(.picked):hover .card {
+  filter:brightness(1.24);
+  box-shadow:0 4px 0 #5f4d8d,0 9px 0 #c9bbf3,0 18px 30px rgba(0,0,0,.58),0 0 0 2px #dfd2ff;
+}
+.decision-draw-dock {
+  width:7.8rem;
+  height:6.6rem;
+  border-color:rgba(207,193,247,.58);
+  background:radial-gradient(circle,rgba(112,91,174,.28),rgba(10,12,30,.68) 70%);
+  box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 28px rgba(166,142,225,.12);
+}
+.decision-dock-sigil {
+  color:#d9cdf8;
+  font:1.35rem var(--serif);
+  text-shadow:0 0 18px rgba(217,205,248,.72);
+}
+.decision-draw-dock.receiving {
+  animation:decisionDockReceive .42s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes decisionDockReceive {
+  0% { transform:scale(1); }
+  45% { transform:scale(1.15); box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 55px rgba(217,205,248,.55); }
+  100% { transform:scale(1); }
+}
+.decision-flying .card { pointer-events:none; }
+.decision-reading .reading-card { animation:decisionChosenReveal .72s cubic-bezier(.16,.86,.2,1) both; }
+@keyframes decisionChosenReveal {
+  from { opacity:0; transform:translateY(2.8rem) rotateY(90deg) scale(.72); filter:brightness(1.45); }
+  to { opacity:1; transform:none; filter:brightness(1); }
+}
+.decision-reading-core {
+  display:grid;
+  grid-template-columns:clamp(7.8rem,17vw,9.8rem) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(1.15rem,4vw,2.8rem);
+  width:min(100%,47rem);
+  margin:1.1rem auto .4rem;
+}
+.decision-reading-core .reading-card-row { margin:0; transform:translateX(clamp(.4rem,1.5vw,1rem)); }
+.decision-reading .reading-card { width:100%; }
+.decision-reading .decision-reading-core .meaning-grid { grid-template-columns:minmax(0,1fr); gap:0; }
+.decision-reading-core .meaning { padding:clamp(.8rem,2vw,1.25rem) 0; }
+.decision-reading-core .meaning h3 { font-size:clamp(1.25rem,2.4vw,1.65rem); }
+.decision-reading-core .meaning p { max-width:36rem; font-size:clamp(.88rem,1.5vw,.98rem); }
+
+.deck, .pile, .spread-card { position: absolute; transform-style: preserve-3d; }
+.deck.is-grabbing,
+.shuffle-table.gathering .shuffle-card,
+.scatter-pile.shuffling .shuffle-card,
+.career-orbit.shuffling .career-ember-card,
+.spread-card.flying,
+.pile-field.joining .pile,
+.pile-field.stacking .pile,
+.decision-fuse-surface.decision-fusing .decision-riffle-card {
+  will-change:transform;
+}
 .deck { left: 50%; top: 50%; width: 7.5rem; height: 11rem; translate: -50% -50%; }
 .stack-card, .card {
   width: 7.5rem; height: 11rem; border-radius: .48rem; position: absolute; overflow: hidden;
@@ -723,11 +861,12 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
   .money-ledger-surface{min-height:32rem}.money-ledger{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .6rem}.money-ledger::before{display:none}.money-ledger-card{width:4rem;height:5.9rem}
   .decision-split-surface{min-height:23rem;padding-inline:.3rem;gap:1rem}.decision-split{gap:.3rem}.decision-half-stack{height:6.2rem}.decision-half-edges > i{width:2px}.decision-half-face{width:3.2rem}
   .decision-fork-surface{min-height:29rem;padding-inline:.25rem;gap:.7rem}.decision-fork{gap:.4rem}.decision-source-edge{display:none}.decision-offer{width:5.4rem;height:7.9rem}
-  .decision-reveal-layout .reveal-slot:first-child{grid-column:1 / -1}.decision-reveal-layout .reveal-slot .card{width:min(28vw,7.1rem)}
+  .decision-reveal-layout .reveal-slot:first-child{grid-column:1}.decision-reveal-layout .reveal-slot .card{width:min(42vw,7.6rem)}
+  .decision-reading-core{grid-template-columns:1fr;justify-items:center;gap:.55rem;margin-top:.8rem}.decision-reading-core .reading-card-row{width:min(42vw,7.8rem)}.decision-reading-core .meaning{text-align:center;padding-top:.7rem}.decision-reading-core .meaning p{max-width:28rem}
 }
 @media (min-width: 720px) {
   .career-reveal-layout{grid-template-columns:repeat(5,minmax(0,1fr))}.career-reveal-layout .reveal-slot .card{width:6.5rem}.career-reading .meaning-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
-  .decision-reveal-layout{grid-template-columns:repeat(5,minmax(0,1fr))}.decision-reveal-layout .reveal-slot .card{width:6.5rem}.decision-reading .meaning-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .decision-reveal-layout{grid-template-columns:minmax(0,1fr)}.decision-reveal-layout .reveal-slot .card{width:8.4rem}.decision-reading .meaning-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;scroll-behavior:auto !important} }
 
@@ -738,7 +877,7 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
 .card.reversed .card-image-fallback { transform: rotate(180deg); }
 
 /* Consistent keyboard focus for the remaining interactive controls */
-.brand:focus-visible, .back-link:focus-visible, .settings-close:focus-visible, .debug-toggle:focus-visible, .examples button:focus-visible, .pile-field .pile:focus-visible, .cut-range:focus-visible, .career-dial:focus-visible, .career-step-card:focus-visible, .money-current-range:focus-visible, .money-coin-button:focus-visible, .decision-split-range:focus-visible, .decision-offer:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+.brand:focus-visible, .back-link:focus-visible, .settings-close:focus-visible, .debug-toggle:focus-visible, .examples button:focus-visible, .pile-field .pile:focus-visible, .cut-range:focus-visible, .career-dial:focus-visible, .career-step-card:focus-visible, .money-current-range:focus-visible, .money-coin-button:focus-visible, .decision-choose-surface .card:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
 
 /* ---- "Make it yours" share page ---- */
 .share-page { --accent: var(--gold); }

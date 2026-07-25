@@ -5,7 +5,7 @@ const INTERPRETATION_ENDPOINT = "/api/interpretation";
 // Kept in lockstep with the app-shell version by both deployment scripts.
 // Card art is otherwise cached for a long time, so an unversioned URL can leave
 // one previously viewed card stuck on obsolete artwork after the deck changes.
-const CARD_ART_VERSION = "31";
+const CARD_ART_VERSION = "34";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -20,19 +20,15 @@ const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "
 const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
 const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
 const MONEY_STAGES = ["moneyCurrent", "moneyVessels", "moneyLedger", "moneyReveal", "reading"];
-const DECISION_STAGES = ["decisionSplit", "decisionFork", "decisionReveal", "reading"];
+const DECISION_STAGES = ["decisionShuffle", "decisionCut", "decisionFuse", "decisionSpread", "decisionChoose", "decisionReveal", "reading"];
 const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
 const MONEY_POSITIONS = ["The Seed", "What to Keep", "What to Grow", "What to Let Flow"];
 const MONEY_VESSELS = ["Keep", "Grow", "Flow"];
-const DECISION_POSITIONS = ["The First Reach", "What You Are Standing In", "The Turning", "What It Costs", "What Opens"];
-// Five times the two halves offer their top card and only one is taken. The five that
-// were passed over are set aside face-down and never turned: the ritual never says why.
-const DECISION_ROUNDS = 5;
-const DECISION_HALF_MINIMUM = DECISION_ROUNDS + 3;
-// Paths whose entrance ad already paid for the whole reading: their first card flip is
-// not interrupted by a second one, and the interpretation unlocks with the reading.
-const SEAMLESS_REVEAL_PATHS = ["Money", "Decision"];
+const DECISION_POSITIONS = ["The Chosen Card"];
+// Money's entrance ad pays for its complete reading. Decision deliberately keeps the
+// same two pauses as Love: one at the first reveal and another for the AI reflection.
+const SEAMLESS_REVEAL_PATHS = ["Money"];
 
 const CARD_NOTES = {
   "The Lovers": ["choice", "alignment", "honest intimacy"],
@@ -674,6 +670,60 @@ Object.assign(I18N.zh, {
   "Unlock the Decision path": "解锁抉择路径", "A short passage before the Decision ritual": "进入抉择仪式前的短暂通道",
   "The crossroads<br>is taking shape.": "岔路口<br>正在成形。", "Watch this brief sponsored moment to open the Decision ritual.": "观看这段简短赞助内容，即可开启抉择仪式。"
 });
+Object.assign(I18N.fr, {
+  "Mix the two halves back together.": "Mélangez à nouveau les deux moitiés.",
+  "Watch the cards alternate from each pile into a newly mixed deck.": "Regardez les cartes alterner entre les deux paquets pour former un jeu fraîchement mélangé.",
+  "One touch will interleave the two halves into a newly mixed deck.": "Un geste entrelacera les deux moitiés en un jeu fraîchement mélangé.",
+  "Mix the two piles": "Mélanger les deux paquets",
+  "Two halves, one deck.": "Deux moitiés, un seul jeu.",
+  "Choose one card that calls to you.": "Choisissez la carte qui vous appelle.",
+  "Touch a card to carry it into the reveal.": "Touchez une carte pour l’amener jusqu’à la révélation.",
+  "Turn over the card you chose.": "Retournez la carte que vous avez choisie.",
+  "Its face is still veiled. Reveal it when you are ready.": "Son visage est encore voilé. Révélez-le lorsque vous êtes prêt·e.",
+  "Turn over your chosen card when you are ready.": "Retournez la carte choisie lorsque vous êtes prêt·e.",
+  "One card will remain.": "Une seule carte restera.",
+  "Chosen": "Choisie",
+  "The Chosen Card": "La carte choisie",
+  "One card, held at the crossroads.": "Une carte, tenue à la croisée des chemins.",
+  "Watch a short ad to unlock a reflection based on your exact question and chosen card.": "Regardez une courte publicité pour débloquer une réflexion basée sur votre question exacte et la carte choisie.",
+  "Watch an ad to unlock my interpretation": "Regarder une publicité pour débloquer mon interprétation"
+});
+Object.assign(I18N.ru, {
+  "Mix the two halves back together.": "Снова перемешайте две половины.",
+  "Watch the cards alternate from each pile into a newly mixed deck.": "Смотрите, как карты поочерёдно выходят из обеих стопок и образуют заново перемешанную колоду.",
+  "One touch will interleave the two halves into a newly mixed deck.": "Одно касание переплетёт две половины в заново перемешанную колоду.",
+  "Mix the two piles": "Перемешать две стопки",
+  "Two halves, one deck.": "Две половины — одна колода.",
+  "Choose one card that calls to you.": "Выберите одну карту, которая вас зовёт.",
+  "Touch a card to carry it into the reveal.": "Коснитесь карты, чтобы перенести её к раскрытию.",
+  "Turn over the card you chose.": "Переверните выбранную карту.",
+  "Its face is still veiled. Reveal it when you are ready.": "Её лицо всё ещё скрыто. Откройте карту, когда будете готовы.",
+  "Turn over your chosen card when you are ready.": "Переверните выбранную карту, когда будете готовы.",
+  "One card will remain.": "Останется одна карта.",
+  "Chosen": "Выбрано",
+  "The Chosen Card": "Выбранная карта",
+  "One card, held at the crossroads.": "Одна карта на перекрёстке.",
+  "Watch a short ad to unlock a reflection based on your exact question and chosen card.": "Посмотрите короткую рекламу, чтобы открыть размышление по вашему вопросу и выбранной карте.",
+  "Watch an ad to unlock my interpretation": "Посмотреть рекламу и открыть толкование"
+});
+Object.assign(I18N.zh, {
+  "Mix the two halves back together.": "将两半牌重新混合。",
+  "Watch the cards alternate from each pile into a newly mixed deck.": "看着两堆牌交替穿插，重新混成一副牌。",
+  "One touch will interleave the two halves into a newly mixed deck.": "轻触一下，两半牌将交错穿插，重新混成一副牌。",
+  "Mix the two piles": "混合两堆牌",
+  "Two halves, one deck.": "两半牌，一副牌。",
+  "Choose one card that calls to you.": "选择那张在召唤你的牌。",
+  "Touch a card to carry it into the reveal.": "触碰一张牌，将它带入揭晓环节。",
+  "Turn over the card you chose.": "翻开你选择的牌。",
+  "Its face is still veiled. Reveal it when you are ready.": "牌面仍被遮掩。准备好时再揭晓它。",
+  "Turn over your chosen card when you are ready.": "准备好时，翻开你选择的牌。",
+  "One card will remain.": "最终只会留下一张牌。",
+  "Chosen": "已选",
+  "The Chosen Card": "你选择的牌",
+  "One card, held at the crossroads.": "一张牌，停驻在岔路口。",
+  "Watch a short ad to unlock a reflection based on your exact question and chosen card.": "观看一个简短广告，解锁基于你的问题与所选牌面的映照。",
+  "Watch an ad to unlock my interpretation": "观看广告以解锁我的解读"
+});
 function t(source) {
   const lang = state?.settings?.language || "en";
   if (lang === "en") return source;
@@ -734,15 +784,12 @@ function createCareerState(seed) {
     selectedIds: []
   };
 }
-// Decision keeps only what the reader watched happen: where the deck broke, and which
-// of the two offered cards was taken in each round. Nothing is drawn behind their back.
+// Decision keeps only what the reader watched happen: where the deck was cut and the
+// single card they chose from the final spread.
 function createDecisionState() {
   return {
-    splitDraft: 39,
-    split: null,
-    rounds: [],
-    keptIds: [],
-    refusedIds: []
+    cut: null,
+    selectedId: null
   };
 }
 function createState() {
@@ -859,32 +906,10 @@ function readingCards() {
     : state.category === "Money"
       ? [state.money.seedId, ...state.money.selectedIds]
       : state.category === "Decision"
-        ? state.decision.keptIds
+        ? [state.decision.selectedId]
         : [state.ritualCardId, ...state.selectedIds];
   return ids.map(cardById).filter(Boolean);
 }
-// The pair on offer is always the top card of each half, so the card the reader takes is
-// the one they were looking at — no index, depth, or weighting stands between the two.
-function decisionOffer() {
-  return [state.piles[0]?.[0] || null, state.piles[1]?.[0] || null];
-}
-// state.piles is the table itself: [left half, right half, what was kept, what was passed
-// over]. Every card stays on one of the four, so nothing is ever conjured at reveal time.
-function decisionDraw(side) {
-  if (side !== "a" && side !== "b") return false;
-  if (state.decision.rounds.length >= DECISION_ROUNDS) return false;
-  const [left, right] = decisionOffer();
-  if (!left || !right) return false;
-  const taken = side === "a" ? state.piles[0].shift() : state.piles[1].shift();
-  const passed = side === "a" ? state.piles[1].shift() : state.piles[0].shift();
-  state.piles[2].push(taken);
-  state.piles[3].push(passed);
-  state.decision.keptIds.push(taken.id);
-  state.decision.refusedIds.push(passed.id);
-  state.decision.rounds.push(side);
-  return true;
-}
-function decisionKeptCards() { return state.decision.keptIds.map(cardById).filter(Boolean); }
 function interaction() { state.performance.interactions += 1; state.performance.lastGesture = Date.now(); persist(); }
 
 function buzz(pattern = 10) {
@@ -1327,75 +1352,64 @@ function renderMoneyReveal() {
 
 function decisionTitle() {
   const copy = {
-    decisionSplit: ["Break the deck in two.", "Drag across the deck. It comes apart where your hand leaves it."],
-    decisionFork: ["Take one. Leave one.", "Each half offers its top card. Draw the one you want; the other is set aside face-down."],
-    decisionReveal: ["Turn over what you kept.", "Five cards stayed with you. The five you passed over stay as they are."]
+    decisionShuffle: ["Loosen the cards beneath your hands.", "Sweep your hand across the loose pile to send a wave through the cards."],
+    decisionCut: ["Cut the deck where it feels right.", "Use the side view to choose the exact place, then lift there."],
+    decisionFuse: ["Mix the two halves back together.", "Watch the cards alternate from each pile into a newly mixed deck."],
+    decisionSpread: ["Let the deck open.", "Open the spread and the cards will fan across the table on their own."],
+    decisionChoose: ["Choose one card that calls to you.", "Touch a card to carry it into the reveal."],
+    decisionReveal: ["Turn over the card you chose.", "Its face is still veiled. Reveal it when you are ready."]
   };
   const [title, lede] = copy[state.stage] || ["Crossroads", ""];
   return `<div class="ritual-head decision-ritual-head">${progress()}<p class="eyebrow">${t("Decision ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
 function renderDecisionRitual() {
   let view = { surface: "", actions: "" };
-  if (state.stage === "decisionSplit") view = renderDecisionSplit();
-  if (state.stage === "decisionFork") view = renderDecisionFork();
+  if (state.stage === "decisionShuffle") view = renderShuffle();
+  if (state.stage === "decisionCut") view = renderDecisionCut();
+  if (state.stage === "decisionFuse") view = renderDecisionFuse();
+  if (state.stage === "decisionSpread") view = renderSpread();
+  if (state.stage === "decisionChoose") view = renderDecisionChoose();
   if (state.stage === "decisionReveal") view = renderDecisionReveal();
   return world(`<section class="scene ritual decision-ritual">${decisionTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "decision-world");
 }
-function decisionSplitAt() {
-  const total = Math.max(DECISION_HALF_MINIMUM * 2, state.deck.length);
-  return clamp(Number(state.decision.splitDraft) || 39, DECISION_HALF_MINIMUM, total - DECISION_HALF_MINIMUM);
-}
-// Each half is drawn as a stack of card edges: three cards to a visible edge, so a thick
-// half simply looks thick. Nothing states what the thickness means, because it means nothing.
-function decisionEdges(count) {
-  return clamp(Math.round(count / 3), 1, 26);
-}
-function decisionEdgeMarkup(count) {
-  return Array.from({ length: decisionEdges(count) }, () => "<i></i>").join("");
-}
-function decisionHalfMarkup(count, side) {
-  return `<div class="decision-half ${side}"><div class="decision-half-stack"><span class="decision-half-edges">${decisionEdgeMarkup(count)}</span><span class="decision-half-face card back"></span></div><span class="decision-half-count">${count} ${t("cards")}</span></div>`;
-}
-function renderDecisionSplit() {
-  const total = state.deck.length;
-  const at = decisionSplitAt();
+function renderDecisionCut() {
   return {
-    surface: `<div class="table-surface decision-split-surface" id="decision-split-surface"><div class="decision-split" id="decision-split-field">${decisionHalfMarkup(at, "left")}<span class="decision-split-seam" aria-hidden="true"></span>${decisionHalfMarkup(total - at, "right")}</div><p class="physical-instruction ${state.decision.splitDraft !== 39 ? "quiet" : ""}">${t("Drag across the deck. It comes apart where your hand leaves it.")}</p><input class="decision-split-range" id="decision-split-range" type="range" min="${DECISION_HALF_MINIMUM}" max="${total - DECISION_HALF_MINIMUM}" value="${at}" aria-label="${t("Choose where the deck comes apart")}"></div>`,
-    actions: `<p class="status-note">${t("Neither half is better. They are only two halves.")}</p><button class="seal-button decision-seal" data-action="decision-split">${t("Break it here")}</button>`
+    surface: `<div class="table-surface cut-table decision-cut-surface" id="decision-cut-surface">${sideDeckMarkup("two")}<span class="piles-guide">${t("The deck is shown from the side so every possible cut is reachable.")}</span></div>`,
+    actions: `<p class="status-note">${t("Move the marker, then lift the deck at that exact place.")}</p><button class="seal-button decision-seal" data-action="decision-make-cut">${t("Lift at this point")}</button>`
   };
 }
-function renderDecisionFork() {
-  const round = state.decision.rounds.length;
-  const done = round >= DECISION_ROUNDS;
-  const [left, right] = decisionOffer();
-  const offer = (card, side) => card && !done
-    ? `<button class="decision-offer card back ${side}" data-action="decision-draw" data-side="${side}" aria-label="${t("Draw the card on the")} ${t(side === "a" ? "left" : "right")}"></button>`
-    : `<span class="decision-offer spent ${side}" aria-hidden="true"></span>`;
-  const half = (index, side) => `<div class="decision-source ${side}"><div class="decision-source-edge" aria-hidden="true">${Array.from({ length: Math.min(9, Math.ceil((state.piles[index]?.length || 0) / 6)) }, (_, i) => `<i style="--e:${i}"></i>`).join("")}</div>${offer(index === 0 ? left : right, side)}</div>`;
-  const kept = Array.from({ length: DECISION_ROUNDS }, (_, index) => index < round
-    ? `<i class="decision-kept-card card back ${index === round - 1 ? "fresh" : ""}"></i>`
-    : `<i class="decision-kept-slot"></i>`).join("");
-  const passed = state.piles[3] || [];
-  const heap = passed.map((card, index) => `<i class="decision-passed-card card back" style="--p:${index}"></i>`).join("");
+function renderDecisionFuse() {
+  const riffleCards = Array.from({ length: 20 }, (_, index) => {
+    const from = index % 2 ? "10rem" : "-10rem";
+    const near = index % 2 ? "1.3rem" : "-1.3rem";
+    const tilt = index % 2 ? "7deg" : "-7deg";
+    const counterTilt = index % 2 ? "-1.75deg" : "1.75deg";
+    const settle = `${(index - 9.5) * -.42}px`;
+    return `<i class="decision-riffle-card card back" style="--i:${index};--from:${from};--near:${near};--tilt:${tilt};--counter-tilt:${counterTilt};--settle:${settle}" aria-hidden="true"></i>`;
+  }).join("");
   return {
-    surface: `<div class="table-surface decision-fork-surface"><div class="decision-fork">${half(0, "a")}<span class="decision-fork-seam" aria-hidden="true">⚭</span>${half(1, "b")}</div><div class="decision-kept" aria-label="${t("What you kept")}">${kept}</div><div class="decision-passed ${passed.length ? "has-cards" : ""}"><div class="decision-passed-heap">${heap}</div><span>${t("set aside, unturned")}</span></div><span class="piles-guide">${round} ${t("of")} ${DECISION_ROUNDS}</span></div>`,
-    actions: done
-      ? `<p class="status-note">${t("Five stayed. Five never turned over.")}</p><button class="seal-button decision-seal" data-action="decision-to-reveal">${t("Turn over what you kept")}</button>`
-      : `<p class="status-note">${t("There is no wrong card to take.")}</p>`
+    surface: `<div class="table-surface centered-table decision-fuse-surface" id="decision-fuse-surface"><div class="pile-field two decision-fuse-field">${pileMarkup(state.piles[0] || [], "0", `${t("pile")} 1`)}${pileMarkup(state.piles[1] || [], "1", `${t("pile")} 2`)}</div><div class="decision-riffle-stream" aria-hidden="true">${riffleCards}</div><span class="decision-fuse-sigil" aria-hidden="true">⚭</span><span class="piles-guide">${t("Two halves, one deck.")}</span></div>`,
+    actions: `<p class="status-note">${t("One touch will interleave the two halves into a newly mixed deck.")}</p><button class="seal-button decision-seal" data-action="decision-fuse">${t("Mix the two piles")}</button>`
   };
 }
-
+function renderDecisionChoose() {
+  const spread = state.spread || createDefaultSpread();
+  return {
+    surface: `<div class="table-surface decision-choose-surface"><div class="spread-layer">${state.deck.map((card, index) => {
+      const p = positionForSpread(index, state.deck.length, spread);
+      return `<div class="spread-card" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back" data-action="pick-decision-card" data-card-id="${card.id}" aria-label="${t("Select a face-down card")}"></button></div>`;
+    }).join("")}</div><div class="draw-dock decision-draw-dock"><span class="dock-title">${t("Chosen")} · 0/1</span><span class="decision-dock-sigil" aria-hidden="true">⚭</span></div></div>`,
+    actions: `<p class="status-note">${t("One card will remain.")}</p>`
+  };
+}
 function renderDecisionReveal() {
-  const cards = readingCards();
-  preloadCardArt(cards);
-  // The five that were passed over stay on the table beside the reading, face-down, for
-  // as long as the spread is open. They are never turned and never explained.
-  const passed = (state.piles[3] || []).map((card, index) => `<i class="decision-passed-card card back" style="--p:${index}"></i>`).join("");
+  const [card] = readingCards();
+  if (!card) return { surface: "", actions: "" };
+  preloadCardArt(card);
+  const revealed = state.revealedIds.includes(card.id);
+  const pending = state.ad?.cardId === card.id;
   return {
-    surface: `<div class="reveal-layout decision-reveal-layout">${cards.map((card, index) => {
-      const revealed = state.revealedIds.includes(card.id);
-      return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(DECISION_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(DECISION_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
-    }).join("")}</div><div class="decision-passed beside"><div class="decision-passed-heap">${passed}</div><span>${t("set aside, unturned")}</span></div>`,
+    surface: `<div class="reveal-layout decision-reveal-layout"><div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t("The Chosen Card")}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t("The Chosen Card")}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div></div>`,
     actions: revealActions()
   };
 }
@@ -1473,7 +1487,10 @@ function renderChoose() {
 }
 function revealActions() {
   const done = state.revealedIds.length === readingPositions().length;
-  return `<p class="status-note">${done ? t("The reading is ready to be gathered.") : t("There is no required order.")}</p>${done ? `<button class="seal-button" data-action="open-reading">${t("Gather the reading")}</button>` : ""}`;
+  const waiting = state.category === "Decision"
+    ? t("Turn over your chosen card when you are ready.")
+    : t("There is no required order.");
+  return `<p class="status-note">${done ? t("The reading is ready to be gathered.") : waiting}</p>${done ? `<button class="seal-button" data-action="open-reading">${t("Gather the reading")}</button>` : ""}`;
 }
 function renderReveal() {
   const cards = readingCards();
@@ -1517,11 +1534,7 @@ function positionMeaning(position, card) {
   const upright = card.reversed ? "turned inward or delayed" : "available to meet directly";
   if (state.category === "Decision") {
     const decisionSnippets = {
-      "The First Reach": `${card.name} is what your hand went to before you had a reason for it: ${upright}. Instinct is not proof, but it is information you already had.`,
-      "What You Are Standing In": `${card.name} describes the conditions the choice is actually being made in, rather than the ones you would prefer to be choosing from.`,
-      "The Turning": `${card.name} marks the place where the decision stops being abstract. Notice what changes here that cannot easily change back.`,
-      "What It Costs": `${card.name} names the price rather than the prize. Every direction has one; the useful question is which cost you could carry without resentment.`,
-      "What Opens": `${card.name} points to what becomes possible once the question is settled — not a promised result, but the room that gets made.`
+      "The Chosen Card": `${card.name} is the card your hand found in the open deck: ${upright}. Treat it as a lens on the decision, not an instruction or a verdict.`
     };
     return decisionSnippets[position];
   }
@@ -1599,29 +1612,17 @@ At ${counts[0]} coins deep, ${keep.name} marks What to Keep. Protect the boundar
 ${flow.name}, selected ${counts[2]} coins into the final vessel, marks What to Let Flow. This may be a thoughtful expense, a fair exchange, or something to release because holding it has become costly. Choose one small next action you can verify in real life: review one number, clarify one term, automate one safeguard, or make one values-aligned allocation. Tarot can frame the question; your records and circumstances should decide the money.`;
 }
 function decisionPersonalInterpretation(cards) {
-  const [first, ground, turning, cost, opens] = cards;
-  const rounds = state.decision.rounds;
-  const leftTaken = rounds.filter((side) => side === "a").length;
-  const rightTaken = rounds.length - leftTaken;
-  const split = state.decision.split ?? 39;
-  const total = split + (state.piles[1]?.length || 0) + rounds.length;
-  const evenness = Math.abs(split / Math.max(1, total) - .5);
-  const breakNote = evenness < .08
-    ? "You broke the deck close to the middle"
-    : split / Math.max(1, total) < .5 ? "You broke the deck early, leaving most of it on the far side" : "You broke the deck late, keeping most of it on the near side";
-  const reachNote = leftTaken === rightTaken
-    ? "and then you took evenly from both halves"
-    : `and then you reached ${Math.max(leftTaken, rightTaken)} times out of five to the same half`;
+  const [chosen] = cards;
+  if (!chosen) return "Your card is still settling into place.";
   const question = state.question.trim() || "this decision";
-  return `Your question — “${question}” — is not answered here, and the cards were never asked to answer it. ${breakNote}, ${reachNote}. Five cards stayed with you and five were set aside without ever being turned. That is the shape of any decision: you find out what you chose, and never what you didn't.
+  const orientation = chosen.reversed
+    ? "Its reversed orientation asks you to pause over what may be delayed, resisted, or still forming inside you."
+    : "Its upright orientation asks you to meet its theme plainly and look for where it is already present.";
+  return `Your question — “${question}” — is held by one card, not answered by it. After the shuffle, cut, reunion, and spread, your hand chose ${chosen.name}. Let that choice narrow your attention without surrendering your judgment.
 
-${first.name} is The First Reach — the card you took before you had built a reason for taking it. Treat it as the preference that was already in the room, the one that arrives ahead of the arguments. It does not have to be obeyed, but it should be admitted.
+${chosen.name} brings ${cardKeywords(chosen).join(", ")} into the room. ${orientation}
 
-${ground.name} shows What You Are Standing In. Decisions are usually made in worse conditions than we would like: tired, rushed, or with incomplete information. This card describes those actual conditions rather than the ideal ones, and part of choosing well is choosing for the person you currently are.
-
-${turning.name} marks The Turning — the point where this stops being something you are thinking about and becomes something you have done. ${cost.name} sits next to it as What It Costs. Read those two together and be specific: what exactly would you be spending, and would you still consider it fair a year from now?
-
-${opens.name} is What Opens. Not a reward and not a forecast — the room that gets made once the question stops taking up space. If you want one concrete step, write down the cost you just read and ask whether you could carry it without resentment. A cost you can name is a cost you can decide about; the five face-down cards will stay face-down either way.`;
+Use it as a practical prompt: name one fact in your situation that reflects this card, one fear that might be coloring it, and one small reversible step that would give you better information. The decision remains yours; the card simply gives you a clearer place to look from.`;
 }
 // First sentence of a longer interpretation, for a one-line share/summary line.
 function firstSentence(text) {
@@ -1641,8 +1642,8 @@ function personalSummary(cards) {
     return `Keep ${keep.name} steady, grow through ${grow.name}, and let ${flow.name} restore movement.`;
   }
   if (state.category === "Decision") {
-    const [first, , , cost, opens] = cards;
-    return `${first.name} is what you reached for first; ${cost.name} is what it costs, and ${opens.name} is the room it makes.`;
+    const [chosen] = cards;
+    return chosen ? `${chosen.name} is the single lens your hand chose for this decision.` : "One card is settling into place.";
   }
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
@@ -1784,12 +1785,14 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.fillStyle = SHARE_INK;
   ctx.fillText(q, 540, 571);
 
-  // Love and Money keep the four-card fan; Career and Decision use five slimmer cards.
+  // Love and Money keep the four-card fan, Career uses five slimmer cards, and the
+  // one-card Decision reading gets a large centered portrait instead of slot one.
+  const one = cards.length === 1;
   const five = cards.length === 5;
-  const cw = five ? 188 : 238, ch = five ? 314 : 397;
-  const lefts = five ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
-  const tops = five ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
-  const angles = five ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
+  const cw = one ? 328 : five ? 188 : 238, ch = one ? 548 : five ? 314 : 397;
+  const lefts = one ? [376] : five ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
+  const tops = one ? [682] : five ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
+  const angles = one ? [0] : five ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
   cards.forEach((card, index) => {
     drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });
@@ -2045,16 +2048,22 @@ function renderReading() {
     : money
       ? "Four cards, a living ledger for your resources."
       : decision
-        ? "Five cards, one crossroads held open."
+        ? "One card, held at the crossroads."
         : "Four cards, gathered beneath one sky.";
-  const unlockCopy = positions.length === 5
-    ? t("Watch a short ad to unlock a reflection based on your exact question and all five cards.")
-    : t("Watch a short ad to unlock a reflection based on your exact question and all four cards.");
+  const unlockCopy = decision
+    ? t("Watch a short ad to unlock a reflection based on your exact question and chosen card.")
+    : positions.length === 5
+      ? t("Watch a short ad to unlock a reflection based on your exact question and all five cards.")
+      : t("Watch a short ad to unlock a reflection based on your exact question and all four cards.");
   const summary = state.aiSummary || personalSummary(cards);
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
     : `<p class="ai-summary">${escapeHTML(summary)}</p><p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} ${t("The prototype reading remains available below as a fallback.")}</p>` : ""}`;
-  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : ""}"><div class="parchment ${money ? "money-parchment" : decision ? "decision-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : decision ? "decision-world" : "");
+  const cardRow = `<div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div>`;
+  const meaningGrid = `<div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div>`;
+  const cardReading = decision ? `<div class="decision-reading-core">${cardRow}${meaningGrid}</div>` : `${cardRow}${meaningGrid}`;
+  const unlockLabel = decision ? "Watch an ad to unlock my interpretation" : "Generate my personal interpretation";
+  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : ""}"><div class="parchment ${money ? "money-parchment" : decision ? "decision-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p>${cardReading}<div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t(unlockLabel)}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : decision ? "decision-world" : "");
 }
 function renderAd() {
   if (!state.ad) return "";
@@ -2082,7 +2091,7 @@ function renderSettings() {
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
-  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.category === "Decision" ? state.decision.keptIds : state.selectedIds;
+  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.category === "Decision" ? [state.decision.selectedId].filter(Boolean) : state.selectedIds;
   return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
@@ -2153,7 +2162,6 @@ function reorderDeck(dx, dy, distance) {
 function bindGestures() {
   const shuffle = document.querySelector("#shuffle-surface"); if (shuffle) bindShuffle(shuffle);
   const scatter = document.querySelector("#career-scatter-surface"); if (scatter) bindCareerScatter(scatter);
-  const split = document.querySelector("#decision-split-surface"); if (split) bindDecisionSplit(split);
   const spread = document.querySelector("#spread-surface"); if (spread) bindSpread(spread);
 }
 function capturePointer(element, event) {
@@ -2190,6 +2198,7 @@ function bindShuffle(surface) {
   let last = null;
   let pileBox = null;
   let touched = new Set();
+  let lastShuffleSoundAt = 0;
   const radius = () => Math.max(72, pileBox.width * .26);
   const nudge = (index, dx, dy, falloff) => {
     const piece = state.shuffleLayout[index];
@@ -2203,10 +2212,12 @@ function bindShuffle(surface) {
     card.style.setProperty("--r", `${piece.r}deg`);
     card.style.setProperty("--z", piece.z);
     card.classList.add("held");
-    // One "shuffle" sample per card the very moment it starts moving — not per gesture — so the
-    // number of sounds heard tracks the number of cards actually swept, like a real deck. A wide
-    // wave can catch many cards in the same instant, so stagger them into a cascade, not one blast.
-    if (!touched.has(index)) setTimeout(() => sound("shuffle", clamp(.08 + falloff * .09, .06, .2)), Math.random() * 80);
+    // Keep a tactile stream of shuffle ticks without spawning dozens of overlapping audio
+    // elements when one broad sweep catches most of the deck in the same frame.
+    if (!touched.has(index) && Date.now() - lastShuffleSoundAt >= 42) {
+      lastShuffleSoundAt = Date.now();
+      sound("shuffle", clamp(.09 + falloff * .08, .07, .19));
+    }
     touched.add(index);
   };
   const centerOf = (index) => {
@@ -2284,12 +2295,14 @@ function bindShuffle(surface) {
 // pass per frame is enough to keep the table readable without the cards ever jittering.
 function separateCareerScatter(box, cardBox, strength = .34) {
   const pieces = careerScatter();
+  const moved = new Set();
   // Slightly wider than a card, so a sliver of table always shows between two of them.
   const gapX = Math.max(16, cardBox.width * 1.15);
   const gapY = Math.max(22, cardBox.height * .88);
-  const shift = (piece, dxPx, dyPx) => {
+  const shift = (piece, index, dxPx, dyPx) => {
     piece.x = clamp(piece.x + dxPx / box.width * 100, 6, 94);
     piece.y = clamp(piece.y + dyPx / box.height * 100, 10, 90);
+    moved.add(index);
   };
   for (let a = 0; a < pieces.length; a += 1) {
     for (let b = a + 1; b < pieces.length; b += 1) {
@@ -2306,10 +2319,11 @@ function separateCareerScatter(box, cardBox, strength = .34) {
         ux = nx / dist * gapX * push;
         uy = ny / dist * gapY * push;
       } else continue;
-      shift(pa, -ux, -uy);
-      shift(pb, ux, uy);
+      shift(pa, a, -ux, -uy);
+      shift(pb, b, ux, uy);
     }
   }
+  return moved;
 }
 // Relax the whole table at once — used when the cards are laid out for choosing, so the
 // final constellation is reachable even where a sweep never passed.
@@ -2343,52 +2357,6 @@ function nearestCareerCard(px, py, cards, box, cardBox) {
   });
   return best;
 }
-// The career table shares the sweep gesture with Love's pile, but every wave is followed
-// by a separation pass so the cards drift apart into a constellation instead of stacking up.
-// Breaking the deck is a drag across the table, not a number entry: the point under the
-// finger is where the two halves part, and the stacks thicken and thin as it moves.
-function bindDecisionSplit(surface) {
-  const field = surface.querySelector("#decision-split-field");
-  if (!field) return;
-  let active = false, box = null, pending = null, raf = 0;
-  const total = () => Math.max(1, state.deck.length);
-  const apply = () => {
-    raf = 0;
-    if (!active || pending === null) return;
-    const ratio = clamp((pending - box.left) / Math.max(1, box.width), 0, 1);
-    const next = clamp(Math.round(ratio * total()), DECISION_HALF_MINIMUM, total() - DECISION_HALF_MINIMUM);
-    pending = null;
-    if (next === state.decision.splitDraft) return;
-    state.decision.splitDraft = next;
-    updateDecisionSplit();
-    // One soft riffle per handful moved, so a long drag sounds like cards passing.
-    if (next % 4 === 0) sound("shuffle", .07);
-  };
-  surface.addEventListener("pointerdown", (event) => {
-    if (transitioning || event.target.closest(".decision-split-range")) return;
-    box = field.getBoundingClientRect();
-    active = true;
-    field.classList.add("parting");
-    pending = event.clientX;
-    apply();
-    capturePointer(surface, event);
-  });
-  surface.addEventListener("pointermove", (event) => {
-    if (!active) return;
-    pending = event.clientX;
-    if (!raf) raf = requestAnimationFrame(apply);
-  });
-  const finish = () => {
-    if (!active) return;
-    active = false;
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    pending = null;
-    field.classList.remove("parting");
-    interaction(); buzz(8);
-  };
-  surface.addEventListener("pointerup", finish);
-  surface.addEventListener("pointercancel", finish);
-}
 function bindCareerScatter(surface) {
   const field = surface.querySelector(".career-orbit");
   const nodes = [...surface.querySelectorAll(".career-ember-card")];
@@ -2398,6 +2366,7 @@ function bindCareerScatter(surface) {
   const picking = field.classList.contains("picking");
   let active = false, start = null, last = null, box = null, cardBox = null;
   let touched = new Set(), swept = false;
+  let lastShuffleSoundAt = 0;
   const radius = () => Math.max(66, box.width * .24);
   const paint = (index) => {
     const piece = state.career.scatter[index];
@@ -2419,15 +2388,20 @@ function bindCareerScatter(surface) {
     move(index, dx * falloff, dy * falloff, dx * .18 * falloff);
     state.career.scatter[index].z = 40 + (state.career.shuffleMoves || 0) + touched.size;
     cards[index].classList.add("held");
-    if (!touched.has(index)) setTimeout(() => sound("shuffle", clamp(.08 + falloff * .09, .06, .2)), Math.random() * 80);
+    if (!touched.has(index) && Date.now() - lastShuffleSoundAt >= 42) {
+      lastShuffleSoundAt = Date.now();
+      sound("shuffle", clamp(.09 + falloff * .08, .07, .19));
+    }
     touched.add(index);
   };
-  const separate = () => {
-    separateCareerScatter(box, cardBox);
-    state.career.scatter.forEach((_, index) => paint(index));
+  const separate = (directlyMoved) => {
+    const changed = separateCareerScatter(box, cardBox);
+    directlyMoved.forEach((index) => changed.add(index));
+    changed.forEach((index) => paint(index));
   };
   const wave = (px, py, dx, dy) => {
     const rad = radius();
+    const directlyMoved = new Set();
     cards.forEach((card) => {
       const index = Number(card.dataset.shuffleIndex);
       const piece = state.career.scatter[index];
@@ -2441,8 +2415,9 @@ function bindCareerScatter(surface) {
       // sweep into a scatter rather than a clump travelling across the table.
       const away = dist > 4 ? { x: (cx - px) / dist, y: (cy - py) / dist } : { x: 0, y: -1 };
       nudge(index, dx + away.x * 14, dy + away.y * 10, falloff);
+      directlyMoved.add(index);
     });
-    separate();
+    separate(directlyMoved);
   };
   let pendingMove = null, moveRaf = 0;
   const processMove = () => {
@@ -2537,21 +2512,6 @@ function updateShuffleStatus() {
   if (guide) guide.textContent = `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}`;
   if (button) button.disabled = !ready;
 }
-// The split repaints in place while the finger is down: the two stacks gain and lose edges
-// and their card counts follow. Neither carries any reading of what the split means.
-function updateDecisionSplit() {
-  const at = decisionSplitAt();
-  const total = Math.max(1, state.deck.length);
-  const edges = document.querySelectorAll(".decision-half-edges");
-  const counts = document.querySelectorAll(".decision-half-count");
-  [at, total - at].forEach((count, side) => {
-    if (edges[side] && edges[side].childElementCount !== decisionEdges(count)) edges[side].innerHTML = decisionEdgeMarkup(count);
-    if (counts[side]) counts[side].textContent = `${count} ${t("cards")}`;
-  });
-  const range = document.querySelector("#decision-split-range");
-  if (range && Number(range.value) !== at) range.value = at;
-  document.querySelector(".decision-split-surface .physical-instruction")?.classList.add("quiet");
-}
 function animateDeckCut(pieces, done) {
   const deck = document.querySelector(".side-deck");
   if (!deck || transitioning) return;
@@ -2612,7 +2572,11 @@ function bindSpread(surface) {
     deck.classList.add("spread-source-away");
     transitioning = true;
     interaction(); buzz([7, 17, 7]); sound("spread", clamp(.1 + distance / 1000, .1, .22));
-    setTimeout(() => { state.stage = "choose"; transitioning = false; render(); }, 620);
+    setTimeout(() => {
+      state.stage = state.category === "Decision" ? "decisionChoose" : "choose";
+      transitioning = false;
+      render();
+    }, 620);
   };
   deck.addEventListener("pointerdown", (event) => {
     points = [{ x: event.clientX, y: event.clientY }];
@@ -2638,7 +2602,12 @@ function animateShuffleGather() {
   surface.classList.add("gathering");
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([7, 14, 9]); sound("gather", .18);
-  setTimeout(() => { state.stage = "cutOne"; transitioning = false; interaction(); render(); }, 760);
+  setTimeout(() => {
+    state.stage = state.category === "Decision" ? "decisionCut" : "cutOne";
+    transitioning = false;
+    interaction();
+    render();
+  }, 760);
 }
 function animateRitualDraw() {
   const surface = document.querySelector("#ritual-card-surface");
@@ -2724,7 +2693,11 @@ function animateAssistedSpread() {
   deck.classList.add("spread-source-away");
   transitioning = true;
   interaction(); sound("spread", .16);
-  setTimeout(() => { state.stage = "choose"; transitioning = false; render(); }, 620);
+  setTimeout(() => {
+    state.stage = state.category === "Decision" ? "decisionChoose" : "choose";
+    transitioning = false;
+    render();
+  }, 620);
 }
 function animatePickCard(element, id) {
   if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= 3) return;
@@ -2752,6 +2725,97 @@ function animatePickCard(element, id) {
   animation.finished.catch(() => {}).then(() => {
     state.selectedIds.push(id);
     transitioning = false; interaction(); buzz(12); sound("take", .17); render();
+  });
+}
+
+function interleaveDecisionPiles(leftPile, rightPile) {
+  const left = [...leftPile];
+  const right = [...rightPile];
+  const mixed = [];
+  const random = rngFor(`${state.seed}-decision-riffle-${state.decision.cut ?? left.length}`);
+  let fromLeft = random() < .5;
+  while (left.length || right.length) {
+    const source = fromLeft ? left : right;
+    const fallback = fromLeft ? right : left;
+    const active = source.length ? source : fallback;
+    // Mostly single cards with occasional two- and three-card clumps: a natural riffle,
+    // never one untouched half simply placed above the other.
+    const roll = random();
+    const count = roll > .9 ? 3 : roll > .64 ? 2 : 1;
+    mixed.push(...active.splice(0, count));
+    fromLeft = active === source ? !fromLeft : fromLeft;
+  }
+  return mixed;
+}
+
+function animateDecisionFuse() {
+  const field = document.querySelector("#decision-fuse-surface .pile-field");
+  if (!field || transitioning || state.piles.length !== 2) return;
+  transitioning = true;
+  const surface = document.querySelector("#decision-fuse-surface");
+  field.classList.add("decision-riffling");
+  surface?.classList.add("decision-fusing");
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  buzz([7, 12, 7, 12, 10, 18]);
+  sound("shuffle", .16);
+  setTimeout(() => sound("shuffle", .13), 150);
+  setTimeout(() => sound("shuffle", .14), 300);
+  setTimeout(() => sound("shuffle", .12), 450);
+  setTimeout(() => sound("gather", .16), 720);
+  setTimeout(() => {
+    state.deck = interleaveDecisionPiles(state.piles[0] || [], state.piles[1] || []);
+    state.piles = [];
+    state.stage = "decisionSpread";
+    transitioning = false;
+    interaction();
+    render();
+  }, 1120);
+}
+
+function finishDecisionChoice(id) {
+  state.decision.selectedId = id;
+  state.revealedIds = [];
+  state.stage = "decisionReveal";
+  state.aiUnlocked = false;
+  state.aiLoading = false;
+  state.aiText = null;
+  state.aiSummary = null;
+  state.aiError = null;
+  transitioning = false;
+  interaction();
+  sound("gather", .18);
+  buzz([8, 18, 12]);
+  render();
+}
+
+function animateDecisionPickCard(element, id) {
+  if (transitioning || state.decision.selectedId) return;
+  const card = cardById(id);
+  const dock = document.querySelector(".decision-draw-dock");
+  if (!card || !dock) return;
+  preloadCardArt(card);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finishDecisionChoice(id);
+    return;
+  }
+  transitioning = true;
+  const from = element.getBoundingClientRect();
+  const to = dock.getBoundingClientRect();
+  const scale = (element.offsetWidth && from.width / element.offsetWidth) || 1;
+  const dx = (to.left + to.width / 2 - (from.left + from.width / 2)) / scale;
+  const dy = (to.top + to.height / 2 - (from.top + from.height / 2)) / scale;
+  element.closest(".spread-card")?.classList.add("flying", "decision-flying");
+  sound("take", .13);
+  const animation = element.animate([
+    { transform: "translate(0, 0) rotate(0deg) scale(1)", filter: "brightness(1)", offset: 0 },
+    { transform: `translate(${dx * .78}px, ${dy * .72 - 22}px) rotate(-5deg) scale(.94)`, filter: "brightness(1.24)", offset: .7 },
+    { transform: `translate(${dx}px, ${dy}px) rotate(0deg) scale(.82)`, filter: "brightness(1.12)", offset: 1 }
+  ], { duration: 620, easing: "cubic-bezier(.18,.82,.2,1)", fill: "forwards" });
+  animation.finished.catch(() => {}).then(() => {
+    dock.classList.add("receiving");
+    buzz([10, 18]);
+    sound("gather", .14);
+    setTimeout(() => finishDecisionChoice(id), 420);
   });
 }
 
@@ -2791,9 +2855,13 @@ function act(action, element) {
     if (state.category === "Decision") {
       state.decision = createDecisionState();
       state.piles = [];
+      state.shuffleLayout = buildShuffleLayout(state.seed);
+      state.shuffleMoves = 0;
+      state.cutDraft = 36;
+      state.spread = null;
       state.revealedIds = [];
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
-      state.stage = "decisionSplit";
+      state.stage = "decisionShuffle";
     } else if (state.category === "Career") {
       state.career = createCareerState(state.seed);
       state.revealedIds = [];
@@ -2860,6 +2928,7 @@ function act(action, element) {
   if (action === "reassemble-three") { animateThreePileJoin(); return; }
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
+  if (action === "pick-decision-card") { animateDecisionPickCard(element, element.dataset.cardId); return; }
   if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return; }
   if (action === "assist-career-scatter") {
     const pieces = careerScatter();
@@ -2980,32 +3049,20 @@ function act(action, element) {
     state.stage = "moneyReveal";
     interaction(); sound("spread", .18); render(); return;
   }
-  if (action === "decision-split") {
+  if (action === "decision-make-cut") {
     if (!state.deck.length) return;
-    const at = decisionSplitAt();
-    // The break is exactly where the reader left it: the deck becomes two real halves and
-    // two empty spaces on the table for what gets kept and what gets passed over.
-    state.decision.split = at;
-    state.piles = [state.deck.slice(0, at), state.deck.slice(at), [], []];
-    state.deck = [];
-    state.decision.rounds = [];
-    state.decision.keptIds = [];
-    state.decision.refusedIds = [];
-    state.stage = "decisionFork";
-    interaction(); buzz([9, 20, 9]); sound("cut", .2); render(); return;
+    const cut = clamp(Number(state.cutDraft) || Math.round(state.deck.length * .46), 9, state.deck.length - 9);
+    animateDeckCut(2, () => {
+      const source = state.deck;
+      state.decision.cut = cut;
+      state.piles = [source.slice(0, cut), source.slice(cut)];
+      state.deck = [];
+      state.stage = "decisionFuse";
+      interaction();
+    });
+    return;
   }
-  if (action === "decision-draw") {
-    if (!decisionDraw(element.dataset.side)) return;
-    preloadCardArt(decisionKeptCards());
-    interaction(); buzz([8, 16]); sound("take", .16); render(); return;
-  }
-  if (action === "decision-to-reveal") {
-    if (readingCards().length !== DECISION_POSITIONS.length) return;
-    state.revealedIds = [];
-    preloadCardArt(readingCards());
-    state.stage = "decisionReveal";
-    interaction(); sound("spread", .18); render(); return;
-  }
+  if (action === "decision-fuse") { animateDecisionFuse(); return; }
 
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
@@ -3078,12 +3135,12 @@ app.addEventListener("click", (event) => {
   if (target.dataset.action === "career-ember" && Date.now() - careerPickAt < 500) return;
   act(target.dataset.action, target);
 });
-function pickCutFromPoint(deck, clientY) {
+function pickCutFromPoint(deck, clientY, knownRect = null) {
   const workbench = deck.closest(".cut-workbench");
   if (!workbench) return;
   const mode = workbench.dataset.cutMode;
   const total = state.deck.length;
-  const rect = deck.getBoundingClientRect();
+  const rect = knownRect || deck.getBoundingClientRect();
   const frac = clamp((clientY - rect.top) / rect.height, 0, 1);
   let value = clamp(Math.round(frac * total), 9, total - 9);
   if (mode === "three") {
@@ -3158,12 +3215,6 @@ app.addEventListener("input", (event) => {
     persist();
     return;
   }
-  if (event.target.id === "decision-split-range") {
-    state.decision.splitDraft = Number(event.target.value);
-    updateDecisionSplit();
-    persist();
-    return;
-  }
   if (event.target.id === "money-current-range") {
     state.money.cutDraft = Number(event.target.value);
     const surface = document.querySelector(".money-current-surface");
@@ -3189,17 +3240,41 @@ app.addEventListener("input", (event) => {
 });
 
 let cutDragDeck = null;
+let cutDragRect = null;
+let cutDragY = null;
+let cutDragRaf = 0;
+function processCutDrag() {
+  cutDragRaf = 0;
+  if (!cutDragDeck || !cutDragRect || cutDragY === null) return;
+  const y = cutDragY;
+  cutDragY = null;
+  pickCutFromPoint(cutDragDeck, y, cutDragRect);
+}
 app.addEventListener("pointerdown", (event) => {
   if (transitioning) return;
   const deck = event.target.closest(".cut-workbench .side-deck");
   if (!deck) return;
   cutDragDeck = deck;
+  cutDragRect = deck.getBoundingClientRect();
+  cutDragY = null;
   capturePointer(deck, event);
-  pickCutFromPoint(deck, event.clientY);
+  pickCutFromPoint(deck, event.clientY, cutDragRect);
 });
-window.addEventListener("pointermove", (event) => { if (cutDragDeck) pickCutFromPoint(cutDragDeck, event.clientY); });
-window.addEventListener("pointerup", () => { cutDragDeck = null; });
-window.addEventListener("pointercancel", () => { cutDragDeck = null; });
+window.addEventListener("pointermove", (event) => {
+  if (!cutDragDeck) return;
+  cutDragY = event.clientY;
+  if (!cutDragRaf) cutDragRaf = requestAnimationFrame(processCutDrag);
+});
+function finishCutDrag(event) {
+  if (cutDragDeck && cutDragRect && Number.isFinite(event?.clientY)) pickCutFromPoint(cutDragDeck, event.clientY, cutDragRect);
+  if (cutDragRaf) cancelAnimationFrame(cutDragRaf);
+  cutDragRaf = 0;
+  cutDragY = null;
+  cutDragRect = null;
+  cutDragDeck = null;
+}
+window.addEventListener("pointerup", finishCutDrag);
+window.addEventListener("pointercancel", finishCutDrag);
 
 // Escape closes the settings dialog (and a finished mock ad), like a native dialog.
 window.addEventListener("keydown", (event) => {

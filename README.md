@@ -49,14 +49,16 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 
 ### Decision — the Crossroads
 
-The most deliberately wordless of the four. Nothing on screen says what any gesture means; the reader can see exactly what happens to the cards and nothing about why.
+Decision is now a focused one-card ritual built from the same tactile language as Love.
 
 1. Choose Decision through the same sponsored entry treatment as Career and Money, then place an open question about the choice.
-2. Drag across the deck to break it in two. The two stacks thicken and thin under the finger and carry only a card count — no marker, no ratio, no label saying which half is which.
-3. Five times, each half offers its top card. Take one; the other is set aside face-down. The pair on offer is always literally the top of each stack, so the card taken is the card that was looked at.
-4. The five taken cards line up face-down as they are drawn. The five passed over build into a heap that is never turned — through the reveal, through the reading, never.
-5. Reveal the five kept cards under fixed positions: The First Reach, What You Are Standing In, The Turning, What It Costs, and What Opens.
-6. The reading is the first and only place any of it is interpreted, and it reads back only what the reader watched happen — roughly where the deck broke and how often they reached to the same half.
+2. Give the full deck a generous, physical shuffle by sweeping waves through the loose cards.
+3. Gather the cards and use the Love ritual's side view and brass marker to cut the deck into two real halves.
+4. See both piles from above, then press the central seal to riffle cards alternately from each half into a genuinely mixed deck.
+5. Open the deck into the same broad reading arc used by Love.
+6. Choose one face-down card. It travels into the center and waits in a dedicated reveal scene.
+7. Tap the card, pass through the same first-reveal sponsored moment used by Love, then turn it over.
+8. Enter the compact one-card reading. The card's core meaning is visible immediately; its AI interpretation stays behind a second, clearly labelled sponsored unlock.
 
 The lower-left `⌘` seal opens the development diagnostics panel. It exposes the stage, seed, pile boundaries, selected IDs, deck order, orientation, and a guided-interaction fallback. It is deliberately visible for prototype review and should be feature-flagged or removed for production.
 
@@ -66,11 +68,11 @@ The lower-left `⌘` seal opens the development diagnostics panel. It exposes th
 
 - At the beginning, `state.deck` holds the complete ordered 78-card array. Every card has a stable ID, original micro-rotation, and upright/reversed state created at session start.
 - `state.piles` holds genuine ranges taken from that deck. Reassembly explicitly flattens selected pile order back into `state.deck`.
-- When the hidden card is drawn, it moves into `state.ritualCard`, leaving the physical deck with 77 cards. `deck` + `piles` + `ritualCard` always total 78; recovery validates that invariant.
+- When the hidden Love card is drawn, it moves into `state.ritualCard`, leaving the physical deck with 77 cards. Decision keeps all 78 cards through shuffle, cut, riffle mixing, and spread, then records the single selected card by ID.
 - `state.ritualCardId`, `selectedIds`, and `revealedIds` always refer to those same persistent card objects; identity and orientation are never generated on reveal.
 - `STAGES` acts as the ritual state machine. Each stage only exposes the next valid manipulation.
 - `AD_CONFIG` isolates the two mock ad checkpoints, so an advertising SDK can replace the overlay without touching tarot state.
-- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the four or five selected card states to Gemini. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
+- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the selected card states to Gemini—one for Decision, four for Love and Money, or five for Career. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
 - Face-up cards use the supplied 78-card artwork in `assets/tarot/`; deck data and rendering remain separated so the set can be swapped later. Images load lazily and fall back to a styled text face if a file is missing.
 
 ## Physics and procedural assistance
