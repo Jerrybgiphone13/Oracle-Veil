@@ -87,7 +87,7 @@ function promptFor({ question, cards, topic }) {
   const structure = career
     ? "5 short paragraphs (current ground, unclaimed strength, friction, leverage/support, and one specific gentle next experiment)"
     : money
-      ? "4 short paragraphs (the seed pattern, what to protect, what to grow, and what to let circulate plus one small verifiable next action)"
+      ? "3 short paragraphs (what to protect, what to grow, and what to let circulate) plus one small verifiable next action"
       : decision
         ? "5 short paragraphs (the first reach, the conditions being chosen from, the turning, the cost, and what opens plus one small honest way to test whether that cost is bearable)"
         : "4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step)";
@@ -99,7 +99,7 @@ async function interpret(request, response) {
   try {
     const input = JSON.parse(await readBody(request));
     const topic = ["Love", "Career", "Money", "Decision"].includes(input.topic) ? input.topic : "Love";
-    const expectedCards = topic === "Career" || topic === "Decision" ? 5 : 4;
+    const expectedCards = topic === "Career" || topic === "Decision" ? 5 : topic === "Money" ? 3 : 4;
     if (typeof input.question !== "string" || input.question.trim().length < 4 || !Array.isArray(input.cards) || input.cards.length !== expectedCards) throw new Error(`A question and ${expectedCards} cards are required.`);
     const cards = input.cards.map((card) => ({ position: String(card.position || "").slice(0, 48), name: String(card.name || "").slice(0, 90), orientation: card.orientation === "reversed" ? "reversed" : "upright" }));
     const gemini = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {

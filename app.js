@@ -19,11 +19,16 @@ const SUITS = [
 const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Page", "Knight", "Queen", "King"];
 const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
 const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
-const MONEY_STAGES = ["moneyCurrent", "moneyVessels", "moneyLedger", "moneyReveal", "reading"];
+// Money now shares Love's shuffle/cut-into-three/spread/choose machinery: the same stage
+// names ("shuffle", "cutThree", "spread", "choose") are reused so the generic gesture code
+// (bindShuffle, sideDeckMarkup, bindSpread, animatePickCard, ...) needs no per-topic branching
+// beyond the few points where the two rituals actually diverge. "pileOrder" replaces
+// "reassembleThree": the three piles are ordered but never merged back into one deck.
+const MONEY_STAGES = ["shuffle", "cutThree", "pileOrder", "spread", "choose", "moneyReveal", "reading"];
 const DECISION_STAGES = ["decisionSplit", "decisionFork", "decisionReveal", "reading"];
 const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
-const MONEY_POSITIONS = ["The Seed", "What to Keep", "What to Grow", "What to Let Flow"];
+const MONEY_POSITIONS = ["What to Keep", "What to Grow", "What to Let Flow"];
 const MONEY_VESSELS = ["Keep", "Grow", "Flow"];
 const DECISION_POSITIONS = ["The First Reach", "What You Are Standing In", "The Turning", "What It Costs", "What Opens"];
 // Five times the two halves offer their top card and only one is taken. The five that
@@ -511,8 +516,9 @@ Object.assign(I18N.zh, {
   "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "观看一个简短广告，解锁基于你的问题与全部五张牌的映照。"
 });
 
-// Money is a living ledger: the cut selects the Seed, then nine placed coins
-// determine the exact depth of the Keep, Grow, and Flow cards.
+// Money now shuffles, cuts into three piles, orders them, and spreads each pile in turn
+// for one card apiece — the same gesture vocabulary as Love, applied to three piles kept
+// separate instead of one deck.
 Object.assign(I18N.fr, {
   "Three paths are ready tonight. Career and Money open after a brief sponsored passage.": "Trois voies sont prêtes ce soir. Carrière et Argent s’ouvrent après un bref passage sponsorisé.",
   "Money Ledger": "Registre d’argent", "Money ritual": "Rituel de l’argent",
@@ -523,17 +529,15 @@ Object.assign(I18N.fr, {
   "Where is value leaking from my life?": "Où la valeur s’échappe-t-elle de ma vie ?",
   "What resource am I not using fully?": "Quelle ressource n’utilisé-je pas pleinement ?",
   "Enter the Money ritual": "Entrer dans le rituel de l’argent",
-  "Find the source of the current.": "Trouvez la source du courant.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "Déplacez la vanne de laiton dans le jeu. La carte juste dessous devient votre Graine.",
-  "Fund the three vessels.": "Alimentez les trois réceptacles.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "Répartissez les neuf pièces entre Garder, Grandir et Circuler. Chaque total atteint cette profondeur exacte dans sa pile.",
-  "Read the living ledger.": "Lisez le registre vivant.", "Every card now carries the action that chose it: one cut and three coin depths.": "Chaque carte porte désormais le geste qui l’a choisie : une coupe et trois profondeurs.",
-  "Turn over the treasury you built.": "Retournez le trésor que vous avez bâti.", "Four cards preserve the exact path of your choices.": "Quatre cartes conservent le chemin exact de vos choix.",
-  "The gate chooses the card directly beneath it.": "La vanne choisit la carte placée juste dessous.", "Take this Seed": "Prendre cette Graine",
-  "coins left": "pièces restantes", "Place coin": "Placer une pièce", "Return coin": "Reprendre une pièce",
-  "Each vessel must hold at least one coin.": "Chaque réceptacle doit contenir au moins une pièce.", "All nine coins are placed. Each count now points to an exact card.": "Les neuf pièces sont placées. Chaque total pointe maintenant vers une carte exacte.",
-  "Seal the vessels": "Sceller les réceptacles", "Chosen at cut": "Choisie à la coupe", "coins deep": "pièces de profondeur",
-  "Your cut became the Seed. The coin counts chose the other three cards.": "Votre coupe est devenue la Graine. Les comptes de pièces ont choisi les trois autres cartes.",
-  "Open the treasury": "Ouvrir le trésor", "Four cards, a living ledger for your resources.": "Quatre cartes, un registre vivant pour vos ressources.",
-  "The Seed": "La Graine", "What to Keep": "Ce qu’il faut garder", "What to Grow": "Ce qu’il faut faire grandir", "What to Let Flow": "Ce qu’il faut laisser circuler",
+  "Choose the order of the three piles.": "Choisissez l’ordre des trois paquets.", "Touch the piles left to right, in the order you want them to sit on the table.": "Touchez les paquets de gauche à droite, dans l’ordre où vous les voulez sur la table.",
+  "Let this pile open.": "Laissez ce paquet s’ouvrir.", "Choose the card that calls to you.": "Choisissez la carte qui vous appelle.",
+  "Turn over the three cards you chose.": "Retournez les trois cartes que vous avez choisies.", "Each pile gave you exactly one card, in the order you set: Keep, Grow, and Flow.": "Chaque paquet vous a donné exactement une carte, dans l’ordre que vous avez fixé : Garder, Grandir et Circuler.",
+  "of 3 chosen · numbers show the left-to-right order": "sur 3 choisis · les numéros indiquent l’ordre de gauche à droite",
+  "Tap the pile that should sit first, on the left.": "Touchez le paquet qui doit se trouver en premier, à gauche.", "Set this order": "Fixer cet ordre",
+  "Tap any face-down card from this pile.": "Touchez n’importe quelle carte face cachée de ce paquet.", "One card has moved into the center.": "Une carte s’est déplacée vers le centre.",
+  "Take this card": "Prendre cette carte",
+  "Open the treasury": "Ouvrir le trésor", "Three cards, a living ledger for your resources.": "Trois cartes, un registre vivant pour vos ressources.",
+  "What to Keep": "Ce qu’il faut garder", "What to Grow": "Ce qu’il faut faire grandir", "What to Let Flow": "Ce qu’il faut laisser circuler",
   "Keep": "Garder", "Grow": "Grandir", "Flow": "Circuler",
   "Unlock the Money path": "Ouvrir la voie Argent", "A short passage before the Money ritual": "Un bref passage avant le rituel de l’argent",
   "The treasury<br>is taking shape.": "Le trésor<br>prend forme.", "Watch this brief sponsored moment to open the Money ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de l’argent."
@@ -546,17 +550,15 @@ Object.assign(I18N.ru, {
   "What is my money asking me to understand?": "Что мои деньги просят меня понять?", "What should I protect before I try to grow?": "Что мне стоит защитить, прежде чем расти?",
   "Where is value leaking from my life?": "Где ценность утекает из моей жизни?", "What resource am I not using fully?": "Какой ресурс я использую не полностью?",
   "Enter the Money ritual": "Войти в денежный ритуал",
-  "Find the source of the current.": "Найдите источник потока.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "Перемещайте латунный шлюз по колоде. Карта прямо под ним станет вашим Семенем.",
-  "Fund the three vessels.": "Наполните три сосуда.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "Разместите девять монет между Сохранить, Вырастить и Отпустить. Число монет укажет точную глубину карты в стопке.",
-  "Read the living ledger.": "Прочтите живую книгу.", "Every card now carries the action that chose it: one cut and three coin depths.": "Каждая карта хранит выбравшее её действие: один срез и три глубины монет.",
-  "Turn over the treasury you built.": "Откройте созданную вами сокровищницу.", "Four cards preserve the exact path of your choices.": "Четыре карты сохраняют точный путь ваших решений.",
-  "The gate chooses the card directly beneath it.": "Шлюз выбирает карту прямо под ним.", "Take this Seed": "Взять это Семя",
-  "coins left": "монет осталось", "Place coin": "Положить монету", "Return coin": "Вернуть монету",
-  "Each vessel must hold at least one coin.": "В каждом сосуде должна быть хотя бы одна монета.", "All nine coins are placed. Each count now points to an exact card.": "Все девять монет размещены. Каждый счёт теперь указывает точную карту.",
-  "Seal the vessels": "Запечатать сосуды", "Chosen at cut": "Выбрано срезом", "coins deep": "монет вглубь",
-  "Your cut became the Seed. The coin counts chose the other three cards.": "Ваш срез стал Семенем. Число монет выбрало остальные три карты.",
-  "Open the treasury": "Открыть сокровищницу", "Four cards, a living ledger for your resources.": "Четыре карты — живая книга ваших ресурсов.",
-  "The Seed": "Семя", "What to Keep": "Что сохранить", "What to Grow": "Что вырастить", "What to Let Flow": "Что отпустить",
+  "Choose the order of the three piles.": "Выберите порядок трёх стопок.", "Touch the piles left to right, in the order you want them to sit on the table.": "Коснитесь стопок слева направо, в том порядке, в котором они должны лечь на стол.",
+  "Let this pile open.": "Дайте этой стопке раскрыться.", "Choose the card that calls to you.": "Выберите карту, которая зовёт вас.",
+  "Turn over the three cards you chose.": "Переверните три выбранные вами карты.", "Each pile gave you exactly one card, in the order you set: Keep, Grow, and Flow.": "Каждая стопка отдала вам ровно одну карту, в заданном вами порядке: Сохранить, Вырастить и Отпустить.",
+  "of 3 chosen · numbers show the left-to-right order": "из 3 выбрано · номера показывают порядок слева направо",
+  "Tap the pile that should sit first, on the left.": "Коснитесь стопки, которая должна оказаться первой, слева.", "Set this order": "Задать этот порядок",
+  "Tap any face-down card from this pile.": "Коснитесь любой карты рубашкой вверх из этой стопки.", "One card has moved into the center.": "Одна карта переместилась в центр.",
+  "Take this card": "Взять эту карту",
+  "Open the treasury": "Открыть сокровищницу", "Three cards, a living ledger for your resources.": "Три карты — живая книга ваших ресурсов.",
+  "What to Keep": "Что сохранить", "What to Grow": "Что вырастить", "What to Let Flow": "Что отпустить",
   "Keep": "Сохранить", "Grow": "Вырастить", "Flow": "Отпустить",
   "Unlock the Money path": "Открыть путь Денег", "A short passage before the Money ritual": "Короткий переход перед денежным ритуалом",
   "The treasury<br>is taking shape.": "Сокровищница<br>обретает форму.", "Watch this brief sponsored moment to open the Money ritual.": "Посмотрите этот короткий рекламный момент, чтобы открыть денежный ритуал."
@@ -569,17 +571,15 @@ Object.assign(I18N.zh, {
   "What is my money asking me to understand?": "我的金钱正在要求我理解什么？", "What should I protect before I try to grow?": "在追求增长之前，我应该先守护什么？",
   "Where is value leaking from my life?": "价值正从我生活的哪里流失？", "What resource am I not using fully?": "我尚未充分使用哪项资源？",
   "Enter the Money ritual": "进入财富仪式",
-  "Find the source of the current.": "找到流动的源头。", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "在牌组中移动黄铜闸门。正下方的牌将成为你的种子。",
-  "Fund the three vessels.": "为三个容器注入资金。", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "将九枚钱币分配到守护、成长与流动。每个数量会抵达牌堆中对应的准确深度。",
-  "Read the living ledger.": "阅读这本活账簿。", "Every card now carries the action that chose it: one cut and three coin depths.": "每张牌都保留了选择它的动作：一次切牌与三组钱币深度。",
-  "Turn over the treasury you built.": "翻开你亲手建成的宝库。", "Four cards preserve the exact path of your choices.": "四张牌保存了你选择的完整路径。",
-  "The gate chooses the card directly beneath it.": "闸门会选择正下方的牌。", "Take this Seed": "取出这枚种子",
-  "coins left": "枚钱币待分配", "Place coin": "放入钱币", "Return coin": "取回钱币",
-  "Each vessel must hold at least one coin.": "每个容器至少需要一枚钱币。", "All nine coins are placed. Each count now points to an exact card.": "九枚钱币已全部放置。每个数量现在都指向一张准确的牌。",
-  "Seal the vessels": "封印容器", "Chosen at cut": "由切牌选中", "coins deep": "枚钱币深",
-  "Your cut became the Seed. The coin counts chose the other three cards.": "你的切牌成为种子，钱币数量选择了另外三张牌。",
-  "Open the treasury": "开启宝库", "Four cards, a living ledger for your resources.": "四张牌，一本记录资源的活账簿。",
-  "The Seed": "种子", "What to Keep": "值得守护", "What to Grow": "值得成长", "What to Let Flow": "值得流动",
+  "Choose the order of the three piles.": "选择三叠牌的顺序。", "Touch the piles left to right, in the order you want them to sit on the table.": "从左到右依次点触牌堆，按你希望它们在桌上排列的顺序。",
+  "Let this pile open.": "让这叠牌展开。", "Choose the card that calls to you.": "选出那张呼唤你的牌。",
+  "Turn over the three cards you chose.": "翻开你选出的三张牌。", "Each pile gave you exactly one card, in the order you set: Keep, Grow, and Flow.": "每叠牌都给了你恰好一张牌，按你设定的顺序：守护、成长与流动。",
+  "of 3 chosen · numbers show the left-to-right order": "已选 3 中的 · 数字表示从左到右的顺序",
+  "Tap the pile that should sit first, on the left.": "点触应放在最左边、第一位的牌堆。", "Set this order": "确定此顺序",
+  "Tap any face-down card from this pile.": "点触这叠牌中任意一张背面朝上的牌。", "One card has moved into the center.": "一张牌已移到中央。",
+  "Take this card": "取走这张牌",
+  "Open the treasury": "开启宝库", "Three cards, a living ledger for your resources.": "三张牌，一本记录资源的活账簿。",
+  "What to Keep": "值得守护", "What to Grow": "值得成长", "What to Let Flow": "值得流动",
   "Keep": "守护", "Grow": "成长", "Flow": "流动",
   "Unlock the Money path": "解锁财富路径", "A short passage before the Money ritual": "进入财富仪式前的短暂通道",
   "The treasury<br>is taking shape.": "宝库<br>正在成形。", "Watch this brief sponsored moment to open the Money ritual.": "观看这段简短赞助内容，即可开启财富仪式。"
@@ -770,14 +770,10 @@ function createState() {
     twoTop: null,
     ad: null,
     career: createCareerState(seed),
-    money: {
-      cutDraft: 31,
-      cut: null,
-      seedId: null,
-      seedCard: null,
-      coinCounts: [1, 1, 1],
-      selectedIds: []
-    },
+    // The three cut piles, once ordered left to right, are worked through one at a time:
+    // pileStep points at the pile currently being spread, selectedIds accumulates the one
+    // card taken from each as the reader moves left to right.
+    money: { pileStep: 0, selectedIds: [] },
     decision: createDecisionState(),
     shareTheme: "midnight",
     aiUnlocked: false,
@@ -850,14 +846,13 @@ function readingPositions() {
 function stageIndex() { return Math.max(0, ritualStages().indexOf(state.stage)); }
 function cardById(id) {
   if (state.ritualCard?.id === id) return state.ritualCard;
-  if (state.money?.seedCard?.id === id) return state.money.seedCard;
   return state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
 }
 function readingCards() {
   const ids = state.category === "Career"
     ? state.career.selectedIds
     : state.category === "Money"
-      ? [state.money.seedId, ...state.money.selectedIds]
+      ? state.money.selectedIds
       : state.category === "Decision"
         ? state.decision.keptIds
         : [state.ritualCardId, ...state.selectedIds];
@@ -1258,60 +1253,29 @@ function renderCareerReveal() {
 }
 
 function moneyTitle() {
+  const vessel = t(MONEY_VESSELS[state.money.pileStep] || "Keep");
   const copy = {
-    moneyCurrent: ["Find the source of the current.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed."],
-    moneyVessels: ["Fund the three vessels.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile."],
-    moneyLedger: ["Read the living ledger.", "Every card now carries the action that chose it: one cut and three coin depths."],
-    moneyReveal: ["Turn over the treasury you built.", "Four cards preserve the exact path of your choices."]
+    // Reuses Love's exact "shuffle" and "cutThree" copy — the gesture is identical.
+    shuffle: ["Loosen the cards beneath your hands.", "Sweep your hand across the loose pile to send a wave through the cards."],
+    cutThree: ["Divide the deck into three.", "Place two markers along the side of the deck."],
+    pileOrder: ["Choose the order of the three piles.", "Touch the piles left to right, in the order you want them to sit on the table."],
+    spread: ["Let this pile open.", "Open the spread and the cards will fan across the table on their own."],
+    choose: ["Choose the card that calls to you.", "Touch a card to draw it into the reading."],
+    moneyReveal: ["Turn over the three cards you chose.", "Each pile gave you exactly one card, in the order you set: Keep, Grow, and Flow."]
   };
   const [title, lede] = copy[state.stage] || ["Money Ledger", ""];
-  return `<div class="ritual-head money-ritual-head">${progress()}<p class="eyebrow">${t("Money ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
+  const vesselSuffix = (state.stage === "spread" || state.stage === "choose") ? ` · ${vessel}` : "";
+  return `<div class="ritual-head money-ritual-head">${progress()}<p class="eyebrow">${t("Money ritual")}${vesselSuffix}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
 function renderMoneyRitual() {
   let view = { surface: "", actions: "" };
-  if (state.stage === "moneyCurrent") view = renderMoneyCurrent();
-  if (state.stage === "moneyVessels") view = renderMoneyVessels();
-  if (state.stage === "moneyLedger") view = renderMoneyLedger();
+  if (state.stage === "shuffle") view = renderShuffle();
+  if (state.stage === "cutThree") view = renderCutThree();
+  if (state.stage === "pileOrder") view = renderReassembleThree();
+  if (state.stage === "spread") view = renderSpread();
+  if (state.stage === "choose") view = renderChoose();
   if (state.stage === "moneyReveal") view = renderMoneyReveal();
   return world(`<section class="scene ritual money-ritual">${moneyTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "money-world");
-}
-function renderMoneyCurrent() {
-  const total = Math.max(1, state.deck.length);
-  const cut = clamp(Number(state.money.cutDraft) || 31, 8, total - 9);
-  const stream = Array.from({ length: 19 }, (_, index) => `<i class="money-stream-card card back" style="--x:${(2.5 + index * 5.2).toFixed(1)}%;--r:${((index - 9) * .65).toFixed(2)}deg;--z:${index}"></i>`).join("");
-  return {
-    surface: `<div class="table-surface money-current-surface" style="--gate:${(cut / total * 100).toFixed(2)}%"><div class="money-current"><div class="money-river" aria-hidden="true">${stream}<span class="money-gate"><b>◉</b></span></div><div class="money-current-count" aria-live="polite"><span>${cut}</span><i> / ${total}</i></div><label class="money-current-label" for="money-current-range">${t("The gate chooses the card directly beneath it.")}</label><input class="money-current-range" id="money-current-range" type="range" min="8" max="${total - 9}" value="${cut}" aria-label="${t("Move the brass gate through the deck. The card directly beneath it becomes your Seed.")}"></div></div>`,
-    actions: `<p class="status-note">${t("The gate chooses the card directly beneath it.")}</p><button class="seal-button money-seal" data-action="money-take-seed">${t("Take this Seed")}</button>`
-  };
-}
-function renderMoneyVessels() {
-  const counts = state.money.coinCounts;
-  const spent = counts.reduce((sum, count) => sum + count, 0);
-  const left = 9 - spent;
-  const bank = Array.from({ length: Math.max(0, left) }, () => `<i class="money-coin" aria-hidden="true">✦</i>`).join("");
-  const vessels = MONEY_VESSELS.map((name, index) => {
-    const count = counts[index];
-    const pileLayers = Array.from({ length: 6 }, (_, layer) => `<i style="--layer-x:${(-layer * .35).toFixed(2)}px;--layer-y:${(-layer * 1.1).toFixed(2)}px"></i>`).join("");
-    const coins = Array.from({ length: count }, () => `<i class="money-coin" aria-hidden="true">✦</i>`).join("");
-    return `<article class="money-vessel" style="--lift:${(-count * .3).toFixed(2)}rem"><div class="money-vessel-pile" aria-hidden="true">${pileLayers}<span class="money-depth-card card back"></span><b>${count}</b></div><h3>${t(name)}</h3><div class="money-vessel-coins" aria-label="${count} ${t("coins deep")}">${coins}</div><div class="money-vessel-controls"><button class="money-coin-button return" data-action="money-coin-remove" data-vessel="${index}" ${count <= 1 ? "disabled" : ""} aria-label="${t("Return coin")}">−</button><button class="money-coin-button place" data-action="money-coin-add" data-vessel="${index}" ${left <= 0 ? "disabled" : ""} aria-label="${t("Place coin")}">+</button></div></article>`;
-  }).join("");
-  const ready = left === 0;
-  return {
-    surface: `<div class="table-surface money-vessels-surface"><div class="money-bank"><span>${left} ${t("coins left")}</span><div>${bank || `<i class="money-bank-seal" aria-hidden="true">◉</i>`}</div></div><div class="money-vessels">${vessels}</div></div>`,
-    actions: `<p class="status-note">${t(ready ? "All nine coins are placed. Each count now points to an exact card." : "Each vessel must hold at least one coin.")}</p><button class="seal-button money-seal" data-action="money-seal-vessels" ${ready ? "" : "disabled"}>${t("Seal the vessels")}</button>`
-  };
-}
-function renderMoneyLedger() {
-  const cards = readingCards();
-  const counts = state.money.coinCounts;
-  const entries = cards.map((card, index) => {
-    const source = index === 0 ? `${t("Chosen at cut")} ${state.money.cut}` : `${counts[index - 1]} ${t("coins deep")}`;
-    return `<article class="money-ledger-entry" style="--r:${((index - 1.5) * 1.1).toFixed(2)}deg"><span class="money-ledger-number">0${index + 1}</span><span class="money-ledger-card card back" aria-hidden="true"></span><h3>${t(MONEY_POSITIONS[index])}</h3><p>${source}</p></article>`;
-  }).join("");
-  return {
-    surface: `<div class="table-surface money-ledger-surface"><div class="money-ledger" aria-label="${t("Read the living ledger.")}">${entries}</div></div>`,
-    actions: `<p class="status-note">${t("Your cut became the Seed. The coin counts chose the other three cards.")}</p><button class="seal-button money-seal" data-action="money-to-reveal">${t("Open the treasury")}</button>`
-  };
 }
 function renderMoneyReveal() {
   const cards = readingCards();
@@ -1402,9 +1366,10 @@ function renderDecisionReveal() {
 function renderShuffle() {
   const ready = state.shuffleMoves >= 3;
   const pieces = state.shuffleLayout?.length ? state.shuffleLayout : buildShuffleLayout(state.seed);
+  const money = state.category === "Money";
   return {
     surface: `<div class="table-surface shuffle-table" id="shuffle-surface"><div class="scatter-pile" aria-label="A loose pile of face-down tarot cards">${pieces.map((piece, index) => `<button class="shuffle-card card back" data-shuffle-index="${index}" aria-label="${t("Move card")} ${index + 1}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`).join("")}</div><p class="physical-instruction ${state.shuffleMoves ? "quiet" : ""}">${t("Sweep across the loose cards to send a wave through the pile.")}</p><span class="piles-guide" id="shuffle-guide">${state.shuffleMoves ? `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}` : t("Drag through the cards—a wave ripples across the pile")}</span></div>`,
-    actions: `<p class="status-note" id="shuffle-status">${ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
+    actions: `<p class="status-note" id="shuffle-status">${ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button ${money ? "money-seal" : ""}" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
   };
 }
 function cutMood(value, total) {
@@ -1445,14 +1410,22 @@ function renderReassembleOne() {
 }
 function renderCutThree() {
   const cuts = state.threeCuts.length;
-  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? t("Place the first marker") : t("First marker set · choose a different place for the second")}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? t("Choose the first break in the side of the deck.") : t("Choose the second break. The two markers will form three piles.")}</p><button class="seal-button" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
+  const money = state.category === "Money";
+  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? t("Place the first marker") : t("First marker set · choose a different place for the second")}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? t("Choose the first break in the side of the deck.") : t("Choose the second break. The two markers will form three piles.")}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
 }
 function renderReassembleThree() {
   const selected = state.assemblyOrder;
-  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `${t("pile")} ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div><div class="hidden-heart-slot filled compact"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${selected.length ? `${selected.length} ${t("of 3 chosen · numbers show the top-to-bottom order")}` : t("Tap the pile that should return first (on top).")}</p><button class="seal-button" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t("Stack in this order")}</button>` };
+  const money = state.category === "Money";
+  const heartSlot = money ? "" : `<div class="hidden-heart-slot filled compact"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div>`;
+  const status = selected.length
+    ? `${selected.length} ${t(money ? "of 3 chosen · numbers show the left-to-right order" : "of 3 chosen · numbers show the top-to-bottom order")}`
+    : t(money ? "Tap the pile that should sit first, on the left." : "Tap the pile that should return first (on top).");
+  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `${t("pile")} ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div>${heartSlot}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t(money ? "Set this order" : "Stack in this order")}</button>` };
 }
 function renderSpread() {
-  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">${t("One touch fans every card into a reading arc")}</span></div>`, actions: `<p class="status-note">${t("Open the spread and the cards fan across the table.")}</p><button class="seal-button" data-action="assist-spread">${t("Open the spread")}</button>` };
+  const money = state.category === "Money";
+  const guide = money ? `${t(MONEY_VESSELS[state.money.pileStep])} · ${state.deck.length} ${t("cards")}` : t("One touch fans every card into a reading arc");
+  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">${guide}</span></div>`, actions: `<p class="status-note">${t("Open the spread and the cards fan across the table.")}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="assist-spread">${t("Open the spread")}</button>` };
 }
 function positionForSpread(index, total, path) {
   const t = index / Math.max(1, total - 1);
@@ -1465,11 +1438,20 @@ function renderChoose() {
   const spread = state.spread || createDefaultSpread();
   const picked = new Set(state.selectedIds);
   const drawn = state.selectedIds.length;
+  const money = state.category === "Money";
+  const cap = money ? 1 : 3;
+  const dock = money
+    ? `<div class="draw-dock"><span class="dock-title">${t(MONEY_VESSELS[state.money.pileStep])}</span><div class="drawn-row">${drawn ? cardBack("selected") : ""}</div></div>`
+    : `<div class="draw-dock"><span class="dock-title">${t("Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div>`;
+  const status = money
+    ? (drawn ? t("One card has moved into the center.") : t("Tap any face-down card from this pile."))
+    : (drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray."));
+  const buttonLabel = money ? (state.money.pileStep === 2 ? t("Open the treasury") : t("Take this card")) : t("Place the four cards");
   return { surface: `<div class="table-surface"><div class="spread-layer">${state.deck.map((card, index) => {
     const p = positionForSpread(index, state.deck.length, spread);
     const isPicked = picked.has(card.id);
     return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="${t("Select a face-down card")}"></button></div>`;
-  }).join("")}</div><div class="draw-dock"><span class="dock-title">${t("Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div></div>`, actions: `<p class="status-note">${drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray.")}</p><button class="seal-button" data-action="to-reveal" ${drawn === 3 ? "" : "disabled"}>${t("Place the four cards")}</button>` };
+  }).join("")}</div>${dock}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="to-reveal" ${drawn === cap ? "" : "disabled"}>${buttonLabel}</button>` };
 }
 function revealActions() {
   const done = state.revealedIds.length === readingPositions().length;
@@ -1537,8 +1519,7 @@ function positionMeaning(position, card) {
   }
   if (state.category === "Money") {
     const moneySnippets = {
-      "The Seed": `${card.name} names the pattern beneath the money question: ${upright}. This is the condition from which the rest of the ledger grows.`,
-      "What to Keep": `${card.name} points to a resource, boundary, or practice worth protecting before you ask it to produce more.`,
+      "What to Keep": `${card.name} points to a resource, boundary, or practice worth protecting before you ask it to produce more: ${upright}.`,
       "What to Grow": `${card.name} highlights where patient attention could compound into greater capacity, choice, or resilience.`,
       "What to Let Flow": `${card.name} asks what can circulate, be spent with intention, or be released so value does not become fearfully stuck.`
     };
@@ -1585,18 +1566,15 @@ ${leverage.name} is Your Leverage—the relationship, system, practice, or resou
 For The Next Bold Move, ${next.name} favors one visible experiment. Choose a step you can take within the next seven days: make the request, show the work, learn the skill, or close one door with intention. Let the response become data for the rung after that.`;
 }
 function moneyPersonalInterpretation(cards) {
-  const [seed, keep, grow, flow] = cards;
-  const counts = state.money.coinCounts;
+  const [keep, grow, flow] = cards;
   const question = state.question.trim() || "this money question";
-  const strongest = Math.max(...counts);
-  const emphasis = MONEY_VESSELS[counts.indexOf(strongest)];
-  return `Your question — “${question}” — is held here as a question of stewardship, not a prediction. The ritual placed the most weight in ${emphasis.toLowerCase()}, so begin by noticing why that vessel asked for more of your nine coins.
+  return `Your question — “${question}” — is held here as a question of stewardship, not a prediction. You cut the shuffled deck into three piles, set the order they would sit in, and drew one card from each in that order.
 
-${seed.name} became The Seed at the exact point where you set the brass gate. It describes the money pattern underneath the question: the belief, condition, or resource from which your next choices are already growing.
+${keep.name} came from the first pile and marks What to Keep. Protect the boundary, reserve, relationship, or capability it evokes before pursuing expansion.
 
-At ${counts[0]} coins deep, ${keep.name} marks What to Keep. Protect the boundary, reserve, relationship, or capability it evokes before pursuing expansion. At ${counts[1]} coins deep, ${grow.name} marks What to Grow. Treat it as a place for consistent attention rather than a promise of fast return.
+${grow.name} came from the second pile and marks What to Grow. Treat it as a place for consistent attention rather than a promise of fast return.
 
-${flow.name}, selected ${counts[2]} coins into the final vessel, marks What to Let Flow. This may be a thoughtful expense, a fair exchange, or something to release because holding it has become costly. Choose one small next action you can verify in real life: review one number, clarify one term, automate one safeguard, or make one values-aligned allocation. Tarot can frame the question; your records and circumstances should decide the money.`;
+${flow.name} came from the third and final pile, marking What to Let Flow. This may be a thoughtful expense, a fair exchange, or something to release because holding it has become costly. Choose one small next action you can verify in real life: review one number, clarify one term, automate one safeguard, or make one values-aligned allocation. Tarot can frame the question; your records and circumstances should decide the money.`;
 }
 function decisionPersonalInterpretation(cards) {
   const [first, ground, turning, cost, opens] = cards;
@@ -1637,7 +1615,7 @@ function personalSummary(cards) {
     return `${strength.name} is the strength to own; ${leverage.name} helps ${next.name} become your next visible move.`;
   }
   if (state.category === "Money") {
-    const [, keep, grow, flow] = cards;
+    const [keep, grow, flow] = cards;
     return `Keep ${keep.name} steady, grow through ${grow.name}, and let ${flow.name} restore movement.`;
   }
   if (state.category === "Decision") {
@@ -1784,12 +1762,14 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.fillStyle = SHARE_INK;
   ctx.fillText(q, 540, 571);
 
-  // Love and Money keep the four-card fan; Career and Decision use five slimmer cards.
+  // Love keeps the four-card fan; Career and Decision use five slimmer cards; Money's three
+  // piles get three larger cards.
   const five = cards.length === 5;
-  const cw = five ? 188 : 238, ch = five ? 314 : 397;
-  const lefts = five ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
-  const tops = five ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
-  const angles = five ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
+  const three = cards.length === 3;
+  const cw = five ? 188 : three ? 268 : 238, ch = five ? 314 : three ? 447 : 397;
+  const lefts = five ? [36, 241, 446, 651, 856] : three ? [118, 406, 694] : [40, 295, 548, 801];
+  const tops = five ? [690, 658, 645, 658, 690] : three ? [658, 636, 658] : [664, 640, 646, 671];
+  const angles = five ? [-6, -3, 0, 3, 6] : three ? [-5, 0, 5] : [-5, -1, 2, 5];
   cards.forEach((card, index) => {
     drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });
@@ -2043,7 +2023,7 @@ function renderReading() {
   const readingTitle = career
     ? "Five cards, a constellation for the work ahead."
     : money
-      ? "Four cards, a living ledger for your resources."
+      ? "Three cards, a living ledger for your resources."
       : decision
         ? "Five cards, one crossroads held open."
         : "Four cards, gathered beneath one sky.";
@@ -2082,7 +2062,7 @@ function renderSettings() {
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
-  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.category === "Decision" ? state.decision.keptIds : state.selectedIds;
+  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? state.money.selectedIds : state.category === "Decision" ? state.decision.keptIds : state.selectedIds;
   return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
@@ -2638,7 +2618,18 @@ function animateShuffleGather() {
   surface.classList.add("gathering");
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([7, 14, 9]); sound("gather", .18);
-  setTimeout(() => { state.stage = "cutOne"; transitioning = false; interaction(); render(); }, 760);
+  setTimeout(() => {
+    // Money skips the single hidden-card cut entirely and goes straight to cutting into
+    // three, so its threeCuts reset happens here instead of at Love's join-two step.
+    if (state.category === "Money") {
+      state.threeCuts = [];
+      state.threeCutDraft = Math.round(state.deck.length * .3);
+      state.stage = "cutThree";
+    } else {
+      state.stage = "cutOne";
+    }
+    transitioning = false; interaction(); render();
+  }, 760);
 }
 function animateRitualDraw() {
   const surface = document.querySelector("#ritual-card-surface");
@@ -2714,6 +2705,27 @@ function animateThreePileJoin() {
     transitioning = false; interaction(); render();
   }, 900);
 }
+// Money never merges the three piles: it only reorders them left to right, then opens
+// the first one for spreading. Unlike animateThreePileJoin, the piles stay separate.
+function animateMoneyPileOrder() {
+  const field = document.querySelector("#reassemble-three-surface .pile-field");
+  if (!field || transitioning || state.assemblyOrder.length !== 3) return;
+  transitioning = true;
+  field.classList.add("stacking");
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  buzz([7, 16, 10]); sound("cut", .16);
+  setTimeout(() => {
+    state.piles = state.assemblyOrder.map((index) => state.piles[index]);
+    state.assemblyOrder = [];
+    state.money.pileStep = 0;
+    state.money.selectedIds = [];
+    state.deck = state.piles[0];
+    state.selectedIds = [];
+    state.spread = null;
+    state.stage = "spread";
+    transitioning = false; interaction(); render();
+  }, 700);
+}
 function animateAssistedSpread() {
   const surface = document.querySelector("#spread-surface");
   const preview = surface?.querySelector(".spread-preview-layer");
@@ -2727,7 +2739,8 @@ function animateAssistedSpread() {
   setTimeout(() => { state.stage = "choose"; transitioning = false; render(); }, 620);
 }
 function animatePickCard(element, id) {
-  if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= 3) return;
+  const cap = state.category === "Money" ? 1 : 3;
+  if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= cap) return;
   preloadCardArt(cardById(id)); // start loading the art now, while it flies to the dock
   const dock = document.querySelector(".draw-dock");
   if (!dock) return;
@@ -2800,11 +2813,14 @@ function act(action, element) {
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
       state.stage = "careerEmbers";
     } else if (state.category === "Money") {
-      state.money = { cutDraft: 31, cut: null, seedId: null, seedCard: null, coinCounts: [1, 1, 1], selectedIds: [] };
+      state.money = { pileStep: 0, selectedIds: [] };
       state.piles = [];
+      state.assemblyOrder = [];
+      state.selectedIds = [];
+      state.spread = null;
       state.revealedIds = [];
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
-      state.stage = "moneyCurrent";
+      state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
     } else {
       state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
     }
@@ -2852,15 +2868,36 @@ function act(action, element) {
       const first = state.threeCuts[0];
       if (Math.abs(cut - first) < 12) cut = clamp(cut < first ? first - 12 : first + 12, 9, state.deck.length - 9);
       state.threeCuts = [first, cut];
-      animateDeckCut(3, () => { const [a, b] = [...state.threeCuts].sort((x, y) => x - y); state.piles = [state.deck.slice(0, a), state.deck.slice(a, b), state.deck.slice(b)]; state.assemblyOrder = []; state.stage = "reassembleThree"; interaction(); });
+      animateDeckCut(3, () => { const [a, b] = [...state.threeCuts].sort((x, y) => x - y); state.piles = [state.deck.slice(0, a), state.deck.slice(a, b), state.deck.slice(b)]; state.assemblyOrder = []; state.stage = state.category === "Money" ? "pileOrder" : "reassembleThree"; interaction(); });
     }
     return;
   }
   if (action === "choose-pile") { const index = Number(element.dataset.pileIndex); if (state.assemblyOrder.includes(index)) { state.assemblyOrder = state.assemblyOrder.filter((item) => item !== index); } else if (state.assemblyOrder.length < 3) { state.assemblyOrder.push(index); buzz(7); sound("take", .1); } interaction(); render(); return; }
-  if (action === "reassemble-three") { animateThreePileJoin(); return; }
+  if (action === "reassemble-three") { if (state.category === "Money") animateMoneyPileOrder(); else animateThreePileJoin(); return; }
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
-  if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return; }
+  if (action === "to-reveal") {
+    if (state.category === "Money") {
+      if (state.selectedIds.length !== 1) return;
+      state.money.selectedIds.push(state.selectedIds[0]);
+      const nextStep = state.money.pileStep + 1;
+      if (nextStep < 3) {
+        state.money.pileStep = nextStep;
+        state.deck = state.piles[nextStep];
+        state.selectedIds = [];
+        state.spread = null;
+        state.stage = "spread";
+        interaction(); sound("cut", .14); render();
+      } else {
+        preloadCardArt(readingCards());
+        state.stage = "moneyReveal";
+        interaction(); sound("spread", .18); render();
+      }
+      return;
+    }
+    if (state.selectedIds.length !== 3) return;
+    preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return;
+  }
   if (action === "assist-career-scatter") {
     const pieces = careerScatter();
     const focus = pieces[Math.floor(Math.random() * pieces.length)];
@@ -2931,53 +2968,6 @@ function act(action, element) {
   if (action === "career-to-reveal") {
     if (state.career.selectedIds.length !== CAREER_POSITIONS.length) return;
     preloadCardArt(readingCards()); state.revealedIds = []; state.stage = "careerReveal";
-    interaction(); sound("spread", .18); render(); return;
-  }
-  if (action === "money-take-seed") {
-    if (!state.deck.length) return;
-    const cut = clamp(Number(state.money.cutDraft) || 31, 8, state.deck.length - 9);
-    const source = [...state.deck];
-    const seed = source[cut - 1];
-    const current = [...source.slice(cut), ...source.slice(0, cut - 1)];
-    const vessels = [[], [], []];
-    current.forEach((card, index) => vessels[index % 3].push(card));
-    state.money.cut = cut;
-    state.money.seedId = seed.id;
-    state.money.seedCard = seed;
-    state.money.coinCounts = [1, 1, 1];
-    state.money.selectedIds = [];
-    state.deck = [];
-    state.piles = vessels;
-    preloadCardArt(seed);
-    state.stage = "moneyVessels";
-    interaction(); buzz([8, 16, 10]); sound("cut", .18); render(); return;
-  }
-  if (action === "money-coin-add" || action === "money-coin-remove") {
-    const vessel = Number(element.dataset.vessel);
-    if (!Number.isInteger(vessel) || vessel < 0 || vessel >= MONEY_VESSELS.length) return;
-    const counts = [...state.money.coinCounts];
-    const total = counts.reduce((sum, count) => sum + count, 0);
-    if (action === "money-coin-add" && total < 9) counts[vessel] += 1;
-    else if (action === "money-coin-remove" && counts[vessel] > 1) counts[vessel] -= 1;
-    else return;
-    state.money.coinCounts = counts;
-    interaction(); buzz(7); sound("take", .1); render(); return;
-  }
-  if (action === "money-seal-vessels") {
-    const counts = state.money.coinCounts;
-    if (counts.length !== 3 || counts.some((count) => count < 1) || counts.reduce((sum, count) => sum + count, 0) !== 9) return;
-    const selected = state.piles.map((pile, index) => pile[counts[index] - 1]).filter(Boolean);
-    if (selected.length !== 3) return;
-    state.money.selectedIds = selected.map((card) => card.id);
-    preloadCardArt(selected);
-    state.stage = "moneyLedger";
-    interaction(); buzz([7, 12, 7, 18]); sound("gather", .18); render(); return;
-  }
-  if (action === "money-to-reveal") {
-    if (readingCards().length !== MONEY_POSITIONS.length) return;
-    state.revealedIds = [];
-    preloadCardArt(readingCards());
-    state.stage = "moneyReveal";
     interaction(); sound("spread", .18); render(); return;
   }
   if (action === "decision-split") {
@@ -3161,15 +3151,6 @@ app.addEventListener("input", (event) => {
   if (event.target.id === "decision-split-range") {
     state.decision.splitDraft = Number(event.target.value);
     updateDecisionSplit();
-    persist();
-    return;
-  }
-  if (event.target.id === "money-current-range") {
-    state.money.cutDraft = Number(event.target.value);
-    const surface = document.querySelector(".money-current-surface");
-    const count = document.querySelector(".money-current-count span");
-    if (surface) surface.style.setProperty("--gate", `${state.money.cutDraft / Math.max(1, state.deck.length) * 100}%`);
-    if (count) count.textContent = state.money.cutDraft;
     persist();
     return;
   }
