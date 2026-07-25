@@ -1,6 +1,6 @@
 # Oracle Veil — prototype
 
-A self-contained, mobile-first PWA prototype for tactile love, career, and money tarot rituals. It uses no third-party dependencies and can be run from any static web server.
+A self-contained, mobile-first PWA prototype for tactile love, career, money, and decision tarot rituals. It uses no third-party dependencies and can be run from any static web server.
 
 ## Run it
 
@@ -47,6 +47,16 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 5. Review the living ledger, which preserves the cut number and all three coin depths beside their face-down cards.
 6. Reveal The Seed, What to Keep, What to Grow, and What to Let Flow, then read a resource-centered reflection with a clear financial-safety disclaimer.
 
+### Decision — the Crossroads
+
+1. Choose Decision through the same sponsored entry treatment as Career and Money, then place an open question about the choice.
+2. Name both options in your own words. The letters of the two names carve that many cards off the top of the real deck before anything is dealt, and the names then label the roads, the scales, the ledger, and the final spread positions.
+3. Ten cards pass through your hands one at a time. Drag each toward a road (or use the two push buttons) and it physically joins that road's pile in the order you sent it. A road is closed off once sending another card there would leave the other unable to reach its two-card minimum, so the fork can always be finished.
+4. Whichever card is still in your hand when the tenth is placed becomes Where You Stand — the one card the ritual never sorts.
+5. Tilt the scales toward the option you lean to. The tilt counts to that exact depth down each road for its road card, and back the same depth from the road's end for its toll, so no road can ever return the same card twice.
+6. Stand at the crossroads: five face-down cards, each labelled with the gesture that chose it (which road, which depth, counted down or up).
+7. Reveal Where You Stand, both roads, and both tolls, then read a reflection that describes each road and its cost without ever picking one for you.
+
 The lower-left `⌘` seal opens the development diagnostics panel. It exposes the stage, seed, pile boundaries, selected IDs, deck order, orientation, and a guided-interaction fallback. It is deliberately visible for prototype review and should be feature-flagged or removed for production.
 
 ## Architecture
@@ -59,7 +69,7 @@ The lower-left `⌘` seal opens the development diagnostics panel. It exposes th
 - `state.ritualCardId`, `selectedIds`, and `revealedIds` always refer to those same persistent card objects; identity and orientation are never generated on reveal.
 - `STAGES` acts as the ritual state machine. Each stage only exposes the next valid manipulation.
 - `AD_CONFIG` isolates the two mock ad checkpoints, so an advertising SDK can replace the overlay without touching tarot state.
-- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the four selected card states to Gemini. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
+- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the four or five selected card states to Gemini. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
 - Face-up cards use the supplied 78-card artwork in `assets/tarot/`; deck data and rendering remain separated so the set can be swapped later. Images load lazily and fall back to a styled text face if a file is missing.
 
 ## Physics and procedural assistance

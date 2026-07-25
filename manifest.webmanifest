@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Oracle Veil",
   "short_name": "Oracle Veil",
-  "description": "Tactile celestial tarot rituals for love, career, and money readings.",
+  "description": "Tactile celestial tarot rituals for love, career, money, and decision readings.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

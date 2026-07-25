@@ -5,7 +5,7 @@ const INTERPRETATION_ENDPOINT = "/api/interpretation";
 // Kept in lockstep with the app-shell version by both deployment scripts.
 // Card art is otherwise cached for a long time, so an unversioned URL can leave
 // one previously viewed card stuck on obsolete artwork after the deck changes.
-const CARD_ART_VERSION = "29";
+const CARD_ART_VERSION = "30";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -1881,12 +1881,12 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.fillStyle = SHARE_INK;
   ctx.fillText(q, 540, 571);
 
-  // Love keeps its four-card fan; Career uses five slimmer stepping-stones.
-  const career = cards.length === 5;
-  const cw = career ? 188 : 238, ch = career ? 314 : 397;
-  const lefts = career ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
-  const tops = career ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
-  const angles = career ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
+  // Love and Money keep the four-card fan; Career and Decision use five slimmer cards.
+  const five = cards.length === 5;
+  const cw = five ? 188 : 238, ch = five ? 314 : 397;
+  const lefts = five ? [36, 241, 446, 651, 856] : [40, 295, 548, 801];
+  const tops = five ? [690, 658, 645, 658, 690] : [664, 640, 646, 671];
+  const angles = five ? [-6, -3, 0, 3, 6] : [-5, -1, 2, 5];
   cards.forEach((card, index) => {
     drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });

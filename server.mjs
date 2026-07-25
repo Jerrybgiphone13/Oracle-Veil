@@ -71,16 +71,21 @@ function promptFor({ question, cards, topic }) {
   const list = cards.map((card) => `${card.position}: ${card.name} (${card.orientation})`).join("\n");
   const career = topic === "Career";
   const money = topic === "Money";
+  const decision = topic === "Decision";
   const focus = career
     ? "a career reading. Keep the guidance practical and agency-centered; never promise a job, promotion, income, or business outcome"
     : money
       ? "a money reading. Keep it reflective and agency-centered; never recommend a specific investment, debt product, purchase, trade, or financial outcome"
-      : "a love reading";
+      : decision
+        ? "a decision reading laid out as a crossroads. The reader named both options themselves and the position labels quote those names. Never tell the reader which option to pick, predict how either turns out, or imply one road is correct; describe what each road and its cost feel like and leave the choice with them"
+        : "a love reading";
   const structure = career
     ? "5 short paragraphs (current ground, unclaimed strength, friction, leverage/support, and one specific gentle next experiment)"
     : money
       ? "4 short paragraphs (the seed pattern, what to protect, what to grow, and what to let circulate plus one small verifiable next action)"
-      : "4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step)";
+      : decision
+        ? "5 short paragraphs (where the reader stands, the first road, that road's toll, the second road and its toll, and one way to test which toll they could genuinely carry)"
+        : "4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step)";
   return `You are writing a concise, emotionally intelligent tarot reflection for ${focus}. Tarot is reflective and uncertain, not predictive fact. Do not claim certainty, manipulate emotion, give medical/legal/financial advice, or state probabilities.\n\nQuestion:\n${question}\n\nCards:\n${list}\n\nRespond with a JSON object with two fields:\n"summary": a single short, warm sentence (max 18 words) that reads like a gentle, direct answer to the question, suitable as a headline on its own — no hedging phrases like "the cards suggest".\n"reading": ${structure}, referring to the exact cards naturally, under 380 words total.`;
 }
 async function interpret(request, response) {
@@ -88,8 +93,8 @@ async function interpret(request, response) {
   if (rateLimited(request.socket.remoteAddress || "unknown")) return sendJSON(response, 429, { error: "Too many requests. Please wait a few minutes before asking again." });
   try {
     const input = JSON.parse(await readBody(request));
-    const topic = ["Love", "Career", "Money"].includes(input.topic) ? input.topic : "Love";
-    const expectedCards = topic === "Career" ? 5 : 4;
+    const topic = ["Love", "Career", "Money", "Decision"].includes(input.topic) ? input.topic : "Love";
+    const expectedCards = topic === "Career" || topic === "Decision" ? 5 : 4;
     if (typeof input.question !== "string" || input.question.trim().length < 4 || !Array.isArray(input.cards) || input.cards.length !== expectedCards) throw new Error(`A question and ${expectedCards} cards are required.`);
     const cards = input.cards.map((card) => ({ position: String(card.position || "").slice(0, 48), name: String(card.name || "").slice(0, 90), orientation: card.orientation === "reversed" ? "reversed" : "upright" }));
     const gemini = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
