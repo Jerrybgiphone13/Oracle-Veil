@@ -1050,15 +1050,15 @@ function renderCareerEmbers() {
     const label = picking ? (awake ? "Awake ember" : "Wake this card") : `${t("Move card")} ${index + 1}`;
     return `<button class="career-ember-card card back ${awake ? "awake" : ""}" data-shuffle-index="${index}" ${pick} aria-label="${label}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`;
   }).join("");
-  const instruction = picking
-    ? t("Touch any three cards. There is no wrong constellation.")
-    : t("Sweep across the table—these cards scatter apart instead of gathering.");
+  // The overlay line only guides the sweep; while choosing, the heading and status note
+  // already say what to do, so the table stays clear.
+  const instruction = picking ? "" : t("Sweep across the table—these cards scatter apart instead of gathering.");
   const guide = picking
     ? `${state.career.emberIds.length}/3 ${t("embers awake")}`
     : moves
       ? `${moves} ${t("sweeps · keep scattering or lay them out")}`
       : t("Drag through the cards—they push each other apart");
-  const surface = `<div class="table-surface career-ember-surface" id="career-scatter-surface"><div class="career-orbit ${picking ? "picking" : ""}" aria-label="A scatter of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div><p class="physical-instruction ${moves ? "quiet" : ""}">${instruction}</p><span class="piles-guide" id="career-scatter-guide">${guide}</span></div>`;
+  const surface = `<div class="table-surface career-ember-surface" id="career-scatter-surface"><div class="career-orbit ${picking ? "picking" : ""}" aria-label="A scatter of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div>${instruction ? `<p class="physical-instruction ${moves ? "quiet" : ""}">${instruction}</p>` : ""}<span class="piles-guide" id="career-scatter-guide">${guide}</span></div>`;
   if (picking) {
     return {
       surface,
@@ -2132,7 +2132,9 @@ function bindCareerScatter(surface) {
     last = start;
     touched = new Set();
     field.classList.add("shuffling");
-    capturePointer(surface, event);
+    // Capture only while sweeping: with a captured pointer the browser can retarget the
+    // following click to the surface, which would swallow the tap that lifts a card.
+    if (!picking) capturePointer(surface, event);
   });
   surface.addEventListener("pointermove", (event) => {
     if (!active) return;
@@ -2505,7 +2507,9 @@ function act(action, element) {
       piece.r = Number((piece.r + (ux >= 0 ? 22 : -22) * f).toFixed(2));
       moved += 1;
     });
-    reorderDeck(Math.random() < .5 ? -60 : 60, 20, 90);
+    // Vary the travel so two taps in a row cannot cut the same packet back where it started.
+    const travel = 45 + Math.random() * 90;
+    reorderDeck(Math.random() < .5 ? -travel : travel, 20, travel);
     state.career.shuffleMoves = (state.career.shuffleMoves || 0) + 2;
     interaction(); buzz([7, 15, 9]);
     for (let i = 0; i < moved; i += 1) sound("shuffle", .08 + Math.random() * .08);
