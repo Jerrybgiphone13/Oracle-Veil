@@ -246,16 +246,21 @@ h3 { color: var(--paper-ink); margin-bottom: .4rem; font-size: 1.15rem; }
 .career-ritual .table-surface { border-color:rgba(170,211,188,.3); background:radial-gradient(ellipse at 50% 45%, rgba(50,104,94,.62),rgba(7,20,27,.12) 68%); }
 .career-ritual .table-surface::after { content:"⌁  ·  ✦  ·  ⌁"; color:rgba(185,224,201,.68); }
 
-.career-ember-surface { min-height:clamp(24rem,56vh,34rem); overflow:hidden; }
-.career-orbit { position:absolute; inset:1.4rem 1rem 2rem; }
+.career-ember-surface { min-height:clamp(24rem,56vh,34rem); overflow:hidden; touch-action:none; }
+.career-orbit { position:absolute; inset:3.1rem 1rem 2.4rem; }
 .career-ember-card {
   left:var(--x); top:var(--y); z-index:var(--z);
-  width:clamp(2.65rem,8.5vw,3.85rem); height:clamp(3.9rem,12.5vw,5.65rem);
+  width:clamp(1.95rem,6.2vw,2.8rem); height:clamp(2.85rem,9.1vw,4.1rem);
   transform:translate(-50%,-50%) rotate(var(--r));
-  transition:transform .38s cubic-bezier(.2,.8,.2,1),filter .25s ease,box-shadow .25s ease;
+  transition:left .34s cubic-bezier(.2,.8,.2,1),top .34s cubic-bezier(.2,.8,.2,1),transform .38s cubic-bezier(.2,.8,.2,1),filter .25s ease,box-shadow .25s ease;
+  cursor:grab;
 }
-.career-ember-card::after { font-size:1.5rem; }
-.career-ember-card.awake { z-index:40; transform:translate(-50%,-58%) rotate(var(--r)) scale(1.13); filter:brightness(1.35); box-shadow:0 4px 0 #775d31,0 8px 0 #c4a96c,0 0 0 2px #b8e1c5,0 0 25px rgba(185,225,198,.64); }
+.career-ember-card::after { font-size:1.05rem; }
+.career-orbit.picking .career-ember-card { cursor:pointer; }
+/* Follow the finger with no layout animation while sweeping — same trick as the Love pile. */
+.career-orbit.shuffling .career-ember-card { transition:filter .12s ease; }
+.career-ember-card.held { cursor:grabbing; filter:brightness(1.16); transition:filter .15s ease; box-shadow:0 7px 13px rgba(0,0,0,.55); }
+.career-ember-card.awake { z-index:60; transform:translate(-50%,-62%) rotate(var(--r)) scale(1.28); filter:brightness(1.35); box-shadow:0 4px 0 #775d31,0 8px 0 #c4a96c,0 0 0 2px #b8e1c5,0 0 25px rgba(185,225,198,.64); }
 .career-forge-mark { position:absolute; left:50%; top:51%; translate:-50% -50%; display:grid; place-items:center; width:7.4rem; aspect-ratio:1; border:1px solid rgba(190,225,204,.38); border-radius:50%; color:#c5e5d0; font-family:var(--serif); font-size:2.4rem; box-shadow:inset 0 0 2rem rgba(177,220,195,.12),0 0 2rem rgba(4,15,21,.5); pointer-events:none; }
 .career-forge-mark::before,.career-forge-mark::after { content:""; position:absolute; inset:15%; border:1px solid rgba(228,196,126,.35); rotate:45deg; }
 .career-forge-mark::after { inset:29%; rotate:0deg; }
@@ -293,6 +298,161 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
 .career-reveal-layout { width:min(100%,52rem); }
 .career-ad .ad-illustration { background:linear-gradient(180deg,transparent 0 55%,rgba(229,197,120,.18) 56%),radial-gradient(ellipse at 50% 85%,#e4c573 0 5%,transparent 32%),repeating-linear-gradient(105deg,transparent 0 24px,rgba(174,214,191,.32) 25px 26px),#12353a; }
 .career-reading .meaning { border-top-color:rgba(67,111,93,.35); }
+
+/* Money path: a living treasury where the cut and coin depths remain visible. */
+.category[data-action="choose-money"] {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(232,198,116,.2), transparent 2.4rem),
+    linear-gradient(145deg, rgba(104,139,93,.22), rgba(226,190,119,.11));
+}
+.money-world {
+  background:
+    radial-gradient(ellipse at 72% 12%, rgba(227,187,99,.2), transparent 20rem),
+    radial-gradient(ellipse at 16% 82%, rgba(104,145,100,.2), transparent 25rem),
+    linear-gradient(145deg, #081b1c 0%, #243a2d 47%, #11191c 100%);
+}
+.money-world .temple { transform:skewX(3deg) scaleX(1.04); opacity:.62; filter:sepia(.22); }
+.money-parchment { box-shadow:0 22px 50px rgba(0,0,0,.36),inset 0 0 5rem rgba(117,111,46,.16); }
+.money-parchment::before,.money-parchment::after { content:"◉"; }
+.money-seal::before { content:"◉"; }
+.money-ritual-head .stage-progress i.active { background:#e2c779; box-shadow:0 0 0 3px rgba(226,199,121,.17); }
+.money-ritual-head .stage-progress i.done { background:#91b18a; }
+.money-ritual .table-surface {
+  border-color:rgba(226,199,121,.32);
+  background:
+    radial-gradient(circle at 50% 49%, rgba(181,139,52,.13), transparent 10rem),
+    radial-gradient(ellipse at 50% 46%, rgba(66,101,75,.64), rgba(7,20,22,.14) 70%);
+}
+.money-ritual .table-surface::after { content:"◉  ·  ✦  ·  ◉"; color:rgba(238,207,134,.72); }
+
+.money-current-surface {
+  min-height:clamp(25rem,56vh,33rem);
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  padding:2.7rem 1rem 2rem;
+}
+.money-current { width:min(100%,47rem); display:grid; justify-items:center; gap:.7rem; }
+.money-river {
+  position:relative;
+  width:min(94%,43rem);
+  height:12rem;
+  filter:drop-shadow(0 18px 22px rgba(0,0,0,.38));
+}
+.money-river::before {
+  content:"";
+  position:absolute;
+  left:2%; right:2%; top:54%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(235,205,134,.48) 10% 90%,transparent);
+  box-shadow:0 0 18px rgba(224,188,105,.32);
+}
+.money-stream-card {
+  left:var(--x);
+  top:50%;
+  z-index:var(--z);
+  width:clamp(2.25rem,6.2vw,3.25rem);
+  height:clamp(3.35rem,9.2vw,4.8rem);
+  transform:translate(-50%,-50%) rotate(var(--r));
+  pointer-events:none;
+  box-shadow:0 2px 0 #775d31,0 4px 0 #c4a96c,0 8px 13px rgba(0,0,0,.38);
+}
+.money-stream-card:nth-child(3n + 1) { margin-top:-.26rem; }
+.money-stream-card:nth-child(3n + 2) { margin-top:.22rem; }
+.money-stream-card::after { font-size:1.15rem; }
+.money-gate {
+  position:absolute;
+  z-index:30;
+  left:clamp(9%,var(--gate),90%);
+  top:2%;
+  width:2.65rem;
+  height:96%;
+  translate:-50% 0;
+  border:1px solid rgba(245,219,153,.82);
+  border-block-width:5px;
+  border-radius:1.2rem 1.2rem .35rem .35rem;
+  background:linear-gradient(90deg,rgba(91,63,25,.83),rgba(223,187,102,.58) 45%,rgba(83,57,25,.86));
+  box-shadow:inset 0 0 0 2px rgba(50,34,17,.52),0 0 24px rgba(231,197,116,.3);
+  transition:left .12s ease;
+}
+.money-gate::before,.money-gate::after { content:""; position:absolute; left:50%; translate:-50% 0; width:4rem; height:.55rem; border:1px solid #e5c982; border-radius:50%; background:#7d5b2c; box-shadow:inset 0 0 0 2px rgba(32,23,14,.55); }
+.money-gate::before { top:-.42rem; }.money-gate::after { bottom:-.42rem; }
+.money-gate b { position:absolute; left:50%; top:50%; translate:-50% -50%; display:grid; place-items:center; width:1.7rem; aspect-ratio:1; border-radius:50%; color:#25372b; background:#f0d690; font-weight:400; }
+.money-current-count { display:flex; align-items:baseline; color:var(--paper-light); font-family:var(--serif); }
+.money-current-count span { font-size:2rem; color:#f0d58f; }.money-current-count i { font-style:normal; font-size:.76rem; color:#aeb9a0; }
+.money-current-label { color:#d8d4b7; font-family:var(--serif); font-size:.88rem; text-align:center; }
+.money-current-range { width:min(88%,35rem); accent-color:#dfbf72; cursor:ew-resize; }
+
+.money-vessels-surface { min-height:clamp(28rem,60vh,36rem); overflow:hidden; padding:2.5rem clamp(.45rem,3vw,2rem) 1.5rem; }
+.money-bank { display:grid; justify-items:center; min-height:4.1rem; gap:.35rem; }
+.money-bank > span { color:#e8d7a6; font:.76rem var(--serif); letter-spacing:.08em; text-transform:uppercase; }
+.money-bank > div { display:flex; min-height:1.75rem; align-items:center; justify-content:center; gap:.25rem; }
+.money-coin {
+  display:grid;
+  place-items:center;
+  width:1.45rem;
+  aspect-ratio:1;
+  flex:0 0 auto;
+  border:1px solid #f2d88d;
+  border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,#f5df9f,#b37a2d 68%,#68441f);
+  color:#6e4d20;
+  font-style:normal;
+  font-size:.55rem;
+  box-shadow:inset 0 0 0 2px rgba(102,68,28,.35),0 3px 7px rgba(0,0,0,.3);
+}
+.money-bank-seal { color:#f0d28a; font-style:normal; font-size:1.55rem; text-shadow:0 0 18px rgba(232,194,105,.55); }
+.money-vessels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(.35rem,2vw,1.2rem); align-items:end; width:min(100%,48rem); margin:.6rem auto 0; }
+.money-vessel { position:relative; display:grid; justify-items:center; align-content:end; gap:.48rem; min-width:0; padding:.6rem .3rem .8rem; border-bottom:1px solid rgba(232,201,128,.33); }
+.money-vessel::before {
+  content:"";
+  position:absolute;
+  left:7%; right:7%; bottom:.15rem;
+  height:56%;
+  border:1px solid rgba(227,198,128,.2);
+  border-radius:1.6rem 1.6rem .45rem .45rem;
+  background:linear-gradient(180deg,transparent,rgba(8,25,22,.42));
+  pointer-events:none;
+}
+.money-vessel h3 { position:relative; margin:0; color:#efe1bb; font-size:clamp(.76rem,2.6vw,1.05rem); }
+.money-vessel-pile { position:relative; z-index:1; width:clamp(3.7rem,12vw,5.2rem); height:clamp(5.4rem,17.5vw,7.6rem); }
+.money-vessel-pile > i {
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(233,204,135,.5);
+  border-radius:.36rem;
+  background:#17362f;
+  translate:var(--layer-x) var(--layer-y);
+}
+.money-depth-card {
+  inset:0;
+  width:100%;
+  height:100%;
+  transform:translateY(var(--lift));
+  filter:brightness(1.08);
+  box-shadow:0 3px 0 #775d31,0 6px 0 #c4a96c,0 10px 16px rgba(0,0,0,.42),0 0 0 1px rgba(232,203,133,.45);
+}
+.money-depth-card::after { font-size:1.55rem; }
+.money-vessel-pile > b { position:absolute; z-index:4; right:-.5rem; top:-.75rem; display:grid; place-items:center; width:1.65rem; aspect-ratio:1; border-radius:50%; color:#24372b; background:#f0d38a; font:400 .78rem var(--serif); box-shadow:0 4px 9px rgba(0,0,0,.35); }
+.money-vessel-coins { position:relative; z-index:2; display:flex; justify-content:center; flex-wrap:wrap; align-content:center; gap:.16rem; width:min(100%,7rem); min-height:3.15rem; }
+.money-vessel-coins .money-coin { width:1.15rem; font-size:.45rem; }
+.money-vessel-controls { position:relative; z-index:2; display:flex; gap:.45rem; }
+.money-coin-button { width:2.5rem; height:2.5rem; border:1px solid rgba(237,211,148,.6); border-radius:50%; background:rgba(13,39,32,.75); color:#f0d28a; font-size:1.25rem; cursor:pointer; }
+.money-coin-button.place { background:linear-gradient(145deg,#d7b65f,#8d6129); color:#14261f; }
+.money-coin-button:disabled { opacity:.3; cursor:not-allowed; }
+
+.money-ledger-surface { min-height:clamp(26rem,56vh,34rem); overflow:hidden; display:grid; place-items:center; padding:2.6rem 1rem 1.5rem; }
+.money-ledger { position:relative; z-index:1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.55rem,2vw,1.25rem); width:min(100%,49rem); }
+.money-ledger::before { content:""; position:absolute; z-index:-1; left:7%; right:7%; top:43%; height:1px; background:linear-gradient(90deg,transparent,#e0c176 10% 90%,transparent); box-shadow:0 0 14px rgba(226,194,115,.42); }
+.money-ledger-entry { position:relative; display:grid; justify-items:center; align-content:start; gap:.42rem; text-align:center; min-width:0; }
+.money-ledger-number { color:#c9b577; font:.64rem var(--serif); letter-spacing:.14em; }
+.money-ledger-card { position:relative; display:block; width:clamp(3.7rem,12vw,5.8rem); height:clamp(5.45rem,17.7vw,8.5rem); transform:rotate(var(--r)); pointer-events:none; }
+.money-ledger-card::after { font-size:1.6rem; }
+.money-ledger-entry h3 { margin:.2rem 0 0; color:#efe2bd; font-size:clamp(.69rem,2vw,.9rem); }
+.money-ledger-entry p { margin:0; color:#b9b89c; font-size:.66rem; line-height:1.3; }
+.money-reveal-layout { width:min(100%,46rem); }
+.money-ad .ad-illustration { background:radial-gradient(circle at 50% 38%,#efd27e 0 4%,transparent 5%),repeating-radial-gradient(circle at 50% 38%,transparent 0 22px,rgba(231,199,120,.22) 23px 24px),linear-gradient(160deg,#1d4435,#152d27 58%,#755325); }
+.money-reading .meaning { border-top-color:rgba(117,111,46,.4); }
 
 .deck, .pile, .spread-card, .reading-card { position: absolute; transform-style: preserve-3d; will-change: transform; }
 .deck { left: 50%; top: 50%; width: 7.5rem; height: 11rem; translate: -50% -50%; }
@@ -479,6 +639,9 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
   .career-ember-surface{min-height:26rem}.career-orbit{inset:1.7rem .25rem 2rem}.career-forge-mark{width:5.8rem;font-size:1.8rem}
   .career-ladder-surface{min-height:31rem}.career-ladder{inset:2.2rem .2rem 2.2rem}.career-rung{width:calc(88% + var(--rung) * 2.5%);grid-template-columns:1.65rem minmax(5.4rem,1fr) minmax(5.8rem,.8fr);gap:.3rem;padding-inline:.25rem}.career-rung-cards{gap:.28rem}.career-step-card,.career-step-placeholder{width:2.25rem;height:3.3rem}
   .career-reveal-layout .reveal-slot:last-child{grid-column:1 / -1}.career-reveal-layout .reveal-slot .card{width:min(28vw,7.1rem)}
+  .money-current-surface{min-height:25rem;padding-inline:.35rem}.money-river{width:100%;height:10.5rem}.money-gate{width:2.15rem}.money-gate::before,.money-gate::after{width:3.25rem}.money-current-label{max-width:88%;font-size:.78rem}
+  .money-vessels-surface{min-height:30rem;padding-inline:.18rem}.money-vessels{gap:.12rem}.money-vessel{padding-inline:.08rem}.money-vessel::before{left:1%;right:1%}.money-vessel-pile{width:3.35rem;height:4.95rem}.money-vessel-coins{min-height:3.6rem}.money-vessel-coins .money-coin{width:1rem}.money-coin-button{width:2.25rem;height:2.25rem}
+  .money-ledger-surface{min-height:32rem}.money-ledger{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .6rem}.money-ledger::before{display:none}.money-ledger-card{width:4rem;height:5.9rem}
 }
 @media (min-width: 720px) {
   .career-reveal-layout{grid-template-columns:repeat(5,minmax(0,1fr))}.career-reveal-layout .reveal-slot .card{width:6.5rem}.career-reading .meaning-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -492,7 +655,7 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
 .card.reversed .card-image-fallback { transform: rotate(180deg); }
 
 /* Consistent keyboard focus for the remaining interactive controls */
-.brand:focus-visible, .back-link:focus-visible, .settings-close:focus-visible, .debug-toggle:focus-visible, .examples button:focus-visible, .pile-field .pile:focus-visible, .cut-range:focus-visible, .career-dial:focus-visible, .career-step-card:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+.brand:focus-visible, .back-link:focus-visible, .settings-close:focus-visible, .debug-toggle:focus-visible, .examples button:focus-visible, .pile-field .pile:focus-visible, .cut-range:focus-visible, .career-dial:focus-visible, .career-step-card:focus-visible, .money-current-range:focus-visible, .money-coin-button:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
 
 /* ---- "Make it yours" share page ---- */
 .share-page { --accent: var(--gold); }

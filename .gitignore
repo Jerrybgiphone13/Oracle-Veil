@@ -17,6 +17,7 @@ serve.py
 
 # Dependencies
 node_modules/
+dist/
 
 # Logs
 *.log

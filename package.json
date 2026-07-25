@@ -6,6 +6,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "build": "bash scripts/build-sites.sh",
     "start": "node server.mjs"
   }
 }

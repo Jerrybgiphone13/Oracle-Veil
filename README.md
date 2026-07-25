@@ -1,6 +1,6 @@
-# The Heart Cut — prototype
+# Oracle Veil — prototype
 
-A self-contained, mobile-first PWA prototype for tactile love and career tarot rituals. It uses no third-party dependencies and can be run from any static web server.
+A self-contained, mobile-first PWA prototype for tactile love, career, and money tarot rituals. It uses no third-party dependencies and can be run from any static web server.
 
 ## Run it
 
@@ -37,6 +37,15 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 5. Build a five-rung path by choosing between two deterministic stepping-stones at every level.
 6. Reveal five cards: Current Ground, Your Unclaimed Strength, The Friction, Your Leverage, and The Next Bold Move.
 7. Read the full reflection with the closer interpretation already unlocked by the entry passage.
+
+### Money — the Living Treasury
+
+1. Choose Money through the same sponsored entry treatment as Career, then place an open money question.
+2. Move a brass gate through the real 78-card deck. The card directly beneath the chosen cut leaves the deck and becomes The Seed.
+3. The remaining 77 cards rotate from that cut and deal into three genuine piles: Keep, Grow, and Flow.
+4. Place all nine coins among the vessels, with at least one in each. A vessel holding four coins selects the fourth card in its pile; every allocation therefore changes the final spread.
+5. Review the living ledger, which preserves the cut number and all three coin depths beside their face-down cards.
+6. Reveal The Seed, What to Keep, What to Grow, and What to Let Flow, then read a resource-centered reflection with a clear financial-safety disclaimer.
 
 The lower-left `⌘` seal opens the development diagnostics panel. It exposes the stage, seed, pile boundaries, selected IDs, deck order, orientation, and a guided-interaction fallback. It is deliberately visible for prototype review and should be feature-flagged or removed for production.
 

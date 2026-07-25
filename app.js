@@ -5,7 +5,7 @@ const INTERPRETATION_ENDPOINT = "/api/interpretation";
 // Kept in lockstep with the app-shell version by both deployment scripts.
 // Card art is otherwise cached for a long time, so an unversioned URL can leave
 // one previously viewed card stuck on obsolete artwork after the deck changes.
-const CARD_ART_VERSION = "28";
+const CARD_ART_VERSION = "29";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -19,8 +19,11 @@ const SUITS = [
 const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Page", "Knight", "Queen", "King"];
 const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
 const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
+const MONEY_STAGES = ["moneyCurrent", "moneyVessels", "moneyLedger", "moneyReveal", "reading"];
 const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
+const MONEY_POSITIONS = ["The Seed", "What to Keep", "What to Grow", "What to Let Flow"];
+const MONEY_VESSELS = ["Keep", "Grow", "Flow"];
 
 const CARD_NOTES = {
   "The Lovers": ["choice", "alignment", "honest intimacy"],
@@ -429,7 +432,14 @@ Object.assign(I18N.fr, {
   "Read the skyline": "Lire l’horizon", "Five cards, a constellation for the work ahead.": "Cinq cartes, une constellation pour le travail à venir.",
   "Current Ground": "Terrain actuel", "Your Unclaimed Strength": "Votre force inexploitée", "The Friction": "La friction", "Your Leverage": "Votre levier", "The Next Bold Move": "Le prochain geste audacieux",
   "A short passage before the Career ritual": "Un bref passage avant le rituel de carrière", "The next horizon<br>is taking shape.": "Le prochain horizon<br>prend forme.",
-  "Unlock the Career path": "Ouvrir la voie Carrière", "Watch this brief sponsored moment to open the Career ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de carrière."
+  "Unlock the Career path": "Ouvrir la voie Carrière", "Watch this brief sponsored moment to open the Career ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de carrière.",
+  "Sweep across the table—these cards scatter apart instead of gathering.": "Balayez la table : ces cartes se dispersent au lieu de se rassembler.",
+  "Drag through the cards—they push each other apart": "Glissez à travers les cartes : elles s’écartent les unes des autres",
+  "sweeps · keep scattering or lay them out": "balayages · continuez à disperser ou étalez-les",
+  "The cards lie apart. Lay them out when you are ready.": "Les cartes sont bien séparées. Étalez-les quand vous êtes prêt·e.",
+  "more sweeps will scatter the deck.": "balayages de plus disperseront le jeu.",
+  "Scatter them for me": "Disperser pour moi", "Lay them out to choose": "Les étaler pour choisir", "Scatter them again": "Les disperser à nouveau",
+  "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "Regardez une courte publicité pour débloquer une réflexion basée sur votre question exacte et les cinq cartes."
 });
 Object.assign(I18N.ru, {
   "Two paths are ready tonight. Career opens after a brief sponsored passage.": "Сегодня готовы два пути. Карьера откроется после короткой рекламной паузы.",
@@ -452,7 +462,14 @@ Object.assign(I18N.ru, {
   "Read the skyline": "Прочесть горизонт", "Five cards, a constellation for the work ahead.": "Пять карт — созвездие для предстоящей работы.",
   "Current Ground": "Текущая опора", "Your Unclaimed Strength": "Ваша неприсвоенная сила", "The Friction": "Сопротивление", "Your Leverage": "Ваш рычаг", "The Next Bold Move": "Следующий смелый шаг",
   "A short passage before the Career ritual": "Короткий переход перед карьерным ритуалом", "The next horizon<br>is taking shape.": "Новый горизонт<br>обретает форму.",
-  "Unlock the Career path": "Открыть путь Карьеры", "Watch this brief sponsored moment to open the Career ritual.": "Посмотрите эту короткую рекламную паузу, чтобы открыть карьерный ритуал."
+  "Unlock the Career path": "Открыть путь Карьеры", "Watch this brief sponsored moment to open the Career ritual.": "Посмотрите эту короткую рекламную паузу, чтобы открыть карьерный ритуал.",
+  "Sweep across the table—these cards scatter apart instead of gathering.": "Проведите рукой по столу — эти карты разлетаются в стороны, а не собираются вместе.",
+  "Drag through the cards—they push each other apart": "Проведите сквозь карты — они расталкивают друг друга",
+  "sweeps · keep scattering or lay them out": "движений · продолжайте разбрасывать или разложите их",
+  "The cards lie apart. Lay them out when you are ready.": "Карты лежат врозь. Разложите их, когда будете готовы.",
+  "more sweeps will scatter the deck.": "движений ещё разбросают колоду.",
+  "Scatter them for me": "Разбросать за меня", "Lay them out to choose": "Разложить для выбора", "Scatter them again": "Разбросать заново",
+  "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "Посмотрите короткую рекламу, чтобы открыть размышление по вашему вопросу и всем пяти картам."
 });
 Object.assign(I18N.zh, {
   "Two paths are ready tonight. Career opens after a brief sponsored passage.": "今夜已有两条路径准备就绪。职业主题将在一段简短赞助内容后开启。",
@@ -475,7 +492,88 @@ Object.assign(I18N.zh, {
   "Read the skyline": "解读天际线", "Five cards, a constellation for the work ahead.": "五张牌，为前方事业连成一座星座。",
   "Current Ground": "当下立足点", "Your Unclaimed Strength": "尚未认领的力量", "The Friction": "阻力", "Your Leverage": "你的杠杆", "The Next Bold Move": "下一个大胆行动",
   "A short passage before the Career ritual": "进入职业仪式前的短暂通道", "The next horizon<br>is taking shape.": "下一片地平线<br>正在成形。",
-  "Unlock the Career path": "解锁职业路径", "Watch this brief sponsored moment to open the Career ritual.": "观看这段简短赞助内容，即可开启职业仪式。"
+  "Unlock the Career path": "解锁职业路径", "Watch this brief sponsored moment to open the Career ritual.": "观看这段简短赞助内容，即可开启职业仪式。",
+  "Sweep across the table—these cards scatter apart instead of gathering.": "在桌面上划过——这些牌会彼此散开，而不是聚拢。",
+  "Drag through the cards—they push each other apart": "从牌间划过——它们会互相推开",
+  "sweeps · keep scattering or lay them out": "次划动 · 继续散牌或摊开它们",
+  "The cards lie apart. Lay them out when you are ready.": "牌已散开。准备好后就摊开它们。",
+  "more sweeps will scatter the deck.": "次划动后牌阵便会散开。",
+  "Scatter them for me": "替我散牌", "Lay them out to choose": "摊开以供挑选", "Scatter them again": "重新散牌",
+  "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "观看一个简短广告，解锁基于你的问题与全部五张牌的映照。"
+});
+
+// Money is a living ledger: the cut selects the Seed, then nine placed coins
+// determine the exact depth of the Keep, Grow, and Flow cards.
+Object.assign(I18N.fr, {
+  "Three paths are ready tonight. Career and Money open after a brief sponsored passage.": "Trois voies sont prêtes ce soir. Carrière et Argent s’ouvrent après un bref passage sponsorisé.",
+  "Money Ledger": "Registre d’argent", "Money ritual": "Rituel de l’argent",
+  "What part of your money life needs a clearer current?": "Quelle part de votre vie financière a besoin d’un courant plus clair ?",
+  "Name the choice, pressure, or possibility you want to understand. Keep the question open enough for a useful reflection.": "Nommez le choix, la pression ou la possibilité à comprendre. Gardez la question assez ouverte pour une réflexion utile.",
+  "What is my money asking me to understand?": "Que cherche mon argent à me faire comprendre ?",
+  "What should I protect before I try to grow?": "Que dois-je protéger avant de chercher à grandir ?",
+  "Where is value leaking from my life?": "Où la valeur s’échappe-t-elle de ma vie ?",
+  "What resource am I not using fully?": "Quelle ressource n’utilisé-je pas pleinement ?",
+  "Enter the Money ritual": "Entrer dans le rituel de l’argent",
+  "Find the source of the current.": "Trouvez la source du courant.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "Déplacez la vanne de laiton dans le jeu. La carte juste dessous devient votre Graine.",
+  "Fund the three vessels.": "Alimentez les trois réceptacles.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "Répartissez les neuf pièces entre Garder, Grandir et Circuler. Chaque total atteint cette profondeur exacte dans sa pile.",
+  "Read the living ledger.": "Lisez le registre vivant.", "Every card now carries the action that chose it: one cut and three coin depths.": "Chaque carte porte désormais le geste qui l’a choisie : une coupe et trois profondeurs.",
+  "Turn over the treasury you built.": "Retournez le trésor que vous avez bâti.", "Four cards preserve the exact path of your choices.": "Quatre cartes conservent le chemin exact de vos choix.",
+  "The gate chooses the card directly beneath it.": "La vanne choisit la carte placée juste dessous.", "Take this Seed": "Prendre cette Graine",
+  "coins left": "pièces restantes", "Place coin": "Placer une pièce", "Return coin": "Reprendre une pièce",
+  "Each vessel must hold at least one coin.": "Chaque réceptacle doit contenir au moins une pièce.", "All nine coins are placed. Each count now points to an exact card.": "Les neuf pièces sont placées. Chaque total pointe maintenant vers une carte exacte.",
+  "Seal the vessels": "Sceller les réceptacles", "Chosen at cut": "Choisie à la coupe", "coins deep": "pièces de profondeur",
+  "Your cut became the Seed. The coin counts chose the other three cards.": "Votre coupe est devenue la Graine. Les comptes de pièces ont choisi les trois autres cartes.",
+  "Open the treasury": "Ouvrir le trésor", "Four cards, a living ledger for your resources.": "Quatre cartes, un registre vivant pour vos ressources.",
+  "The Seed": "La Graine", "What to Keep": "Ce qu’il faut garder", "What to Grow": "Ce qu’il faut faire grandir", "What to Let Flow": "Ce qu’il faut laisser circuler",
+  "Keep": "Garder", "Grow": "Grandir", "Flow": "Circuler",
+  "Unlock the Money path": "Ouvrir la voie Argent", "A short passage before the Money ritual": "Un bref passage avant le rituel de l’argent",
+  "The treasury<br>is taking shape.": "Le trésor<br>prend forme.", "Watch this brief sponsored moment to open the Money ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de l’argent."
+});
+Object.assign(I18N.ru, {
+  "Three paths are ready tonight. Career and Money open after a brief sponsored passage.": "Сегодня готовы три пути. Карьера и Деньги откроются после короткой рекламной паузы.",
+  "Money Ledger": "Денежная книга", "Money ritual": "Денежный ритуал",
+  "What part of your money life needs a clearer current?": "Какой части вашей денежной жизни нужен более ясный поток?",
+  "Name the choice, pressure, or possibility you want to understand. Keep the question open enough for a useful reflection.": "Назовите выбор, давление или возможность, которые хотите понять. Оставьте вопрос достаточно открытым для полезного размышления.",
+  "What is my money asking me to understand?": "Что мои деньги просят меня понять?", "What should I protect before I try to grow?": "Что мне стоит защитить, прежде чем расти?",
+  "Where is value leaking from my life?": "Где ценность утекает из моей жизни?", "What resource am I not using fully?": "Какой ресурс я использую не полностью?",
+  "Enter the Money ritual": "Войти в денежный ритуал",
+  "Find the source of the current.": "Найдите источник потока.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "Перемещайте латунный шлюз по колоде. Карта прямо под ним станет вашим Семенем.",
+  "Fund the three vessels.": "Наполните три сосуда.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "Разместите девять монет между Сохранить, Вырастить и Отпустить. Число монет укажет точную глубину карты в стопке.",
+  "Read the living ledger.": "Прочтите живую книгу.", "Every card now carries the action that chose it: one cut and three coin depths.": "Каждая карта хранит выбравшее её действие: один срез и три глубины монет.",
+  "Turn over the treasury you built.": "Откройте созданную вами сокровищницу.", "Four cards preserve the exact path of your choices.": "Четыре карты сохраняют точный путь ваших решений.",
+  "The gate chooses the card directly beneath it.": "Шлюз выбирает карту прямо под ним.", "Take this Seed": "Взять это Семя",
+  "coins left": "монет осталось", "Place coin": "Положить монету", "Return coin": "Вернуть монету",
+  "Each vessel must hold at least one coin.": "В каждом сосуде должна быть хотя бы одна монета.", "All nine coins are placed. Each count now points to an exact card.": "Все девять монет размещены. Каждый счёт теперь указывает точную карту.",
+  "Seal the vessels": "Запечатать сосуды", "Chosen at cut": "Выбрано срезом", "coins deep": "монет вглубь",
+  "Your cut became the Seed. The coin counts chose the other three cards.": "Ваш срез стал Семенем. Число монет выбрало остальные три карты.",
+  "Open the treasury": "Открыть сокровищницу", "Four cards, a living ledger for your resources.": "Четыре карты — живая книга ваших ресурсов.",
+  "The Seed": "Семя", "What to Keep": "Что сохранить", "What to Grow": "Что вырастить", "What to Let Flow": "Что отпустить",
+  "Keep": "Сохранить", "Grow": "Вырастить", "Flow": "Отпустить",
+  "Unlock the Money path": "Открыть путь Денег", "A short passage before the Money ritual": "Короткий переход перед денежным ритуалом",
+  "The treasury<br>is taking shape.": "Сокровищница<br>обретает форму.", "Watch this brief sponsored moment to open the Money ritual.": "Посмотрите этот короткий рекламный момент, чтобы открыть денежный ритуал."
+});
+Object.assign(I18N.zh, {
+  "Three paths are ready tonight. Career and Money open after a brief sponsored passage.": "今夜已有三条路径准备就绪。事业与财富将在一段简短赞助内容后开启。",
+  "Money Ledger": "财富账簿", "Money ritual": "财富仪式",
+  "What part of your money life needs a clearer current?": "你的金钱生活中，哪一部分需要更清晰的流向？",
+  "Name the choice, pressure, or possibility you want to understand. Keep the question open enough for a useful reflection.": "写下你想理解的选择、压力或可能性，让问题保持开放，以容纳有用的映照。",
+  "What is my money asking me to understand?": "我的金钱正在要求我理解什么？", "What should I protect before I try to grow?": "在追求增长之前，我应该先守护什么？",
+  "Where is value leaking from my life?": "价值正从我生活的哪里流失？", "What resource am I not using fully?": "我尚未充分使用哪项资源？",
+  "Enter the Money ritual": "进入财富仪式",
+  "Find the source of the current.": "找到流动的源头。", "Move the brass gate through the deck. The card directly beneath it becomes your Seed.": "在牌组中移动黄铜闸门。正下方的牌将成为你的种子。",
+  "Fund the three vessels.": "为三个容器注入资金。", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile.": "将九枚钱币分配到守护、成长与流动。每个数量会抵达牌堆中对应的准确深度。",
+  "Read the living ledger.": "阅读这本活账簿。", "Every card now carries the action that chose it: one cut and three coin depths.": "每张牌都保留了选择它的动作：一次切牌与三组钱币深度。",
+  "Turn over the treasury you built.": "翻开你亲手建成的宝库。", "Four cards preserve the exact path of your choices.": "四张牌保存了你选择的完整路径。",
+  "The gate chooses the card directly beneath it.": "闸门会选择正下方的牌。", "Take this Seed": "取出这枚种子",
+  "coins left": "枚钱币待分配", "Place coin": "放入钱币", "Return coin": "取回钱币",
+  "Each vessel must hold at least one coin.": "每个容器至少需要一枚钱币。", "All nine coins are placed. Each count now points to an exact card.": "九枚钱币已全部放置。每个数量现在都指向一张准确的牌。",
+  "Seal the vessels": "封印容器", "Chosen at cut": "由切牌选中", "coins deep": "枚钱币深",
+  "Your cut became the Seed. The coin counts chose the other three cards.": "你的切牌成为种子，钱币数量选择了另外三张牌。",
+  "Open the treasury": "开启宝库", "Four cards, a living ledger for your resources.": "四张牌，一本记录资源的活账簿。",
+  "The Seed": "种子", "What to Keep": "值得守护", "What to Grow": "值得成长", "What to Let Flow": "值得流动",
+  "Keep": "守护", "Grow": "成长", "Flow": "流动",
+  "Unlock the Money path": "解锁财富路径", "A short passage before the Money ritual": "进入财富仪式前的短暂通道",
+  "The treasury<br>is taking shape.": "宝库<br>正在成形。", "Watch this brief sponsored moment to open the Money ritual.": "观看这段简短赞助内容，即可开启财富仪式。"
 });
 function t(source) {
   const lang = state?.settings?.language || "en";
@@ -509,6 +607,34 @@ function buildShuffleLayout(seed) {
     };
   });
 }
+// Career opens on a physical table too, but its sweep pushes cards apart instead of
+// letting them clump the way Love's pile does: the constellation wants space between
+// its sparks, so every wave is followed by a separation pass.
+const CAREER_SCATTER_COUNT = 24;
+function buildCareerScatter(seed) {
+  const random = rngFor(`${seed}-career-scatter`);
+  return Array.from({ length: CAREER_SCATTER_COUNT }, (_, index) => {
+    const angle = random() * Math.PI * 2;
+    const radius = 4 + Math.sqrt(random()) * 13;
+    return {
+      x: Number((50 + Math.cos(angle) * radius).toFixed(2)),
+      y: Number((50 + Math.sin(angle) * radius * .72).toFixed(2)),
+      r: Number(((random() - .5) * 58).toFixed(2)),
+      z: index + 1
+    };
+  });
+}
+function createCareerState(seed) {
+  return {
+    phase: "shuffle",
+    scatter: buildCareerScatter(seed),
+    shuffleMoves: 0,
+    emberIds: [],
+    compass: 88,
+    candidateIds: [],
+    selectedIds: []
+  };
+}
 function createState() {
   const seed = uid();
   return {
@@ -533,10 +659,13 @@ function createState() {
     threeCutDraft: 23,
     twoTop: null,
     ad: null,
-    career: {
-      emberIds: [],
-      compass: 88,
-      candidateIds: [],
+    career: createCareerState(seed),
+    money: {
+      cutDraft: 31,
+      cut: null,
+      seedId: null,
+      seedCard: null,
+      coinCounts: [1, 1, 1],
       selectedIds: []
     },
     shareTheme: "midnight",
@@ -595,14 +724,28 @@ function persist() {
 }
 window.addEventListener("pagehide", persistNow);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistNow(); });
-function ritualStages() { return state.category === "Career" ? CAREER_STAGES : LOVE_STAGES; }
-function readingPositions() { return state.category === "Career" ? CAREER_POSITIONS : LOVE_POSITIONS; }
+function ritualStages() {
+  if (state.category === "Career") return CAREER_STAGES;
+  if (state.category === "Money") return MONEY_STAGES;
+  return LOVE_STAGES;
+}
+function readingPositions() {
+  if (state.category === "Career") return CAREER_POSITIONS;
+  if (state.category === "Money") return MONEY_POSITIONS;
+  return LOVE_POSITIONS;
+}
 function stageIndex() { return Math.max(0, ritualStages().indexOf(state.stage)); }
 function cardById(id) {
-  return state.ritualCard?.id === id ? state.ritualCard : state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
+  if (state.ritualCard?.id === id) return state.ritualCard;
+  if (state.money?.seedCard?.id === id) return state.money.seedCard;
+  return state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
 }
 function readingCards() {
-  const ids = state.category === "Career" ? state.career.selectedIds : [state.ritualCardId, ...state.selectedIds];
+  const ids = state.category === "Career"
+    ? state.career.selectedIds
+    : state.category === "Money"
+      ? [state.money.seedId, ...state.money.selectedIds]
+      : [state.ritualCardId, ...state.selectedIds];
   return ids.map(cardById).filter(Boolean);
 }
 function interaction() { state.performance.interactions += 1; state.performance.lastGesture = Date.now(); persist(); }
@@ -768,7 +911,7 @@ function progress() {
   return `<div class="stage-progress" aria-label="Ritual progress">${ritualStages().map((stage, index) => `<i class="${index < current ? "done" : index === current ? "active" : ""}" title="${stage}"></i>`).join("")}</div>`;
 }
 function topbar() {
-  return `<header class="topbar"><button class="brand" data-action="home" aria-label="Return to the opening">The Heart Cut</button>
+  return `<header class="topbar"><button class="brand" data-action="home" aria-label="Return to the opening">Oracle Veil</button>
     <div class="utility-row"><button class="settings-button" data-action="open-settings" aria-haspopup="dialog">${t("Settings")}</button></div></header>`;
 }
 function world(content, className = "") {
@@ -782,22 +925,36 @@ function renderCategory() {
   const categories = [
     { name: "Love", symbol: "♡", action: "choose-love", note: "begin" },
     { name: "Career", symbol: "⌁", action: "choose-career", note: "watch to enter", locked: true },
-    { name: "Money", symbol: "✦" }, { name: "Decision", symbol: "⚭" },
+    { name: "Money", symbol: "◉", action: "choose-money", note: "watch to enter", locked: true },
+    { name: "Decision", symbol: "⚭" },
     { name: "Friendship / Family", symbol: "⌇" }, { name: "Personal Growth", symbol: "☾" },
     { name: "General Future", symbol: "☉" }
   ];
-  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Two paths are ready tonight. Career opens after a brief sponsored passage.")}</p></div><div class="category-grid">${categories.map(({ name, symbol, action, note, locked }) => `<button class="category ${action ? "available" : ""} ${locked ? "locked" : ""}" ${action ? `data-action="${action}"` : "disabled"}>${locked ? `<span class="category-lock" aria-hidden="true"><i></i></span>` : ""}<span class="symbol">${symbol}</span><span>${t(name)}</span><small>${action ? t(note) : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
+  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Three paths are ready tonight. Career and Money open after a brief sponsored passage.")}</p></div><div class="category-grid">${categories.map(({ name, symbol, action, note, locked }) => `<button class="category ${action ? "available" : ""} ${locked ? "locked" : ""}" ${action ? `data-action="${action}"` : "disabled"}>${locked ? `<span class="category-lock" aria-hidden="true"><i></i></span>` : ""}<span class="symbol">${symbol}</span><span>${t(name)}</span><small>${action ? t(note) : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
 }
 function renderQuestion() {
   const career = state.category === "Career";
+  const money = state.category === "Money";
   const examples = career
     ? ["What strength am I ready to be known for?", "What is keeping me from my next career chapter?", "Where should I focus my energy at work?", "What opportunity am I not seeing yet?"]
-    : ["Where is this relationship going?", "What should I understand about this person?", "What is blocking my love life?", "What energy surrounds this connection?"];
-  const title = career ? "What part of your working life is asking to move?" : "What does your heart wish to understand?";
+    : money
+      ? ["What is my money asking me to understand?", "What should I protect before I try to grow?", "Where is value leaking from my life?", "What resource am I not using fully?"]
+      : ["Where is this relationship going?", "What should I understand about this person?", "What is blocking my love life?", "What energy surrounds this connection?"];
+  const title = career
+    ? "What part of your working life is asking to move?"
+    : money
+      ? "What part of your money life needs a clearer current?"
+      : "What does your heart wish to understand?";
   const lede = career
     ? "Name the tension, opportunity, or direction you want to explore. Open questions leave room for a useful reflection."
-    : "Give the question enough room to breathe. It does not need to be yes or no.";
-  return world(`<section class="scene"><div class="parchment ${career ? "career-parchment" : ""}"><p class="eyebrow">The Heart Cut · ${t(career ? "Career Compass" : "Love")}</p><h2>${t(title)}</h2><p>${t(lede)}</p><textarea id="question-input" class="question-box" maxlength="340" placeholder="${t("Write here…")}">${escapeHTML(state.question)}</textarea><ul class="examples">${examples.map((ex) => `<li><button data-example="${escapeHTML(t(ex))}">${t(ex)}</button></li>`).join("")}</ul><div class="question-actions"><button class="back-link" data-action="back-category">${t("Choose another path")}</button><button class="seal-button ${career ? "career-seal" : ""}" data-action="question-next" ${state.question.trim().length < 4 ? "disabled" : ""}>${t(career ? "Enter the Career ritual" : "Place the question")}</button></div></div></section>`);
+    : money
+      ? "Name the choice, pressure, or possibility you want to understand. Keep the question open enough for a useful reflection."
+      : "Give the question enough room to breathe. It does not need to be yes or no.";
+  const pathName = career ? "Career Compass" : money ? "Money Ledger" : "Love";
+  const nextLabel = career ? "Enter the Career ritual" : money ? "Enter the Money ritual" : "Place the question";
+  const themeClass = career ? "career-parchment" : money ? "money-parchment" : "";
+  const worldClass = career ? "career-world" : money ? "money-world" : "";
+  return world(`<section class="scene"><div class="parchment ${themeClass}"><p class="eyebrow">Oracle Veil · ${t(pathName)}</p><h2>${t(title)}</h2><p>${t(lede)}</p><textarea id="question-input" class="question-box" maxlength="340" placeholder="${t("Write here…")}">${escapeHTML(state.question)}</textarea><ul class="examples">${examples.map((ex) => `<li><button data-example="${escapeHTML(t(ex))}">${t(ex)}</button></li>`).join("")}</ul><div class="question-actions"><button class="back-link" data-action="back-category">${t("Choose another path")}</button><button class="seal-button ${career ? "career-seal" : money ? "money-seal" : ""}" data-action="question-next" ${state.question.trim().length < 4 ? "disabled" : ""}>${t(nextLabel)}</button></div></div></section>`, worldClass);
 }
 function ritualTitle() {
   const copy = {
@@ -811,12 +968,13 @@ function ritualTitle() {
     choose: ["Choose three cards that call to you.", "Touch a card to draw it into the reading."],
     reveal: ["Reveal the story in the order you wish.", "The first turn opens a brief doorway. The others are uninterrupted."],
   };
-  const [title, lede] = copy[state.stage] || ["The Heart Cut", ""];
+  const [title, lede] = copy[state.stage] || ["Oracle Veil", ""];
   return `<div class="ritual-head">${progress()}<p class="eyebrow">${t("Love ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
 
 function renderRitual() {
   if (state.category === "Career") return renderCareerRitual();
+  if (state.category === "Money") return renderMoneyRitual();
   let surface = "";
   let actions = "";
   if (state.stage === "shuffle") ({ surface, actions } = renderShuffle());
@@ -839,8 +997,11 @@ function careerCompassTheme(degrees = state.career.compass) {
   return "Reinvention";
 }
 function careerTitle() {
+  const scattering = state.stage === "careerEmbers" && state.career.phase !== "pick";
   const copy = {
-    careerEmbers: ["Wake the embers in your deck.", "Touch three cards that feel alive. They will become the sparks beneath your path."],
+    careerEmbers: scattering
+      ? ["Loosen the cards beneath your hands.", "Sweep across the table—these cards scatter apart instead of gathering."]
+      : ["Wake the embers in your deck.", "Touch three cards that feel alive. They will become the sparks beneath your path."],
     careerCompass: ["Set the direction of your ambition.", "Turn the brass compass toward the quality your next chapter needs."],
     careerLadder: ["Build your constellation ladder.", "At every rung, choose the stepping-stone that feels like yours."],
     careerReveal: ["Turn over the path you have built.", "Five cards now hold the arc from where you stand to your next bold move."]
@@ -870,22 +1031,43 @@ function renderCareerRitual() {
   if (state.stage === "careerReveal") view = renderCareerReveal();
   return world(`<section class="scene ritual career-ritual">${careerTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "career-world");
 }
+function careerScatter() {
+  if (!state.career.scatter?.length) state.career.scatter = buildCareerScatter(state.seed);
+  return state.career.scatter;
+}
 function renderCareerEmbers() {
+  const picking = state.career.phase === "pick";
   const chosen = new Set(state.career.emberIds);
-  const cards = state.deck.slice(0, 21);
-  const field = cards.map((card, index) => {
-    const ring = index % 3;
-    const angle = (index / cards.length) * Math.PI * 2 - Math.PI / 2;
-    const rx = [31, 25, 18][ring], ry = [31, 25, 18][ring];
-    const x = 50 + Math.cos(angle) * rx;
-    const y = 51 + Math.sin(angle) * ry;
-    const rotation = angle * 180 / Math.PI + 90 + (ring - 1) * 7;
+  const moves = state.career.shuffleMoves || 0;
+  const ready = moves >= 3;
+  // Every scattered card is a real position in the deck, so the sweep that reorders
+  // the deck underneath also reshuffles which card each face-down back is hiding.
+  const field = careerScatter().map((piece, index) => {
+    const card = state.deck[index];
+    if (!card) return "";
     const awake = chosen.has(card.id);
-    return `<button class="career-ember-card card back ${awake ? "awake" : ""}" data-action="career-ember" data-card-id="${card.id}" aria-pressed="${awake}" aria-label="${awake ? "Awake ember" : "Wake this card"}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%;--r:${rotation.toFixed(2)}deg;--z:${index + 1}"></button>`;
+    const pick = picking ? `data-action="career-ember" data-card-id="${card.id}" aria-pressed="${awake}"` : "";
+    const label = picking ? (awake ? "Awake ember" : "Wake this card") : `${t("Move card")} ${index + 1}`;
+    return `<button class="career-ember-card card back ${awake ? "awake" : ""}" data-shuffle-index="${index}" ${pick} aria-label="${label}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`;
   }).join("");
+  const instruction = picking
+    ? t("Touch any three cards. There is no wrong constellation.")
+    : t("Sweep across the table—these cards scatter apart instead of gathering.");
+  const guide = picking
+    ? `${state.career.emberIds.length}/3 ${t("embers awake")}`
+    : moves
+      ? `${moves} ${t("sweeps · keep scattering or lay them out")}`
+      : t("Drag through the cards—they push each other apart");
+  const surface = `<div class="table-surface career-ember-surface" id="career-scatter-surface"><div class="career-orbit ${picking ? "picking" : ""}" aria-label="A scatter of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div><p class="physical-instruction ${moves ? "quiet" : ""}">${instruction}</p><span class="piles-guide" id="career-scatter-guide">${guide}</span></div>`;
+  if (picking) {
+    return {
+      surface,
+      actions: `<p class="status-note">${t("Touch any three cards. There is no wrong constellation.")}</p><button class="text-button" data-action="career-scatter-again">${t("Scatter them again")}</button><button class="seal-button career-seal" data-action="career-raise" ${state.career.emberIds.length === 3 ? "" : "disabled"}>${t("Raise the constellation")}</button>`
+    };
+  }
   return {
-    surface: `<div class="table-surface career-ember-surface"><div class="career-orbit" aria-label="A constellation of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div><span class="piles-guide">${state.career.emberIds.length}/3 ${t("embers awake")}</span></div>`,
-    actions: `<p class="status-note">${t("Touch any three cards. There is no wrong constellation.")}</p><button class="seal-button career-seal" data-action="career-raise" ${state.career.emberIds.length === 3 ? "" : "disabled"}>${t("Raise the constellation")}</button>`
+    surface,
+    actions: `<p class="status-note" id="career-scatter-status">${ready ? t("The cards lie apart. Lay them out when you are ready.") : `${3 - moves} ${t("more sweeps will scatter the deck.")}`}</p><button class="text-button" data-action="assist-career-scatter">${t("Scatter them for me")}</button><button class="seal-button career-seal" data-action="career-scatter-done" ${ready ? "" : "disabled"}>${t("Lay them out to choose")}</button>`
   };
 }
 function renderCareerCompass() {
@@ -922,6 +1104,74 @@ function renderCareerReveal() {
     surface: `<div class="reveal-layout career-reveal-layout">${cards.map((card, index) => {
       const revealed = state.revealedIds.includes(card.id);
       return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(CAREER_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(CAREER_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    }).join("")}</div>`,
+    actions: revealActions()
+  };
+}
+
+function moneyTitle() {
+  const copy = {
+    moneyCurrent: ["Find the source of the current.", "Move the brass gate through the deck. The card directly beneath it becomes your Seed."],
+    moneyVessels: ["Fund the three vessels.", "Place all nine coins among Keep, Grow, and Flow. Each count reaches to that exact depth in its card pile."],
+    moneyLedger: ["Read the living ledger.", "Every card now carries the action that chose it: one cut and three coin depths."],
+    moneyReveal: ["Turn over the treasury you built.", "Four cards preserve the exact path of your choices."]
+  };
+  const [title, lede] = copy[state.stage] || ["Money Ledger", ""];
+  return `<div class="ritual-head money-ritual-head">${progress()}<p class="eyebrow">${t("Money ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
+}
+function renderMoneyRitual() {
+  let view = { surface: "", actions: "" };
+  if (state.stage === "moneyCurrent") view = renderMoneyCurrent();
+  if (state.stage === "moneyVessels") view = renderMoneyVessels();
+  if (state.stage === "moneyLedger") view = renderMoneyLedger();
+  if (state.stage === "moneyReveal") view = renderMoneyReveal();
+  return world(`<section class="scene ritual money-ritual">${moneyTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "money-world");
+}
+function renderMoneyCurrent() {
+  const total = Math.max(1, state.deck.length);
+  const cut = clamp(Number(state.money.cutDraft) || 31, 8, total - 9);
+  const stream = Array.from({ length: 19 }, (_, index) => `<i class="money-stream-card card back" style="--x:${(2.5 + index * 5.2).toFixed(1)}%;--r:${((index - 9) * .65).toFixed(2)}deg;--z:${index}"></i>`).join("");
+  return {
+    surface: `<div class="table-surface money-current-surface" style="--gate:${(cut / total * 100).toFixed(2)}%"><div class="money-current"><div class="money-river" aria-hidden="true">${stream}<span class="money-gate"><b>◉</b></span></div><div class="money-current-count" aria-live="polite"><span>${cut}</span><i> / ${total}</i></div><label class="money-current-label" for="money-current-range">${t("The gate chooses the card directly beneath it.")}</label><input class="money-current-range" id="money-current-range" type="range" min="8" max="${total - 9}" value="${cut}" aria-label="${t("Move the brass gate through the deck. The card directly beneath it becomes your Seed.")}"></div></div>`,
+    actions: `<p class="status-note">${t("The gate chooses the card directly beneath it.")}</p><button class="seal-button money-seal" data-action="money-take-seed">${t("Take this Seed")}</button>`
+  };
+}
+function renderMoneyVessels() {
+  const counts = state.money.coinCounts;
+  const spent = counts.reduce((sum, count) => sum + count, 0);
+  const left = 9 - spent;
+  const bank = Array.from({ length: Math.max(0, left) }, () => `<i class="money-coin" aria-hidden="true">✦</i>`).join("");
+  const vessels = MONEY_VESSELS.map((name, index) => {
+    const count = counts[index];
+    const pileLayers = Array.from({ length: 6 }, (_, layer) => `<i style="--layer-x:${(-layer * .35).toFixed(2)}px;--layer-y:${(-layer * 1.1).toFixed(2)}px"></i>`).join("");
+    const coins = Array.from({ length: count }, () => `<i class="money-coin" aria-hidden="true">✦</i>`).join("");
+    return `<article class="money-vessel" style="--lift:${(-count * .3).toFixed(2)}rem"><div class="money-vessel-pile" aria-hidden="true">${pileLayers}<span class="money-depth-card card back"></span><b>${count}</b></div><h3>${t(name)}</h3><div class="money-vessel-coins" aria-label="${count} ${t("coins deep")}">${coins}</div><div class="money-vessel-controls"><button class="money-coin-button return" data-action="money-coin-remove" data-vessel="${index}" ${count <= 1 ? "disabled" : ""} aria-label="${t("Return coin")}">−</button><button class="money-coin-button place" data-action="money-coin-add" data-vessel="${index}" ${left <= 0 ? "disabled" : ""} aria-label="${t("Place coin")}">+</button></div></article>`;
+  }).join("");
+  const ready = left === 0;
+  return {
+    surface: `<div class="table-surface money-vessels-surface"><div class="money-bank"><span>${left} ${t("coins left")}</span><div>${bank || `<i class="money-bank-seal" aria-hidden="true">◉</i>`}</div></div><div class="money-vessels">${vessels}</div></div>`,
+    actions: `<p class="status-note">${t(ready ? "All nine coins are placed. Each count now points to an exact card." : "Each vessel must hold at least one coin.")}</p><button class="seal-button money-seal" data-action="money-seal-vessels" ${ready ? "" : "disabled"}>${t("Seal the vessels")}</button>`
+  };
+}
+function renderMoneyLedger() {
+  const cards = readingCards();
+  const counts = state.money.coinCounts;
+  const entries = cards.map((card, index) => {
+    const source = index === 0 ? `${t("Chosen at cut")} ${state.money.cut}` : `${counts[index - 1]} ${t("coins deep")}`;
+    return `<article class="money-ledger-entry" style="--r:${((index - 1.5) * 1.1).toFixed(2)}deg"><span class="money-ledger-number">0${index + 1}</span><span class="money-ledger-card card back" aria-hidden="true"></span><h3>${t(MONEY_POSITIONS[index])}</h3><p>${source}</p></article>`;
+  }).join("");
+  return {
+    surface: `<div class="table-surface money-ledger-surface"><div class="money-ledger" aria-label="${t("Read the living ledger.")}">${entries}</div></div>`,
+    actions: `<p class="status-note">${t("Your cut became the Seed. The coin counts chose the other three cards.")}</p><button class="seal-button money-seal" data-action="money-to-reveal">${t("Open the treasury")}</button>`
+  };
+}
+function renderMoneyReveal() {
+  const cards = readingCards();
+  preloadCardArt(cards);
+  return {
+    surface: `<div class="reveal-layout money-reveal-layout">${cards.map((card, index) => {
+      const revealed = state.revealedIds.includes(card.id);
+      return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(MONEY_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(MONEY_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
     }).join("")}</div>`,
     actions: revealActions()
   };
@@ -1013,14 +1263,20 @@ function renderReveal() {
 }
 
 function cardKeywords(card) {
-  if (state.category !== "Career" && CARD_NOTES[card.name]) return CARD_NOTES[card.name];
+  if (state.category === "Love" && CARD_NOTES[card.name]) return CARD_NOTES[card.name];
   const suitWords = state.category === "Career"
     ? {
         Wands: ["initiative", "momentum", "visibility"], Cups: ["collaboration", "instinct", "shared values"],
         Swords: ["strategy", "communication", "a clear decision"], Pentacles: ["craft", "resources", "sustainable growth"],
         "Major Arcana": ["a defining chapter", "leadership", "purpose"]
       }
-    : {
+    : state.category === "Money"
+      ? {
+          Wands: ["enterprise", "momentum", "calculated risk"], Cups: ["values", "enoughness", "reciprocity"],
+          Swords: ["discernment", "clear terms", "a deliberate choice"], Pentacles: ["material value", "stewardship", "patient growth"],
+          "Major Arcana": ["a money pattern", "agency", "a defining choice"]
+        }
+      : {
         Wands: ["desire", "momentum", "courage"], Cups: ["feeling", "connection", "receptivity"],
         Swords: ["clarity", "truth", "a necessary thought"], Pentacles: ["grounding", "value", "what can grow"],
         "Major Arcana": ["a larger pattern", "inner change", "attention"]
@@ -1040,6 +1296,15 @@ function positionMeaning(position, card) {
     };
     return careerSnippets[position];
   }
+  if (state.category === "Money") {
+    const moneySnippets = {
+      "The Seed": `${card.name} names the pattern beneath the money question: ${upright}. This is the condition from which the rest of the ledger grows.`,
+      "What to Keep": `${card.name} points to a resource, boundary, or practice worth protecting before you ask it to produce more.`,
+      "What to Grow": `${card.name} highlights where patient attention could compound into greater capacity, choice, or resilience.`,
+      "What to Let Flow": `${card.name} asks what can circulate, be spent with intention, or be released so value does not become fearfully stuck.`
+    };
+    return moneySnippets[position];
+  }
   const snippets = {
     "Hidden Heart": `Under the question, ${card.name} suggests an influence that is ${upright}. Notice what has been felt before it has been named.`,
     "You": `In your own position, ${card.name} points to the way you are meeting this situation: ${upright}.`,
@@ -1050,6 +1315,7 @@ function positionMeaning(position, card) {
 }
 function personalInterpretation(cards) {
   if (state.category === "Career") return careerPersonalInterpretation(cards);
+  if (state.category === "Money") return moneyPersonalInterpretation(cards);
   const [hidden, you, connection, ahead] = cards;
   const reversed = cards.filter((card) => card.reversed).length;
   const question = state.question.trim() || "this question";
@@ -1078,6 +1344,20 @@ ${leverage.name} is Your Leverage—the relationship, system, practice, or resou
 
 For The Next Bold Move, ${next.name} favors one visible experiment. Choose a step you can take within the next seven days: make the request, show the work, learn the skill, or close one door with intention. Let the response become data for the rung after that.`;
 }
+function moneyPersonalInterpretation(cards) {
+  const [seed, keep, grow, flow] = cards;
+  const counts = state.money.coinCounts;
+  const question = state.question.trim() || "this money question";
+  const strongest = Math.max(...counts);
+  const emphasis = MONEY_VESSELS[counts.indexOf(strongest)];
+  return `Your question — “${question}” — is held here as a question of stewardship, not a prediction. The ritual placed the most weight in ${emphasis.toLowerCase()}, so begin by noticing why that vessel asked for more of your nine coins.
+
+${seed.name} became The Seed at the exact point where you set the brass gate. It describes the money pattern underneath the question: the belief, condition, or resource from which your next choices are already growing.
+
+At ${counts[0]} coins deep, ${keep.name} marks What to Keep. Protect the boundary, reserve, relationship, or capability it evokes before pursuing expansion. At ${counts[1]} coins deep, ${grow.name} marks What to Grow. Treat it as a place for consistent attention rather than a promise of fast return.
+
+${flow.name}, selected ${counts[2]} coins into the final vessel, marks What to Let Flow. This may be a thoughtful expense, a fair exchange, or something to release because holding it has become costly. Choose one small next action you can verify in real life: review one number, clarify one term, automate one safeguard, or make one values-aligned allocation. Tarot can frame the question; your records and circumstances should decide the money.`;
+}
 // First sentence of a longer interpretation, for a one-line share/summary line.
 function firstSentence(text) {
   const s = String(text || "").replace(/\s+/g, " ").trim();
@@ -1090,6 +1370,10 @@ function personalSummary(cards) {
   if (state.category === "Career") {
     const [, strength, , leverage, next] = cards;
     return `${strength.name} is the strength to own; ${leverage.name} helps ${next.name} become your next visible move.`;
+  }
+  if (state.category === "Money") {
+    const [, keep, grow, flow] = cards;
+    return `Keep ${keep.name} steady, grow through ${grow.name}, and let ${flow.name} restore movement.`;
   }
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
@@ -1309,7 +1593,7 @@ async function shareImageFile(theme) {
 }
 function shareCaption() {
   const summary = state.aiSummary || personalSummary(readingCards());
-  return `${summary}\n\n✦ My tarot reading from The Heart Cut · oracleveil.online`;
+  return `${summary}\n\n✦ My tarot reading from Oracle Veil · oracleveil.online`;
 }
 // "Save image" and the native "More" option.
 async function exportShareImage(mode, button) {
@@ -1419,7 +1703,7 @@ function renderSharePage() {
   return `<div class="share-page world" data-theme="${themeId}">
     <header class="share-topbar">
       <button class="share-back" type="button" data-action="share-back" aria-label="Back to the reading"><span aria-hidden="true">←</span></button>
-      <div class="share-brand">✦ THE HEART CUT ✦</div>
+      <div class="share-brand">✦ Oracle Veil ✦</div>
       <h1 class="share-title">Make it yours</h1>
       <button class="share-exit text-button" type="button" data-action="share-back">Exit</button>
     </header>
@@ -1445,7 +1729,7 @@ function renderSharePage() {
 async function requestAIInterpretation() {
   if (location.protocol === "file:") {
     state.aiLoading = false;
-    state.aiError = state.category === "Career" ? null : "Live interpretation needs the local server. Open the app through the command in README.md.";
+    state.aiError = state.category !== "Love" ? null : "Live interpretation needs the local server. Open the app through the command in README.md.";
     persist(); render();
     return;
   }
@@ -1470,9 +1754,9 @@ async function requestAIInterpretation() {
     state.aiSummary = givenSummary || firstSentence(state.aiText) || personalSummary(readingCards());
     state.aiError = null;
   } catch (error) {
-    // Career's entrance ad already unlocks the complete built-in reflection.
+    // Career and Money entrance ads already unlock the complete built-in reflection.
     // If an API is not configured on a static host, keep that experience seamless.
-    state.aiError = state.category === "Career" ? null : error instanceof Error ? error.message : "The interpretation service is unavailable.";
+    state.aiError = state.category !== "Love" ? null : error instanceof Error ? error.message : "The interpretation service is unavailable.";
   } finally {
     state.aiLoading = false;
     persist(); render();
@@ -1485,29 +1769,52 @@ function renderReading() {
   const cards = readingCards();
   const positions = readingPositions();
   const career = state.category === "Career";
+  const money = state.category === "Money";
+  const readingTitle = career
+    ? "Five cards, a constellation for the work ahead."
+    : money
+      ? "Four cards, a living ledger for your resources."
+      : "Four cards, gathered beneath one sky.";
+  const unlockCopy = career
+    ? t("Watch a short ad to unlock a reflection based on your exact question and all five cards.")
+    : t("Watch a short ad to unlock a reflection based on your exact question and all four cards.");
   const summary = state.aiSummary || personalSummary(cards);
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
     : `<p class="ai-summary">${escapeHTML(summary)}</p><p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} ${t("The prototype reading remains available below as a fallback.")}</p>` : ""}`;
-  return world(`<section class="scene reading ${career ? "career-reading" : ""}"><div class="parchment"><p class="eyebrow">The Heart Cut · ${t("your reading")}</p><h2>${t(career ? "Five cards, a constellation for the work ahead." : "Four cards, gathered beneath one sky.")}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${t("Watch a short ad to unlock a reflection based on your exact question and all four cards.")}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : "");
+  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : ""}"><div class="parchment ${money ? "money-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : "");
 }
 function renderAd() {
   if (!state.ad) return "";
   const ready = state.ad.ready;
   const careerEntry = state.ad.intent === "career-entry";
-  const title = careerEntry ? t("Unlock the Career path") : state.ad.intent === "interpretation" ? t("A quiet pause before the closer reading") : t("A small doorway in the ritual");
-  const illustration = careerEntry ? t("The next horizon<br>is taking shape.") : t("The sky keeps<br>its own counsel.");
-  const copy = careerEntry ? t("Watch this brief sponsored moment to open the Career ritual.") : t("This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.");
-  return `<div class="ad-scrim ${careerEntry ? "career-ad" : ""}" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card" tabindex="-1"><p class="ad-tag">${t("Mock sponsored moment")}</p><div class="ad-illustration">${illustration}</div><h2>${title}</h2><p>${copy}</p><div class="ad-footer"><span>${ready ? t("You may continue") : t(careerEntry ? "A short passage before the Career ritual" : "The door opens in a breath…")}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? t("Continue") : t("Please wait")}</button></div></section></div>`;
+  const moneyEntry = state.ad.intent === "money-entry";
+  const title = careerEntry
+    ? t("Unlock the Career path")
+    : moneyEntry
+      ? t("Unlock the Money path")
+      : state.ad.intent === "interpretation" ? t("A quiet pause before the closer reading") : t("A small doorway in the ritual");
+  const illustration = careerEntry
+    ? t("The next horizon<br>is taking shape.")
+    : moneyEntry
+      ? t("The treasury<br>is taking shape.")
+      : t("The sky keeps<br>its own counsel.");
+  const copy = careerEntry
+    ? t("Watch this brief sponsored moment to open the Career ritual.")
+    : moneyEntry
+      ? t("Watch this brief sponsored moment to open the Money ritual.")
+      : t("This placeholder is deliberately separate from the ritual so an advertising provider can be exchanged later.");
+  const waitLabel = careerEntry ? "A short passage before the Career ritual" : moneyEntry ? "A short passage before the Money ritual" : "The door opens in a breath…";
+  return `<div class="ad-scrim ${careerEntry ? "career-ad" : moneyEntry ? "money-ad" : ""}" role="dialog" aria-modal="true" aria-label="Mock advertisement"><section class="ad-card" tabindex="-1"><p class="ad-tag">${t("Mock sponsored moment")}</p><div class="ad-illustration">${illustration}</div><h2>${title}</h2><p>${copy}</p><div class="ad-footer"><span>${ready ? t("You may continue") : t(waitLabel)}</span><button class="text-button" data-action="dismiss-ad" ${ready ? "" : "disabled"}>${ready ? t("Continue") : t("Please wait")}</button></div></section></div>`;
 }
 function renderSettings() {
   if (!settingsOpen) return "";
   const languageNames = { en: "English", fr: "Français", ru: "Русский", zh: "中文" };
-  return `<div class="settings-scrim" role="dialog" aria-modal="true" aria-labelledby="settings-title"><section class="settings-panel"><div class="settings-heading"><div><p class="eyebrow">The Heart Cut</p><h2 id="settings-title">${t("Settings")}</h2></div><button class="settings-close" data-action="close-settings" aria-label="Close settings">×</button></div><label class="settings-field" for="settings-language"><span>${t("Language")}</span><select id="settings-language"><option value="en" ${state.settings.language === "en" ? "selected" : ""}>English</option><option value="fr" ${state.settings.language === "fr" ? "selected" : ""}>Français</option><option value="ru" ${state.settings.language === "ru" ? "selected" : ""}>Русский</option><option value="zh" ${state.settings.language === "zh" ? "selected" : ""}>中文</option></select><small id="settings-language-value">${t("Selected:")} ${languageNames[state.settings.language]}</small></label><label class="settings-toggle" for="settings-sfx"><input id="settings-sfx" type="checkbox" ${state.settings.sfxEnabled ? "checked" : ""}><span><strong>${t("Sound effects")}</strong><small>${t("Card, shuffle, and transition sounds.")}</small></span></label><label class="settings-field" for="settings-volume"><span>${t("Volume")} <output id="settings-volume-value">${state.settings.volume}%</output></span><input id="settings-volume" type="range" min="0" max="100" value="${state.settings.volume}" ${state.settings.sfxEnabled ? "" : "disabled"}><small>${t("Controls every card, shuffle, and transition sound.")}</small></label><label class="settings-toggle" for="settings-music"><input id="settings-music" type="checkbox" ${state.settings.music ? "checked" : ""}><span><strong>${t("Background music")}</strong><small>“Sunset” — Kai Engel · CC BY 4.0</small></span></label><button class="seal-button settings-done" data-action="close-settings">${t("Save settings")}</button></section></div>`;
+  return `<div class="settings-scrim" role="dialog" aria-modal="true" aria-labelledby="settings-title"><section class="settings-panel"><div class="settings-heading"><div><p class="eyebrow">Oracle Veil</p><h2 id="settings-title">${t("Settings")}</h2></div><button class="settings-close" data-action="close-settings" aria-label="Close settings">×</button></div><label class="settings-field" for="settings-language"><span>${t("Language")}</span><select id="settings-language"><option value="en" ${state.settings.language === "en" ? "selected" : ""}>English</option><option value="fr" ${state.settings.language === "fr" ? "selected" : ""}>Français</option><option value="ru" ${state.settings.language === "ru" ? "selected" : ""}>Русский</option><option value="zh" ${state.settings.language === "zh" ? "selected" : ""}>中文</option></select><small id="settings-language-value">${t("Selected:")} ${languageNames[state.settings.language]}</small></label><label class="settings-toggle" for="settings-sfx"><input id="settings-sfx" type="checkbox" ${state.settings.sfxEnabled ? "checked" : ""}><span><strong>${t("Sound effects")}</strong><small>${t("Card, shuffle, and transition sounds.")}</small></span></label><label class="settings-field" for="settings-volume"><span>${t("Volume")} <output id="settings-volume-value">${state.settings.volume}%</output></span><input id="settings-volume" type="range" min="0" max="100" value="${state.settings.volume}" ${state.settings.sfxEnabled ? "" : "disabled"}><small>${t("Controls every card, shuffle, and transition sound.")}</small></label><label class="settings-toggle" for="settings-music"><input id="settings-music" type="checkbox" ${state.settings.music ? "checked" : ""}><span><strong>${t("Background music")}</strong><small>“Sunset” — Kai Engel · CC BY 4.0</small></span></label><button class="seal-button settings-done" data-action="close-settings">${t("Save settings")}</button></section></div>`;
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
-  const chosen = state.category === "Career" ? state.career.selectedIds : state.selectedIds;
+  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.selectedIds;
   return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
@@ -1577,6 +1884,7 @@ function reorderDeck(dx, dy, distance) {
 }
 function bindGestures() {
   const shuffle = document.querySelector("#shuffle-surface"); if (shuffle) bindShuffle(shuffle);
+  const scatter = document.querySelector("#career-scatter-surface"); if (scatter) bindCareerScatter(scatter);
   const spread = document.querySelector("#spread-surface"); if (spread) bindSpread(spread);
 }
 function capturePointer(element, event) {
@@ -1702,6 +2010,180 @@ function bindShuffle(surface) {
   };
   surface.addEventListener("pointerup", finish);
   surface.addEventListener("pointercancel", finish);
+}
+// Push overlapping neighbours apart along an ellipse the size of a card. One relaxation
+// pass per frame is enough to keep the table readable without the cards ever jittering.
+function separateCareerScatter(box, cardBox, strength = .34) {
+  const pieces = careerScatter();
+  const gapX = Math.max(28, cardBox.width * .96);
+  const gapY = Math.max(38, cardBox.height * .74);
+  const shift = (piece, dxPx, dyPx) => {
+    piece.x = clamp(piece.x + dxPx / box.width * 100, 6, 94);
+    piece.y = clamp(piece.y + dyPx / box.height * 100, 10, 90);
+  };
+  for (let a = 0; a < pieces.length; a += 1) {
+    for (let b = a + 1; b < pieces.length; b += 1) {
+      const pa = pieces[a], pb = pieces[b];
+      const nx = (pb.x - pa.x) / 100 * box.width / gapX;
+      const ny = (pb.y - pa.y) / 100 * box.height / gapY;
+      const dist = Math.hypot(nx, ny);
+      let ux, uy;
+      if (dist < .001) { // perfectly stacked: shove them apart on a deterministic diagonal
+        ux = (a % 2 ? 1 : -1) * gapX * .3;
+        uy = (b % 2 ? 1 : -1) * gapY * .3;
+      } else if (dist < 1) {
+        const push = (1 - dist) * strength;
+        ux = nx / dist * gapX * push;
+        uy = ny / dist * gapY * push;
+      } else continue;
+      shift(pa, -ux, -uy);
+      shift(pb, ux, uy);
+    }
+  }
+}
+// Relax the whole table at once — used when the cards are laid out for choosing, so the
+// final constellation is reachable even where a sweep never passed.
+function relaxCareerScatter(passes = 8) {
+  const field = document.querySelector(".career-orbit");
+  const card = field?.querySelector(".career-ember-card");
+  if (!field || !card) return;
+  const box = field.getBoundingClientRect();
+  // offsetWidth/Height, not the bounding rect: the cards are rotated, and their rect would
+  // report the inflated axis-aligned box instead of the real card footprint.
+  const cardBox = { width: card.offsetWidth, height: card.offsetHeight };
+  if (!box.width || !cardBox.width) return;
+  for (let pass = 0; pass < passes; pass += 1) separateCareerScatter(box, cardBox, .5);
+}
+// The career table shares the sweep gesture with Love's pile, but every wave is followed
+// by a separation pass so the cards drift apart into a constellation instead of stacking up.
+function bindCareerScatter(surface) {
+  const field = surface.querySelector(".career-orbit");
+  const nodes = [...surface.querySelectorAll(".career-ember-card")];
+  if (!field || !nodes.length) return;
+  const cards = [];
+  nodes.forEach((node) => { cards[Number(node.dataset.shuffleIndex)] = node; });
+  const picking = field.classList.contains("picking");
+  let active = false, start = null, last = null, box = null, cardBox = null;
+  let touched = new Set(), swept = false;
+  const radius = () => Math.max(66, box.width * .24);
+  const paint = (index) => {
+    const piece = state.career.scatter[index];
+    const card = cards[index];
+    if (!piece || !card) return;
+    card.style.setProperty("--x", `${piece.x}%`);
+    card.style.setProperty("--y", `${piece.y}%`);
+    card.style.setProperty("--r", `${piece.r}deg`);
+    card.style.setProperty("--z", piece.z);
+  };
+  const move = (index, dxPx, dyPx, spin) => {
+    const piece = state.career.scatter[index];
+    if (!piece) return;
+    piece.x = clamp(piece.x + dxPx / box.width * 100, 6, 94);
+    piece.y = clamp(piece.y + dyPx / box.height * 100, 10, 90);
+    if (spin) piece.r = Number((piece.r + spin).toFixed(2));
+  };
+  const nudge = (index, dx, dy, falloff) => {
+    move(index, dx * falloff, dy * falloff, dx * .18 * falloff);
+    state.career.scatter[index].z = 40 + (state.career.shuffleMoves || 0) + touched.size;
+    cards[index].classList.add("held");
+    if (!touched.has(index)) setTimeout(() => sound("shuffle", clamp(.08 + falloff * .09, .06, .2)), Math.random() * 80);
+    touched.add(index);
+  };
+  const separate = () => {
+    separateCareerScatter(box, cardBox);
+    state.career.scatter.forEach((_, index) => paint(index));
+  };
+  const wave = (px, py, dx, dy) => {
+    const rad = radius();
+    cards.forEach((card) => {
+      const index = Number(card.dataset.shuffleIndex);
+      const piece = state.career.scatter[index];
+      if (!piece) return;
+      const cx = box.left + piece.x / 100 * box.width;
+      const cy = box.top + piece.y / 100 * box.height;
+      const dist = Math.hypot(px - cx, py - cy);
+      if (dist >= rad) return;
+      const falloff = (1 - dist / rad) * 1.35;
+      // A little of the push is radial (away from the finger), which is what turns the
+      // sweep into a scatter rather than a clump travelling across the table.
+      const away = dist > 4 ? { x: (cx - px) / dist, y: (cy - py) / dist } : { x: 0, y: -1 };
+      nudge(index, dx + away.x * 14, dy + away.y * 10, falloff);
+    });
+    separate();
+  };
+  let pendingMove = null, moveRaf = 0;
+  const processMove = () => {
+    moveRaf = 0;
+    if (!active || !pendingMove) return;
+    const now = pendingMove; pendingMove = null;
+    const dx = now.x - last.x;
+    const dy = now.y - last.y;
+    if (Math.hypot(dx, dy) < 1.5) return;
+    wave(now.x, now.y, dx, dy);
+    last = now;
+  };
+  surface.addEventListener("pointerdown", (event) => {
+    if (transitioning) return;
+    box = field.getBoundingClientRect();
+    cardBox = { width: nodes[0].offsetWidth, height: nodes[0].offsetHeight };
+    active = true;
+    swept = false;
+    start = { x: event.clientX, y: event.clientY };
+    last = start;
+    touched = new Set();
+    field.classList.add("shuffling");
+    capturePointer(surface, event);
+  });
+  surface.addEventListener("pointermove", (event) => {
+    if (!active) return;
+    pendingMove = { x: event.clientX, y: event.clientY };
+    if (!moveRaf) moveRaf = requestAnimationFrame(processMove);
+  });
+  const finish = (event) => {
+    if (!active) return;
+    active = false;
+    if (moveRaf) { cancelAnimationFrame(moveRaf); moveRaf = 0; }
+    pendingMove = null;
+    field.classList.remove("shuffling");
+    const px = Number.isFinite(event.clientX) ? event.clientX : last.x;
+    const py = Number.isFinite(event.clientY) ? event.clientY : last.y;
+    cards.forEach((card) => card.classList.remove("held"));
+    const count = touched.size;
+    if (!count) return; // a still tap stays a tap, so picking a card is never a shove
+    swept = true;
+    const dxTotal = px - start.x;
+    const dyTotal = py - start.y;
+    const distance = Math.max(Math.hypot(dxTotal, dyTotal), 42);
+    const passes = clamp(Math.round(count / 3), 1, 4);
+    if (!picking) {
+      // Only the shuffle phase reorders the deck; once the cards are laid out for choosing,
+      // moving one must not change which card is hiding under a given back.
+      for (let i = 0; i < passes; i += 1) reorderDeck(dxTotal >= 0 ? distance : -distance, dyTotal, distance);
+      state.career.shuffleMoves = (state.career.shuffleMoves || 0) + clamp(count, 1, 6);
+      updateCareerScatterStatus();
+    }
+    interaction(); buzz([8, 16, 10]); persist();
+  };
+  surface.addEventListener("pointerup", finish);
+  surface.addEventListener("pointercancel", finish);
+  // A sweep that ends over a card must not also count as choosing it.
+  surface.addEventListener("click", (event) => {
+    if (!swept) return;
+    swept = false;
+    event.stopPropagation();
+    event.preventDefault();
+  }, true);
+}
+function updateCareerScatterStatus() {
+  const moves = state.career.shuffleMoves || 0;
+  const ready = moves >= 3;
+  const status = document.querySelector("#career-scatter-status");
+  const guide = document.querySelector("#career-scatter-guide");
+  const button = document.querySelector('[data-action="career-scatter-done"]');
+  if (status) status.textContent = ready ? t("The cards lie apart. Lay them out when you are ready.") : `${3 - moves} ${t("more sweeps will scatter the deck.")}`;
+  if (guide) guide.textContent = `${moves} ${t("sweeps · keep scattering or lay them out")}`;
+  if (button) button.disabled = !ready;
+  document.querySelector(".career-ember-surface .physical-instruction")?.classList.add("quiet");
 }
 function updateShuffleStatus() {
   const ready = state.shuffleMoves >= 3;
@@ -1929,14 +2411,28 @@ function act(action, element) {
     setTimeout(() => { if (state.ad?.intent === "career-entry") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
     return;
   }
+  if (action === "choose-money") {
+    state.category = "Money";
+    state.question = "";
+    state.ad = { intent: "money-entry", ready: false };
+    mountAd(); interaction();
+    setTimeout(() => { if (state.ad?.intent === "money-entry") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
+    return;
+  }
   if (action === "back-category") { state.stage = "category"; render(); return; }
   if (action === "question-next") {
     if (state.question.trim().length < 4) return;
     if (state.category === "Career") {
-      state.career = { emberIds: [], compass: 88, candidateIds: [], selectedIds: [] };
+      state.career = createCareerState(state.seed);
       state.revealedIds = [];
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
       state.stage = "careerEmbers";
+    } else if (state.category === "Money") {
+      state.money = { cutDraft: 31, cut: null, seedId: null, seedCard: null, coinCounts: [1, 1, 1], selectedIds: [] };
+      state.piles = [];
+      state.revealedIds = [];
+      state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      state.stage = "moneyCurrent";
     } else {
       state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
     }
@@ -1993,7 +2489,42 @@ function act(action, element) {
   if (action === "assist-spread") { animateAssistedSpread(); return; }
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
   if (action === "to-reveal") { if (state.selectedIds.length !== 3) return; preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return; }
+  if (action === "assist-career-scatter") {
+    const pieces = careerScatter();
+    const focus = pieces[Math.floor(Math.random() * pieces.length)];
+    let moved = 0;
+    pieces.forEach((piece) => {
+      const dx = piece.x - focus.x, dy = piece.y - focus.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 34) return;
+      const f = 1 - dist / 34;
+      const ux = dist > .4 ? dx / dist : (piece.z % 2 ? 1 : -1);
+      const uy = dist > .4 ? dy / dist : (piece.z % 3 ? .7 : -.7);
+      piece.x = clamp(piece.x + ux * 26 * f, 6, 94);
+      piece.y = clamp(piece.y + uy * 22 * f, 10, 90);
+      piece.r = Number((piece.r + (ux >= 0 ? 22 : -22) * f).toFixed(2));
+      moved += 1;
+    });
+    reorderDeck(Math.random() < .5 ? -60 : 60, 20, 90);
+    state.career.shuffleMoves = (state.career.shuffleMoves || 0) + 2;
+    interaction(); buzz([7, 15, 9]);
+    for (let i = 0; i < moved; i += 1) sound("shuffle", .08 + Math.random() * .08);
+    render();
+    return;
+  }
+  if (action === "career-scatter-done") {
+    if ((state.career.shuffleMoves || 0) < 3) return;
+    relaxCareerScatter(); // every card reachable before the choosing begins
+    state.career.phase = "pick";
+    interaction(); buzz([8, 14, 8]); sound("spread", .16); render(); return;
+  }
+  if (action === "career-scatter-again") {
+    state.career.phase = "shuffle";
+    state.career.emberIds = [];
+    interaction(); sound("shuffle", .12); render(); return;
+  }
   if (action === "career-ember") {
+    if (state.career.phase !== "pick") return;
     const id = element.dataset.cardId;
     const selected = state.career.emberIds;
     if (selected.includes(id)) state.career.emberIds = selected.filter((cardId) => cardId !== id);
@@ -2028,10 +2559,57 @@ function act(action, element) {
     preloadCardArt(readingCards()); state.revealedIds = []; state.stage = "careerReveal";
     interaction(); sound("spread", .18); render(); return;
   }
+  if (action === "money-take-seed") {
+    if (!state.deck.length) return;
+    const cut = clamp(Number(state.money.cutDraft) || 31, 8, state.deck.length - 9);
+    const source = [...state.deck];
+    const seed = source[cut - 1];
+    const current = [...source.slice(cut), ...source.slice(0, cut - 1)];
+    const vessels = [[], [], []];
+    current.forEach((card, index) => vessels[index % 3].push(card));
+    state.money.cut = cut;
+    state.money.seedId = seed.id;
+    state.money.seedCard = seed;
+    state.money.coinCounts = [1, 1, 1];
+    state.money.selectedIds = [];
+    state.deck = [];
+    state.piles = vessels;
+    preloadCardArt(seed);
+    state.stage = "moneyVessels";
+    interaction(); buzz([8, 16, 10]); sound("cut", .18); render(); return;
+  }
+  if (action === "money-coin-add" || action === "money-coin-remove") {
+    const vessel = Number(element.dataset.vessel);
+    if (!Number.isInteger(vessel) || vessel < 0 || vessel >= MONEY_VESSELS.length) return;
+    const counts = [...state.money.coinCounts];
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    if (action === "money-coin-add" && total < 9) counts[vessel] += 1;
+    else if (action === "money-coin-remove" && counts[vessel] > 1) counts[vessel] -= 1;
+    else return;
+    state.money.coinCounts = counts;
+    interaction(); buzz(7); sound("take", .1); render(); return;
+  }
+  if (action === "money-seal-vessels") {
+    const counts = state.money.coinCounts;
+    if (counts.length !== 3 || counts.some((count) => count < 1) || counts.reduce((sum, count) => sum + count, 0) !== 9) return;
+    const selected = state.piles.map((pile, index) => pile[counts[index] - 1]).filter(Boolean);
+    if (selected.length !== 3) return;
+    state.money.selectedIds = selected.map((card) => card.id);
+    preloadCardArt(selected);
+    state.stage = "moneyLedger";
+    interaction(); buzz([7, 12, 7, 18]); sound("gather", .18); render(); return;
+  }
+  if (action === "money-to-reveal") {
+    if (readingCards().length !== MONEY_POSITIONS.length) return;
+    state.revealedIds = [];
+    preloadCardArt(readingCards());
+    state.stage = "moneyReveal";
+    interaction(); sound("spread", .18); render(); return;
+  }
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
     if (state.revealedIds.includes(id) || state.ad) return;
-    if (state.category === "Love" && AD_CONFIG.firstReveal && state.revealedIds.length === 0) {
+    if (state.category !== "Money" && AD_CONFIG.firstReveal && state.revealedIds.length === 0) {
       state.ad = { intent: "reveal", cardId: id, ready: false };
       element.classList.add("flip-pending");
       mountAd(); interaction();
@@ -2051,6 +2629,9 @@ function act(action, element) {
     } else if (ad.intent === "career-entry") {
       state.stage = "question";
       interaction(); render();
+    } else if (ad.intent === "money-entry") {
+      state.stage = "question";
+      interaction(); render();
     } else {
       flipRevealCard(ad.cardId);
     }
@@ -2058,7 +2639,7 @@ function act(action, element) {
   }
   if (action === "open-reading") {
     state.stage = "reading";
-    if (state.category === "Career" && !state.aiUnlocked) {
+    if (state.category === "Money" && !state.aiUnlocked) {
       state.aiUnlocked = true; state.aiLoading = true; state.aiText = null; state.aiSummary = null; state.aiError = null;
       interaction(); render(); void requestAIInterpretation();
     } else {
@@ -2074,7 +2655,7 @@ function act(action, element) {
     return;
   }
   if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
-  if (action === "share-reading") { if (navigator.share) navigator.share({ title: "The Heart Cut", text: readingShareText() }).catch(() => {}); return; }
+  if (action === "share-reading") { if (navigator.share) navigator.share({ title: "Oracle Veil", text: readingShareText() }).catch(() => {}); return; }
   if (action === "share-image") { if (readingCards().length !== readingPositions().length) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
   if (action === "share-back") { shareSheetOpen = false; state.stage = "reading"; render(); return; }
   if (action === "share-theme") { const theme = element.dataset.theme; if (theme && theme !== state.shareTheme) { state.shareTheme = theme; sound("flip", .12); render(); } return; }
@@ -2168,6 +2749,15 @@ app.addEventListener("input", (event) => {
     if (surface) surface.style.setProperty("--needle", `${state.career.compass}deg`);
     if (value) value.textContent = t(theme);
     if (compass) compass.setAttribute("aria-label", `${t("Your compass points toward")} ${t(theme)}`);
+    persist();
+    return;
+  }
+  if (event.target.id === "money-current-range") {
+    state.money.cutDraft = Number(event.target.value);
+    const surface = document.querySelector(".money-current-surface");
+    const count = document.querySelector(".money-current-count span");
+    if (surface) surface.style.setProperty("--gate", `${state.money.cutDraft / Math.max(1, state.deck.length) * 100}%`);
+    if (count) count.textContent = state.money.cutDraft;
     persist();
     return;
   }

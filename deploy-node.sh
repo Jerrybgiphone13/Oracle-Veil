@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy The Heart Cut as a Node app (cPanel "Setup Node.js App" / Passenger) on
+# Deploy Oracle Veil as a Node app (cPanel "Setup Node.js App" / Passenger) on
 # Namecheap shared hosting. Unlike deploy.sh (static -> public_html), this uploads
 # the FULL project — including server.mjs and package.json — to the Node app root,
 # so server.mjs serves both the static files and the /api/interpretation endpoint.

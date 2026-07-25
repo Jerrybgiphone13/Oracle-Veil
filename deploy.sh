@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Incremental deploy for The Heart Cut -> Namecheap cPanel (LiteSpeed).
+# Incremental deploy for Oracle Veil -> Namecheap cPanel (LiteSpeed).
 # Only changed files are uploaded. Also bumps the cache version so browsers
 # and the service worker fetch fresh files instead of stale cached ones.
 set -euo pipefail
