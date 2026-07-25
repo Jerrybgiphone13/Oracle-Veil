@@ -1,0 +1,5 @@
+Contact: https://github.com/Jerrybgiphone13/Oracle-Veil/security/advisories/new
+Expires: 2027-01-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://oracleveil.online/.well-known/security.txt
+Policy: https://oracleveil.online/security.html

@@ -26,9 +26,14 @@ const mimeTypes = {
   ".mp3": "audio/mpeg"
 };
 const SECURITY_HEADERS = {
+  "Content-Security-Policy": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self' https://upload.wikimedia.org; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self'; upgrade-insecure-requests",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
   "X-Content-Type-Options": "nosniff",
-  "Referrer-Policy": "no-referrer",
-  "X-Frame-Options": "SAMEORIGIN"
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Frame-Options": "DENY"
 };
 // Per-IP rate limit for the paid Gemini endpoint.
 const RATE_WINDOW_MS = 10 * 60 * 1000;

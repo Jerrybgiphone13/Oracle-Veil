@@ -879,3 +879,27 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
   .theme-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: .7rem; }
   .theme-thumbnail { aspect-ratio: 1 / 1; }
 }
+.site-info-links {
+  position: fixed;
+  z-index: 8;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 12px;
+  font: 600 0.66rem/1.2 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.site-info-links a {
+  color: #d8c89f;
+  text-decoration: none;
+}
+
+.site-info-links a:hover,
+.site-info-links a:focus-visible {
+  color: #fff2ce;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

@@ -1,7 +1,12 @@
 const SECURITY_HEADERS = {
-  "Referrer-Policy": "no-referrer",
+  "Content-Security-Policy": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self' https://upload.wikimedia.org; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self'; upgrade-insecure-requests",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "X-Content-Type-Options": "nosniff",
-  "X-Frame-Options": "SAMEORIGIN"
+  "X-Frame-Options": "DENY"
 };
 
 function json(status, body) {
@@ -33,6 +38,13 @@ export default {
     if (!env.ASSETS) return new Response("Static assets are unavailable.", { status: 503, headers: SECURITY_HEADERS });
     const assetUrl = new URL(request.url);
     if (assetUrl.pathname === "/") assetUrl.pathname = "/index.html";
-    return env.ASSETS.fetch(new Request(assetUrl, request));
+    const assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));
+    const headers = new Headers(assetResponse.headers);
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+    return new Response(request.method === "HEAD" ? null : assetResponse.body, {
+      status: assetResponse.status,
+      statusText: assetResponse.statusText,
+      headers
+    });
   }
 };

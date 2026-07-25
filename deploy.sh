@@ -38,7 +38,6 @@ rsync -avz \
   --exclude '.git' --exclude '.gitignore' --exclude '.DS_Store' --exclude '**/.DS_Store' \
   --exclude 'server.mjs' --exclude '.env*' --exclude 'deploy.local' --exclude 'package.json' \
   --exclude 'README.md' --exclude 'deploy.sh' --exclude 'deploy-node.sh' \
-  --exclude '.htaccess' \
   --exclude '_preview_sidedeck.html' --exclude 'dev-*.html' --exclude 'cards.pages' \
   --exclude 'key.txt' --exclude '*.zip' --exclude 'serve.py' --exclude 'scripts' \
   -e "ssh -p $SSH_PORT" \

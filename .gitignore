@@ -12,9 +12,6 @@ dev-*.html
 serve.py
 *.zip
 
-# Server-managed Apache/Passenger config — never deploy the local placeholder
-.htaccess
-
 # Dependencies
 node_modules/
 dist/
