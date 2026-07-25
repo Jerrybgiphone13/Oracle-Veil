@@ -72,7 +72,7 @@ The lower-left `⌘` seal opens the development diagnostics panel. It exposes th
 - `state.ritualCardId`, `selectedIds`, and `revealedIds` always refer to those same persistent card objects; identity and orientation are never generated on reveal.
 - `STAGES` acts as the ritual state machine. Each stage only exposes the next valid manipulation.
 - `AD_CONFIG` isolates the two mock ad checkpoints, so an advertising SDK can replace the overlay without touching tarot state.
-- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the selected card states to Gemini—one for Decision, four for Love and Money, or five for Career. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
+- `server.mjs` owns `POST /api/interpretation` and forwards only the question plus the selected card states to Gemini—one for Decision, three for Money, four for Love, or five for Career. The browser never receives or stores the key. The endpoint adds a per-IP rate limit (30 requests per 10 minutes) and a 20-second upstream timeout; static responses get correct MIME types, cache headers, and basic security headers.
 - Face-up cards use the supplied 78-card artwork in `assets/tarot/`; deck data and rendering remain separated so the set can be swapped later. Images load lazily and fall back to a styled text face if a file is missing.
 
 ## Physics and procedural assistance
