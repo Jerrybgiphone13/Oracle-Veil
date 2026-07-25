@@ -5,7 +5,7 @@ const INTERPRETATION_ENDPOINT = "/api/interpretation";
 // Kept in lockstep with the app-shell version by both deployment scripts.
 // Card art is otherwise cached for a long time, so an unversioned URL can leave
 // one previously viewed card stuck on obsolete artwork after the deck changes.
-const CARD_ART_VERSION = "30";
+const CARD_ART_VERSION = "31";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -20,16 +20,16 @@ const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "
 const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
 const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
 const MONEY_STAGES = ["moneyCurrent", "moneyVessels", "moneyLedger", "moneyReveal", "reading"];
-const DECISION_STAGES = ["decisionNaming", "decisionRoads", "decisionScales", "decisionCrossroads", "decisionReveal", "reading"];
+const DECISION_STAGES = ["decisionSplit", "decisionFork", "decisionReveal", "reading"];
 const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
 const MONEY_POSITIONS = ["The Seed", "What to Keep", "What to Grow", "What to Let Flow"];
 const MONEY_VESSELS = ["Keep", "Grow", "Flow"];
-// Ten cards pass through the reader's hands at the fork; each road must end with at
-// least two so a road card and its toll can never be the same card.
-const DECISION_ROAD_CARDS = 10;
-const DECISION_ROAD_MINIMUM = 2;
-const DECISION_NAME_PRESETS = [["Stay", "Go"], ["Yes", "No"], ["Now", "Later"]];
+const DECISION_POSITIONS = ["The First Reach", "What You Are Standing In", "The Turning", "What It Costs", "What Opens"];
+// Five times the two halves offer their top card and only one is taken. The five that
+// were passed over are set aside face-down and never turned: the ritual never says why.
+const DECISION_ROUNDS = 5;
+const DECISION_HALF_MINIMUM = DECISION_ROUNDS + 3;
 // Paths whose entrance ad already paid for the whole reading: their first card flip is
 // not interrupted by a second one, and the interpretation unlocks with the reading.
 const SEAMLESS_REVEAL_PATHS = ["Money", "Decision"];
@@ -585,42 +585,34 @@ Object.assign(I18N.zh, {
   "The treasury<br>is taking shape.": "宝库<br>正在成形。", "Watch this brief sponsored moment to open the Money ritual.": "观看这段简短赞助内容，即可开启财富仪式。"
 });
 
-// Decision is a crossroads: the two names the reader writes carve the deck, their hands
-// push ten cards down one road or the other, and the tilt of the scales counts the depth.
+// Decision says as little as it can. The reader breaks the deck where they like and takes
+// one of two offered cards five times; nothing on screen tells them what any of it means.
 Object.assign(I18N.fr, {
   "Four paths are ready tonight. Career, Money and Decision open after a brief sponsored passage.": "Quatre voies sont prêtes ce soir. Carrière, Argent et Décision s’ouvrent après un bref passage sponsorisé.",
   "Crossroads": "Croisée des chemins", "Decision ritual": "Rituel de la décision", "Enter the Decision ritual": "Entrer dans le rituel de la décision",
   "Which choice is holding you still?": "Quel choix vous retient immobile ?",
-  "Name the tension between the two options. The ritual will carry both names all the way to the cards.": "Nommez la tension entre les deux options. Le rituel portera les deux noms jusqu’aux cartes.",
+  "Name the tension that is holding you still. From here the ritual asks for nothing but your hands.": "Nommez la tension qui vous retient. Le rituel ne vous demandera rien d’autre que vos mains.",
   "Should I stay where I am or begin again?": "Dois-je rester où je suis ou tout recommencer ?",
   "Which of these two offers is truly mine?": "Laquelle de ces deux offres est vraiment la mienne ?",
   "Do I speak now or wait a little longer?": "Dois-je parler maintenant ou attendre encore un peu ?",
   "What am I refusing to admit about this choice?": "Qu’est-ce que je refuse d’admettre au sujet de ce choix ?",
-  "Name the two roads.": "Nommez les deux chemins.",
-  "Write both options as you would say them aloud. Their letters carve the deck before a single card is dealt.": "Écrivez les deux options comme vous les diriez à voix haute. Leurs lettres entaillent le jeu avant toute distribution.",
-  "First road": "Premier chemin", "Second road": "Second chemin", "Or take a familiar pair": "Ou prenez une paire familière",
-  "Both roads need a name.": "Les deux chemins ont besoin d’un nom.", "The two roads must differ.": "Les deux chemins doivent être différents.",
-  "letters": "lettres", "cards carved off the top": "cartes retirées du dessus", "Carve the names": "Entailler les noms",
-  "Send each card down a road.": "Envoyez chaque carte sur un chemin.",
-  "Ten cards pass through your hands. Push each one toward the road where it belongs.": "Dix cartes passent entre vos mains. Poussez chacune vers le chemin auquel elle appartient.",
-  "Drag the card toward a road—or use the two buttons.": "Faites glisser la carte vers un chemin — ou utilisez les deux boutons.",
-  "cards left to place": "cartes à placer", "Push left": "Pousser à gauche", "Push right": "Pousser à droite",
-  "Take the last card back": "Reprendre la dernière carte", "Let them fall for me": "Laisser tomber pour moi",
-  "Each road needs at least two cards.": "Chaque chemin a besoin d’au moins deux cartes.",
-  "This one stays in your hand.": "Celle-ci reste dans votre main.", "Stand at the crossroads": "Se tenir à la croisée",
-  "Weigh the two roads.": "Pesez les deux chemins.",
-  "Tilt the scales toward the option you lean to. The tilt reaches that exact depth down each road.": "Inclinez la balance vers l’option qui vous attire. L’inclinaison atteint cette profondeur exacte sur chaque chemin.",
-  "Your lean": "Votre penchant", "toward": "vers", "in balance": "en équilibre",
-  "The tilt chooses one card down each road, and one counted back from its end.": "L’inclinaison choisit une carte en descendant chaque chemin, et une autre comptée depuis sa fin.",
-  "Seal the weighing": "Sceller la pesée",
-  "Stand at the crossroads.": "Tenez-vous à la croisée.",
-  "Five cards are set, and each still remembers the gesture that placed it.": "Cinq cartes sont posées, et chacune se souvient encore du geste qui l’a placée.",
-  "Never left your hand": "N’a jamais quitté votre main", "counted down": "comptée en descendant", "counted up": "comptée en remontant",
-  "of": "sur", "Your names carved the deck, your hands built the roads, your lean chose the depth.": "Vos noms ont entaillé le jeu, vos mains ont bâti les chemins, votre penchant a choisi la profondeur.",
-  "Open the crossroads": "Ouvrir la croisée",
-  "Turn over the crossroads.": "Retournez la croisée.", "Five cards hold both roads and what each one asks in return.": "Cinq cartes tiennent les deux chemins et ce que chacun réclame en retour.",
-  "Five cards, one crossroads held open.": "Cinq cartes, une croisée maintenue ouverte.",
-  "Where You Stand": "Où vous vous tenez", "The road of “{name}”": "Le chemin de « {name} »", "The toll of “{name}”": "Le péage de « {name} »",
+  "Break the deck in two.": "Brisez le jeu en deux.",
+  "Drag across the deck. It comes apart where your hand leaves it.": "Glissez la main sur le jeu. Il se sépare là où votre main le quitte.",
+  "Choose where the deck comes apart": "Choisir où le jeu se sépare",
+  "Neither half is better. They are only two halves.": "Aucune moitié ne vaut mieux que l’autre. Ce sont deux moitiés.",
+  "Break it here": "Briser ici",
+  "Take one. Leave one.": "Prenez-en une. Laissez l’autre.",
+  "Each half offers its top card. Draw the one you want; the other is set aside face-down.": "Chaque moitié présente sa carte du dessus. Prenez celle que vous voulez ; l’autre est mise de côté, face cachée.",
+  "Draw the card on the": "Prendre la carte de", "left": "gauche", "right": "droite",
+  "There is no wrong card to take.": "Aucune carte n’est la mauvaise.",
+  "What you kept": "Ce que vous avez gardé", "set aside, unturned": "mises de côté, non retournées",
+  "Five stayed. Five never turned over.": "Cinq sont restées. Cinq ne seront jamais retournées.",
+  "Turn over what you kept": "Retourner ce que vous avez gardé",
+  "Turn over what you kept.": "Retournez ce que vous avez gardé.",
+  "Five cards stayed with you. The five you passed over stay as they are.": "Cinq cartes vous sont restées. Les cinq que vous avez laissées restent telles quelles.",
+  "Five cards, one crossroads held open.": "Cinq cartes, une croisée laissée ouverte.",
+  "The First Reach": "Le premier geste", "What You Are Standing In": "Ce dans quoi vous vous tenez",
+  "The Turning": "Le basculement", "What It Costs": "Ce que cela coûte", "What Opens": "Ce qui s’ouvre",
   "Unlock the Decision path": "Ouvrir la voie Décision", "A short passage before the Decision ritual": "Un bref passage avant le rituel de la décision",
   "The crossroads<br>is taking shape.": "La croisée<br>prend forme.", "Watch this brief sponsored moment to open the Decision ritual.": "Regardez ce bref moment sponsorisé pour ouvrir le rituel de la décision."
 });
@@ -628,36 +620,28 @@ Object.assign(I18N.ru, {
   "Four paths are ready tonight. Career, Money and Decision open after a brief sponsored passage.": "Сегодня готовы четыре пути. Карьера, Деньги и Решение откроются после короткой рекламной паузы.",
   "Crossroads": "Перекрёсток", "Decision ritual": "Ритуал решения", "Enter the Decision ritual": "Войти в ритуал решения",
   "Which choice is holding you still?": "Какой выбор держит вас на месте?",
-  "Name the tension between the two options. The ritual will carry both names all the way to the cards.": "Назовите напряжение между двумя вариантами. Ритуал донесёт оба имени до самых карт.",
+  "Name the tension that is holding you still. From here the ritual asks for nothing but your hands.": "Назовите напряжение, которое вас держит. Больше ритуалу не понадобится ничего, кроме ваших рук.",
   "Should I stay where I am or begin again?": "Остаться там, где я есть, или начать заново?",
   "Which of these two offers is truly mine?": "Какое из двух предложений действительно моё?",
   "Do I speak now or wait a little longer?": "Сказать сейчас или подождать ещё немного?",
   "What am I refusing to admit about this choice?": "В чём я отказываюсь себе признаться насчёт этого выбора?",
-  "Name the two roads.": "Назовите две дороги.",
-  "Write both options as you would say them aloud. Their letters carve the deck before a single card is dealt.": "Запишите оба варианта так, как произнесли бы вслух. Их буквы надрежут колоду ещё до первой карты.",
-  "First road": "Первая дорога", "Second road": "Вторая дорога", "Or take a familiar pair": "Или возьмите знакомую пару",
-  "Both roads need a name.": "Обеим дорогам нужно имя.", "The two roads must differ.": "Дороги должны отличаться.",
-  "letters": "букв", "cards carved off the top": "карт снято сверху", "Carve the names": "Вырезать имена",
-  "Send each card down a road.": "Отправьте каждую карту по своей дороге.",
-  "Ten cards pass through your hands. Push each one toward the road where it belongs.": "Десять карт пройдут через ваши руки. Толкните каждую к той дороге, где ей место.",
-  "Drag the card toward a road—or use the two buttons.": "Перетащите карту к дороге — или используйте две кнопки.",
-  "cards left to place": "карт осталось разложить", "Push left": "Толкнуть влево", "Push right": "Толкнуть вправо",
-  "Take the last card back": "Вернуть последнюю карту", "Let them fall for me": "Пусть упадут сами",
-  "Each road needs at least two cards.": "На каждой дороге нужно минимум две карты.",
-  "This one stays in your hand.": "Эта остаётся в вашей руке.", "Stand at the crossroads": "Встать на перекрёстке",
-  "Weigh the two roads.": "Взвесьте две дороги.",
-  "Tilt the scales toward the option you lean to. The tilt reaches that exact depth down each road.": "Наклоните весы к тому варианту, к которому склоняетесь. Наклон достанет именно эту глубину на каждой дороге.",
-  "Your lean": "Ваш наклон", "toward": "к", "in balance": "в равновесии",
-  "The tilt chooses one card down each road, and one counted back from its end.": "Наклон выбирает одну карту вниз по дороге и одну, отсчитанную с её конца.",
-  "Seal the weighing": "Запечатать взвешивание",
-  "Stand at the crossroads.": "Встаньте на перекрёстке.",
-  "Five cards are set, and each still remembers the gesture that placed it.": "Пять карт легли, и каждая помнит движение, которое её положило.",
-  "Never left your hand": "Не покидала вашу руку", "counted down": "отсчитана сверху", "counted up": "отсчитана снизу",
-  "of": "из", "Your names carved the deck, your hands built the roads, your lean chose the depth.": "Ваши имена надрезали колоду, ваши руки построили дороги, ваш наклон выбрал глубину.",
-  "Open the crossroads": "Открыть перекрёсток",
-  "Turn over the crossroads.": "Переверните перекрёсток.", "Five cards hold both roads and what each one asks in return.": "Пять карт держат обе дороги и то, что каждая просит взамен.",
+  "Break the deck in two.": "Разломите колоду надвое.",
+  "Drag across the deck. It comes apart where your hand leaves it.": "Проведите рукой по колоде. Она разойдётся там, где рука её оставит.",
+  "Choose where the deck comes apart": "Выберите, где колода разойдётся",
+  "Neither half is better. They are only two halves.": "Ни одна половина не лучше. Это просто две половины.",
+  "Break it here": "Разломить здесь",
+  "Take one. Leave one.": "Возьмите одну. Оставьте другую.",
+  "Each half offers its top card. Draw the one you want; the other is set aside face-down.": "Каждая половина показывает свою верхнюю карту. Возьмите ту, что хотите; другая ляжет в сторону рубашкой вверх.",
+  "Draw the card on the": "Взять карту", "left": "слева", "right": "справа",
+  "There is no wrong card to take.": "Здесь нет неправильной карты.",
+  "What you kept": "Что вы оставили себе", "set aside, unturned": "отложены, не перевёрнуты",
+  "Five stayed. Five never turned over.": "Пять остались. Пять не будут перевёрнуты никогда.",
+  "Turn over what you kept": "Перевернуть оставленное",
+  "Turn over what you kept.": "Переверните то, что оставили.",
+  "Five cards stayed with you. The five you passed over stay as they are.": "Пять карт остались с вами. Пять, которые вы не взяли, останутся как есть.",
   "Five cards, one crossroads held open.": "Пять карт — перекрёсток, оставленный открытым.",
-  "Where You Stand": "Где вы стоите", "The road of “{name}”": "Дорога «{name}»", "The toll of “{name}”": "Плата за «{name}»",
+  "The First Reach": "Первое движение", "What You Are Standing In": "То, в чём вы стоите",
+  "The Turning": "Перелом", "What It Costs": "Чего это стоит", "What Opens": "Что открывается",
   "Unlock the Decision path": "Открыть путь Решения", "A short passage before the Decision ritual": "Короткий переход перед ритуалом решения",
   "The crossroads<br>is taking shape.": "Перекрёсток<br>обретает форму.", "Watch this brief sponsored moment to open the Decision ritual.": "Посмотрите этот короткий рекламный момент, чтобы открыть ритуал решения."
 });
@@ -665,36 +649,28 @@ Object.assign(I18N.zh, {
   "Four paths are ready tonight. Career, Money and Decision open after a brief sponsored passage.": "今夜已有四条路径准备就绪。事业、财富与抉择将在一段简短赞助内容后开启。",
   "Crossroads": "岔路口", "Decision ritual": "抉择仪式", "Enter the Decision ritual": "进入抉择仪式",
   "Which choice is holding you still?": "哪一个抉择让你停在原地？",
-  "Name the tension between the two options. The ritual will carry both names all the way to the cards.": "写下两个选项之间的张力。仪式会把这两个名字一路带到牌上。",
+  "Name the tension that is holding you still. From here the ritual asks for nothing but your hands.": "写下让你停住的那份张力。除此之外，仪式只需要你的双手。",
   "Should I stay where I am or begin again?": "我该留在原地，还是重新开始？",
   "Which of these two offers is truly mine?": "这两个机会中，哪一个真正属于我？",
   "Do I speak now or wait a little longer?": "我该现在开口，还是再等一等？",
   "What am I refusing to admit about this choice?": "关于这个抉择，我拒绝承认什么？",
-  "Name the two roads.": "为两条路命名。",
-  "Write both options as you would say them aloud. Their letters carve the deck before a single card is dealt.": "像说出口那样写下两个选项。在发牌之前，它们的字母就已切入牌组。",
-  "First road": "第一条路", "Second road": "第二条路", "Or take a familiar pair": "或选择一组熟悉的搭配",
-  "Both roads need a name.": "两条路都需要名字。", "The two roads must differ.": "两条路必须不同。",
-  "letters": "个字符", "cards carved off the top": "张牌自顶端切去", "Carve the names": "刻下名字",
-  "Send each card down a road.": "把每张牌送上一条路。",
-  "Ten cards pass through your hands. Push each one toward the road where it belongs.": "十张牌将经过你的手。把每一张推向它所属的那条路。",
-  "Drag the card toward a road—or use the two buttons.": "把牌拖向一条路——或使用两侧按钮。",
-  "cards left to place": "张牌待放置", "Push left": "推向左侧", "Push right": "推向右侧",
-  "Take the last card back": "收回最后一张牌", "Let them fall for me": "替我落牌",
-  "Each road needs at least two cards.": "每条路至少需要两张牌。",
-  "This one stays in your hand.": "这一张留在你手中。", "Stand at the crossroads": "站上岔路口",
-  "Weigh the two roads.": "称量两条路。",
-  "Tilt the scales toward the option you lean to. The tilt reaches that exact depth down each road.": "把天平倾向你更偏好的一方。倾斜会抵达每条路上对应的准确深度。",
-  "Your lean": "你的倾向", "toward": "偏向", "in balance": "保持平衡",
-  "The tilt chooses one card down each road, and one counted back from its end.": "倾斜在每条路上选出一张顺数的牌，以及一张自末端倒数的牌。",
-  "Seal the weighing": "封存这次称量",
-  "Stand at the crossroads.": "站在岔路口。",
-  "Five cards are set, and each still remembers the gesture that placed it.": "五张牌已就位，每一张都记得放下它的那个动作。",
-  "Never left your hand": "从未离开你的手", "counted down": "顺数", "counted up": "倒数",
-  "of": "／", "Your names carved the deck, your hands built the roads, your lean chose the depth.": "你的名字切开牌组，你的手筑起道路，你的倾向选定深度。",
-  "Open the crossroads": "开启岔路口",
-  "Turn over the crossroads.": "翻开岔路口。", "Five cards hold both roads and what each one asks in return.": "五张牌承载两条路，以及各自索取的代价。",
+  "Break the deck in two.": "把牌组掰成两半。",
+  "Drag across the deck. It comes apart where your hand leaves it.": "在牌组上横向拖动。你的手在哪里离开，它就在哪里裂开。",
+  "Choose where the deck comes apart": "选择牌组分开的位置",
+  "Neither half is better. They are only two halves.": "两半没有优劣，它们只是两半。",
+  "Break it here": "在此掰开",
+  "Take one. Leave one.": "取一张，留一张。",
+  "Each half offers its top card. Draw the one you want; the other is set aside face-down.": "每一半都递出它最上面的牌。取走你要的那张；另一张会被覆置一旁。",
+  "Draw the card on the": "取走", "left": "左边那张", "right": "右边那张",
+  "There is no wrong card to take.": "没有哪张牌是错的。",
+  "What you kept": "你留下的牌", "set aside, unturned": "置于一旁，未曾翻开",
+  "Five stayed. Five never turned over.": "五张留下，五张永不翻开。",
+  "Turn over what you kept": "翻开你留下的牌",
+  "Turn over what you kept.": "翻开你留下的牌。",
+  "Five cards stayed with you. The five you passed over stay as they are.": "五张牌留在你身边。你放过的那五张，就保持原样。",
   "Five cards, one crossroads held open.": "五张牌，一个始终敞开的岔路口。",
-  "Where You Stand": "你所站之处", "The road of “{name}”": "「{name}」之路", "The toll of “{name}”": "「{name}」之代价",
+  "The First Reach": "最初的伸手", "What You Are Standing In": "你身处之境",
+  "The Turning": "转折", "What It Costs": "代价", "What Opens": "由此敞开",
   "Unlock the Decision path": "解锁抉择路径", "A short passage before the Decision ritual": "进入抉择仪式前的短暂通道",
   "The crossroads<br>is taking shape.": "岔路口<br>正在成形。", "Watch this brief sponsored moment to open the Decision ritual.": "观看这段简短赞助内容，即可开启抉择仪式。"
 });
@@ -758,19 +734,15 @@ function createCareerState(seed) {
     selectedIds: []
   };
 }
-// Decision keeps nothing but the reader's own gestures: two written names, the order in
-// which ten cards were pushed left or right, and how far the scales were tilted. Every
-// card in the final spread is recomputed from these three, never drawn at random.
+// Decision keeps only what the reader watched happen: where the deck broke, and which
+// of the two offered cards was taken in each round. Nothing is drawn behind their back.
 function createDecisionState() {
   return {
-    roadA: "",
-    roadB: "",
-    names: null,
-    pivot: 0,
-    placed: [],
-    standId: null,
-    lean: 50,
-    picks: null
+    splitDraft: 39,
+    split: null,
+    rounds: [],
+    keptIds: [],
+    refusedIds: []
   };
 }
 function createState() {
@@ -869,23 +841,10 @@ function ritualStages() {
   if (state.category === "Decision") return DECISION_STAGES;
   return LOVE_STAGES;
 }
-// The two roads are named by the reader, so their spread positions are built from that
-// text instead of a fixed table — the label a card lands under is itself an outcome.
-function decisionNames() {
-  const names = state.decision?.names;
-  return { a: names?.a || t("First road"), b: names?.b || t("Second road") };
-}
-function decisionLabel(kind, name) {
-  return t(kind === "toll" ? "The toll of “{name}”" : "The road of “{name}”").replace("{name}", name);
-}
-function decisionPositions() {
-  const { a, b } = decisionNames();
-  return ["Where You Stand", decisionLabel("road", a), decisionLabel("toll", a), decisionLabel("road", b), decisionLabel("toll", b)];
-}
 function readingPositions() {
   if (state.category === "Career") return CAREER_POSITIONS;
   if (state.category === "Money") return MONEY_POSITIONS;
-  if (state.category === "Decision") return decisionPositions();
+  if (state.category === "Decision") return DECISION_POSITIONS;
   return LOVE_POSITIONS;
 }
 function stageIndex() { return Math.max(0, ritualStages().indexOf(state.stage)); }
@@ -900,41 +859,32 @@ function readingCards() {
     : state.category === "Money"
       ? [state.money.seedId, ...state.money.selectedIds]
       : state.category === "Decision"
-        ? decisionCardIds()
+        ? state.decision.keptIds
         : [state.ritualCardId, ...state.selectedIds];
   return ids.map(cardById).filter(Boolean);
 }
-// Where the scales stop reaches the same depth down both roads: one card counted from the
-// head of the road, one counted back from its end. With at least two cards on a road the
-// pair can never collapse onto the same card.
-function decisionDepths(lean = state.decision.lean) {
-  const roads = [state.piles[0] || [], state.piles[1] || []];
-  return roads.map((road, index) => {
-    const length = road.length;
-    if (!length) return { depth: 0, road: null, toll: null, length: 0 };
-    const pull = index === 0 ? lean : 100 - lean;
-    const depth = clamp(1 + Math.round(pull / 100 * (length - 1)), 1, length);
-    const roadIndex = depth - 1;
-    let tollIndex = length - depth;
-    if (tollIndex === roadIndex) tollIndex = (roadIndex + 1) % length;
-    return { depth, length, tollDepth: length - tollIndex, road: road[roadIndex], toll: road[tollIndex] };
-  });
+// The pair on offer is always the top card of each half, so the card the reader takes is
+// the one they were looking at — no index, depth, or weighting stands between the two.
+function decisionOffer() {
+  return [state.piles[0]?.[0] || null, state.piles[1]?.[0] || null];
 }
-// One card leaves the hand and joins a road. Nothing is drawn or randomised here — the
-// card is simply whichever one was next, which is what makes the roads the reader's own.
-function placeDecisionCard(side) {
+// state.piles is the table itself: [left half, right half, what was kept, what was passed
+// over]. Every card stays on one of the four, so nothing is ever conjured at reveal time.
+function decisionDraw(side) {
   if (side !== "a" && side !== "b") return false;
-  if (state.decision.placed.length >= DECISION_ROAD_CARDS || decisionRoadBlocked(side) || !state.deck.length) return false;
-  const card = state.deck.shift();
-  state.piles[side === "a" ? 0 : 1].push(card);
-  state.decision.placed.push(side);
+  if (state.decision.rounds.length >= DECISION_ROUNDS) return false;
+  const [left, right] = decisionOffer();
+  if (!left || !right) return false;
+  const taken = side === "a" ? state.piles[0].shift() : state.piles[1].shift();
+  const passed = side === "a" ? state.piles[1].shift() : state.piles[0].shift();
+  state.piles[2].push(taken);
+  state.piles[3].push(passed);
+  state.decision.keptIds.push(taken.id);
+  state.decision.refusedIds.push(passed.id);
+  state.decision.rounds.push(side);
   return true;
 }
-function decisionCardIds() {
-  const picks = state.decision.picks;
-  if (!picks) return [];
-  return [state.decision.standId, picks.roadA, picks.tollA, picks.roadB, picks.tollB];
-}
+function decisionKeptCards() { return state.decision.keptIds.map(cardById).filter(Boolean); }
 function interaction() { state.performance.interactions += 1; state.performance.lastGesture = Date.now(); persist(); }
 
 function buzz(pattern = 10) {
@@ -1136,7 +1086,7 @@ const QUESTION_COPY = {
   Decision: {
     pathName: "Crossroads", nextLabel: "Enter the Decision ritual", theme: "decision",
     title: "Which choice is holding you still?",
-    lede: "Name the tension between the two options. The ritual will carry both names all the way to the cards.",
+    lede: "Name the tension that is holding you still. From here the ritual asks for nothing but your hands.",
     examples: ["Should I stay where I am or begin again?", "Which of these two offers is truly mine?", "Do I speak now or wait a little longer?", "What am I refusing to admit about this choice?"]
   },
   Love: {
@@ -1377,127 +1327,75 @@ function renderMoneyReveal() {
 
 function decisionTitle() {
   const copy = {
-    decisionNaming: ["Name the two roads.", "Write both options as you would say them aloud. Their letters carve the deck before a single card is dealt."],
-    decisionRoads: ["Send each card down a road.", "Ten cards pass through your hands. Push each one toward the road where it belongs."],
-    decisionScales: ["Weigh the two roads.", "Tilt the scales toward the option you lean to. The tilt reaches that exact depth down each road."],
-    decisionCrossroads: ["Stand at the crossroads.", "Five cards are set, and each still remembers the gesture that placed it."],
-    decisionReveal: ["Turn over the crossroads.", "Five cards hold both roads and what each one asks in return."]
+    decisionSplit: ["Break the deck in two.", "Drag across the deck. It comes apart where your hand leaves it."],
+    decisionFork: ["Take one. Leave one.", "Each half offers its top card. Draw the one you want; the other is set aside face-down."],
+    decisionReveal: ["Turn over what you kept.", "Five cards stayed with you. The five you passed over stay as they are."]
   };
   const [title, lede] = copy[state.stage] || ["Crossroads", ""];
   return `<div class="ritual-head decision-ritual-head">${progress()}<p class="eyebrow">${t("Decision ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
 function renderDecisionRitual() {
   let view = { surface: "", actions: "" };
-  if (state.stage === "decisionNaming") view = renderDecisionNaming();
-  if (state.stage === "decisionRoads") view = renderDecisionRoads();
-  if (state.stage === "decisionScales") view = renderDecisionScales();
-  if (state.stage === "decisionCrossroads") view = renderDecisionCrossroads();
+  if (state.stage === "decisionSplit") view = renderDecisionSplit();
+  if (state.stage === "decisionFork") view = renderDecisionFork();
   if (state.stage === "decisionReveal") view = renderDecisionReveal();
   return world(`<section class="scene ritual decision-ritual">${decisionTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "decision-world");
 }
-function decisionNameDraft() {
-  return { a: state.decision.roadA.trim().slice(0, 24), b: state.decision.roadB.trim().slice(0, 24) };
+function decisionSplitAt() {
+  const total = Math.max(DECISION_HALF_MINIMUM * 2, state.deck.length);
+  return clamp(Number(state.decision.splitDraft) || 39, DECISION_HALF_MINIMUM, total - DECISION_HALF_MINIMUM);
 }
-function renderDecisionNaming() {
-  const { a, b } = decisionNameDraft();
-  const letters = a.length + b.length;
-  const same = Boolean(a) && a.toLowerCase() === b.toLowerCase();
-  const ready = Boolean(a) && Boolean(b) && !same;
-  const note = !a || !b ? "Both roads need a name." : same ? "The two roads must differ." : "";
-  const stone = (side, value, label) => `<label class="decision-stone ${value ? "carved" : ""}"><span>${t(label)}</span><input class="decision-name-input" id="decision-name-${side}" type="text" maxlength="24" autocomplete="off" spellcheck="false" value="${escapeHTML(value)}" placeholder="${t(label)}" aria-label="${t(label)}"><i class="decision-stone-count" aria-hidden="true">${value.length}</i></label>`;
-  const presets = DECISION_NAME_PRESETS.map(([first, second]) => `<button class="decision-preset" data-action="decision-preset" data-a="${escapeHTML(t(first))}" data-b="${escapeHTML(t(second))}">${t(first)} / ${t(second)}</button>`).join("");
+// Each half is drawn as a stack of card edges: three cards to a visible edge, so a thick
+// half simply looks thick. Nothing states what the thickness means, because it means nothing.
+function decisionEdges(count) {
+  return clamp(Math.round(count / 3), 1, 26);
+}
+function decisionEdgeMarkup(count) {
+  return Array.from({ length: decisionEdges(count) }, () => "<i></i>").join("");
+}
+function decisionHalfMarkup(count, side) {
+  return `<div class="decision-half ${side}"><div class="decision-half-stack"><span class="decision-half-edges">${decisionEdgeMarkup(count)}</span><span class="decision-half-face card back"></span></div><span class="decision-half-count">${count} ${t("cards")}</span></div>`;
+}
+function renderDecisionSplit() {
+  const total = state.deck.length;
+  const at = decisionSplitAt();
   return {
-    surface: `<div class="table-surface decision-naming-surface"><div class="decision-signpost" aria-hidden="true"><i></i><b>⚭</b></div><div class="decision-stones">${stone("a", a, "First road")}${stone("b", b, "Second road")}</div><div class="decision-presets"><span>${t("Or take a familiar pair")}</span><div>${presets}</div></div><span class="piles-guide" id="decision-carve-guide">${letters} ${t("letters")} · ${letters % 78} ${t("cards carved off the top")}</span></div>`,
-    actions: `<p class="status-note">${note ? t(note) : `${letters} ${t("letters")} · ${letters % 78} ${t("cards carved off the top")}`}</p><button class="seal-button decision-seal" data-action="decision-carve" ${ready ? "" : "disabled"}>${t("Carve the names")}</button>`
+    surface: `<div class="table-surface decision-split-surface" id="decision-split-surface"><div class="decision-split" id="decision-split-field">${decisionHalfMarkup(at, "left")}<span class="decision-split-seam" aria-hidden="true"></span>${decisionHalfMarkup(total - at, "right")}</div><p class="physical-instruction ${state.decision.splitDraft !== 39 ? "quiet" : ""}">${t("Drag across the deck. It comes apart where your hand leaves it.")}</p><input class="decision-split-range" id="decision-split-range" type="range" min="${DECISION_HALF_MINIMUM}" max="${total - DECISION_HALF_MINIMUM}" value="${at}" aria-label="${t("Choose where the deck comes apart")}"></div>`,
+    actions: `<p class="status-note">${t("Neither half is better. They are only two halves.")}</p><button class="seal-button decision-seal" data-action="decision-split">${t("Break it here")}</button>`
   };
 }
-// A side is closed once sending another card there would leave the other road unable to
-// reach its two-card minimum: the reader can always finish, never paint into a corner.
-function decisionRoadBlocked(side) {
-  const placed = state.decision.placed;
-  const remaining = DECISION_ROAD_CARDS - placed.length;
-  const other = placed.filter((entry) => entry !== side).length;
-  return remaining - 1 < DECISION_ROAD_MINIMUM - other;
-}
-function decisionRoadPile(index, name) {
-  const cards = state.piles[index] || [];
-  // Only the card that just landed animates; the rest of the road is already at rest.
-  const stack = cards.map((card, depth) => `<i class="decision-road-card card back ${depth === cards.length - 1 ? "fresh" : ""}" style="--depth:${depth}" data-card-id="${card.id}"></i>`).join("");
-  return `<div class="decision-road ${index === 0 ? "left" : "right"} ${decisionRoadBlocked(index === 0 ? "a" : "b") ? "closed" : ""}" data-road="${index === 0 ? "a" : "b"}"><span class="decision-road-name">${escapeHTML(name)}</span><div class="decision-road-stack">${stack || `<i class="decision-road-empty" aria-hidden="true"></i>`}</div><span class="decision-road-count">${cards.length}</span></div>`;
-}
-function renderDecisionRoads() {
-  const { a, b } = decisionNames();
-  const placed = state.decision.placed;
-  const remaining = DECISION_ROAD_CARDS - placed.length;
-  const active = remaining > 0 ? state.deck[0] : null;
-  const upcoming = remaining > 1 ? Math.min(3, remaining - 1) : 0;
-  const queue = Array.from({ length: upcoming }, (_, index) => `<i class="decision-queue-card card back" style="--queue:${index}"></i>`).join("");
-  const card = active
-    ? `<button class="decision-active-card card back" id="decision-active-card" type="button" tabindex="-1" data-card-id="${active.id}" aria-label="${t("Drag the card toward a road—or use the two buttons.")}"></button>`
-    : `<span class="decision-stand-card card back" aria-hidden="true"></span>`;
+function renderDecisionFork() {
+  const round = state.decision.rounds.length;
+  const done = round >= DECISION_ROUNDS;
+  const [left, right] = decisionOffer();
+  const offer = (card, side) => card && !done
+    ? `<button class="decision-offer card back ${side}" data-action="decision-draw" data-side="${side}" aria-label="${t("Draw the card on the")} ${t(side === "a" ? "left" : "right")}"></button>`
+    : `<span class="decision-offer spent ${side}" aria-hidden="true"></span>`;
+  const half = (index, side) => `<div class="decision-source ${side}"><div class="decision-source-edge" aria-hidden="true">${Array.from({ length: Math.min(9, Math.ceil((state.piles[index]?.length || 0) / 6)) }, (_, i) => `<i style="--e:${i}"></i>`).join("")}</div>${offer(index === 0 ? left : right, side)}</div>`;
+  const kept = Array.from({ length: DECISION_ROUNDS }, (_, index) => index < round
+    ? `<i class="decision-kept-card card back ${index === round - 1 ? "fresh" : ""}"></i>`
+    : `<i class="decision-kept-slot"></i>`).join("");
+  const passed = state.piles[3] || [];
+  const heap = passed.map((card, index) => `<i class="decision-passed-card card back" style="--p:${index}"></i>`).join("");
   return {
-    surface: `<div class="table-surface decision-roads-surface" id="decision-fork-surface"><div class="decision-fork">${decisionRoadPile(0, a)}<div class="decision-hand">${queue}${card}<span class="decision-hand-note">${active ? "" : t("This one stays in your hand.")}</span></div>${decisionRoadPile(1, b)}</div>${active ? `<p class="physical-instruction ${placed.length ? "quiet" : ""}">${t("Drag the card toward a road—or use the two buttons.")}</p>` : ""}<span class="piles-guide" id="decision-fork-guide">${remaining} ${t("cards left to place")}</span></div>`,
-    actions: remaining > 0
-      ? `<div class="decision-push-row"><button class="decision-push left" data-action="decision-place" data-road="a" ${decisionRoadBlocked("a") ? "disabled" : ""} aria-label="${t("Push left")}: ${escapeHTML(a)}">◀ ${escapeHTML(a)}</button><button class="decision-push right" data-action="decision-place" data-road="b" ${decisionRoadBlocked("b") ? "disabled" : ""} aria-label="${t("Push right")}: ${escapeHTML(b)}">${escapeHTML(b)} ▶</button></div><p class="status-note">${t("Each road needs at least two cards.")}</p><button class="text-button" data-action="decision-assist">${t("Let them fall for me")}</button>${placed.length ? `<button class="text-button" data-action="decision-undo">${t("Take the last card back")}</button>` : ""}`
-      : `<p class="status-note">${t("This one stays in your hand.")}</p><button class="text-button" data-action="decision-undo">${t("Take the last card back")}</button><button class="seal-button decision-seal" data-action="decision-stand">${t("Stand at the crossroads")}</button>`
+    surface: `<div class="table-surface decision-fork-surface"><div class="decision-fork">${half(0, "a")}<span class="decision-fork-seam" aria-hidden="true">⚭</span>${half(1, "b")}</div><div class="decision-kept" aria-label="${t("What you kept")}">${kept}</div><div class="decision-passed ${passed.length ? "has-cards" : ""}"><div class="decision-passed-heap">${heap}</div><span>${t("set aside, unturned")}</span></div><span class="piles-guide">${round} ${t("of")} ${DECISION_ROUNDS}</span></div>`,
+    actions: done
+      ? `<p class="status-note">${t("Five stayed. Five never turned over.")}</p><button class="seal-button decision-seal" data-action="decision-to-reveal">${t("Turn over what you kept")}</button>`
+      : `<p class="status-note">${t("There is no wrong card to take.")}</p>`
   };
 }
-function decisionLeanReading(lean = state.decision.lean) {
-  const { a, b } = decisionNames();
-  if (lean === 50) return t("in balance");
-  const toward = lean > 50 ? a : b;
-  const strength = Math.round(Math.abs(lean - 50) * 2);
-  return `${strength}% ${t("toward")} ${toward}`;
-}
-function renderDecisionScales() {
-  const { a, b } = decisionNames();
-  const lean = state.decision.lean;
-  const depths = decisionDepths(lean);
-  const pan = (index, name) => {
-    const { depth, tollDepth, length } = depths[index];
-    const cards = (state.piles[index] || []).map((card, position) => {
-      const role = position === depth - 1 ? "is-road" : position === length - tollDepth ? "is-toll" : "";
-      return `<i class="decision-pan-card ${role}"></i>`;
-    }).join("");
-    return `<div class="decision-pan ${index === 0 ? "left" : "right"}"><span class="decision-pan-name">${escapeHTML(name)}</span><div class="decision-pan-stack">${cards}</div><span class="decision-pan-depth">${depth} ${t("of")} ${length}</span></div>`;
-  };
-  return {
-    surface: `<div class="table-surface decision-scales-surface" style="--lean:${lean}"><div class="decision-scales" role="img" aria-label="${t("Your lean")}: ${decisionLeanReading(lean)}"><div class="decision-beam">${pan(0, a)}${pan(1, b)}</div><span class="decision-fulcrum">⚭</span></div><label class="decision-lean-label" for="decision-lean-range">${t("Your lean")} <output id="decision-lean-value">${decisionLeanReading(lean)}</output></label><input class="decision-lean-range" id="decision-lean-range" type="range" min="0" max="100" value="${lean}" aria-label="${t("Tilt the scales toward the option you lean to. The tilt reaches that exact depth down each road.")}"></div>`,
-    actions: `<p class="status-note">${t("The tilt chooses one card down each road, and one counted back from its end.")}</p><button class="seal-button decision-seal" data-action="decision-seal-scales">${t("Seal the weighing")}</button>`
-  };
-}
-function decisionProvenance() {
-  const picks = state.decision.picks;
-  const { a, b } = decisionNames();
-  if (!picks) return [];
-  return [
-    t("Never left your hand"),
-    `${a} · ${picks.depthA} ${t("of")} ${picks.lengthA} ${t("counted down")}`,
-    `${a} · ${picks.tollDepthA} ${t("of")} ${picks.lengthA} ${t("counted up")}`,
-    `${b} · ${picks.depthB} ${t("of")} ${picks.lengthB} ${t("counted down")}`,
-    `${b} · ${picks.tollDepthB} ${t("of")} ${picks.lengthB} ${t("counted up")}`
-  ];
-}
-function renderDecisionCrossroads() {
-  const positions = decisionPositions();
-  const sources = decisionProvenance();
-  const entries = readingCards().map((card, index) => `<article class="decision-milestone ${index === 0 ? "stand" : ""}" style="--r:${((index - 2) * 1.15).toFixed(2)}deg"><span class="decision-milestone-number">0${index + 1}</span><span class="decision-milestone-card card back" aria-hidden="true"></span><h3>${escapeHTML(positions[index])}</h3><p>${escapeHTML(sources[index] || "")}</p></article>`).join("");
-  const { a, b } = decisionNames();
-  const counts = [state.piles[0]?.length || 0, state.piles[1]?.length || 0];
-  return {
-    surface: `<div class="table-surface decision-crossroads-surface"><div class="decision-crossroads" aria-label="${t("Stand at the crossroads.")}">${entries}</div><span class="piles-guide">${escapeHTML(a)} ${counts[0]} · ${escapeHTML(b)} ${counts[1]} · ${decisionLeanReading()}</span></div>`,
-    actions: `<p class="status-note">${t("Your names carved the deck, your hands built the roads, your lean chose the depth.")}</p><button class="seal-button decision-seal" data-action="decision-to-reveal">${t("Open the crossroads")}</button>`
-  };
-}
+
 function renderDecisionReveal() {
   const cards = readingCards();
-  const positions = decisionPositions();
   preloadCardArt(cards);
+  // The five that were passed over stay on the table beside the reading, face-down, for
+  // as long as the spread is open. They are never turned and never explained.
+  const passed = (state.piles[3] || []).map((card, index) => `<i class="decision-passed-card card back" style="--p:${index}"></i>`).join("");
   return {
     surface: `<div class="reveal-layout decision-reveal-layout">${cards.map((card, index) => {
       const revealed = state.revealedIds.includes(card.id);
-      return `<div class="reveal-slot ${index === 0 ? "decision-stand-slot" : ""}"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${escapeHTML(positions[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${escapeHTML(positions[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
-    }).join("")}</div>`,
+      return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(DECISION_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(DECISION_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    }).join("")}</div><div class="decision-passed beside"><div class="decision-passed-heap">${passed}</div><span>${t("set aside, unturned")}</span></div>`,
     actions: revealActions()
   };
 }
@@ -1615,16 +1513,17 @@ function cardKeywords(card) {
   const words = suitWords[card.suit] || suitWords["Major Arcana"];
   return card.reversed ? ["turned inward", ...words.slice(0, 2)] : words;
 }
-function positionMeaning(position, card, index = 0) {
+function positionMeaning(position, card) {
   const upright = card.reversed ? "turned inward or delayed" : "available to meet directly";
-  // Decision positions carry the reader's own wording, so they are matched by slot rather
-  // than by label: 0 is the card never dealt, then each road followed by its toll.
   if (state.category === "Decision") {
-    const { a, b } = decisionNames();
-    const road = index <= 2 ? a : b;
-    if (index === 0) return `${card.name} shows the ground you are standing on while both roads are still open: ${upright}. It is the one card that never left your hand.`;
-    if (index % 2 === 1) return `On the road of “${road}”, ${card.name} describes the texture of that choice as you would actually live it — ${upright}, and closer to a mood than a guarantee.`;
-    return `${card.name} is the toll of “${road}”: what that road quietly asks you to spend, postpone, or leave behind. Weigh it against the road itself before you decide.`;
+    const decisionSnippets = {
+      "The First Reach": `${card.name} is what your hand went to before you had a reason for it: ${upright}. Instinct is not proof, but it is information you already had.`,
+      "What You Are Standing In": `${card.name} describes the conditions the choice is actually being made in, rather than the ones you would prefer to be choosing from.`,
+      "The Turning": `${card.name} marks the place where the decision stops being abstract. Notice what changes here that cannot easily change back.`,
+      "What It Costs": `${card.name} names the price rather than the prize. Every direction has one; the useful question is which cost you could carry without resentment.`,
+      "What Opens": `${card.name} points to what becomes possible once the question is settled — not a promised result, but the room that gets made.`
+    };
+    return decisionSnippets[position];
   }
   if (state.category === "Career") {
     const careerSnippets = {
@@ -1700,24 +1599,29 @@ At ${counts[0]} coins deep, ${keep.name} marks What to Keep. Protect the boundar
 ${flow.name}, selected ${counts[2]} coins into the final vessel, marks What to Let Flow. This may be a thoughtful expense, a fair exchange, or something to release because holding it has become costly. Choose one small next action you can verify in real life: review one number, clarify one term, automate one safeguard, or make one values-aligned allocation. Tarot can frame the question; your records and circumstances should decide the money.`;
 }
 function decisionPersonalInterpretation(cards) {
-  const [stand, roadA, tollA, roadB, tollB] = cards;
-  const { a, b } = decisionNames();
-  const picks = state.decision.picks || {};
-  const counts = [state.piles[0]?.length || 0, state.piles[1]?.length || 0];
+  const [first, ground, turning, cost, opens] = cards;
+  const rounds = state.decision.rounds;
+  const leftTaken = rounds.filter((side) => side === "a").length;
+  const rightTaken = rounds.length - leftTaken;
+  const split = state.decision.split ?? 39;
+  const total = split + (state.piles[1]?.length || 0) + rounds.length;
+  const evenness = Math.abs(split / Math.max(1, total) - .5);
+  const breakNote = evenness < .08
+    ? "You broke the deck close to the middle"
+    : split / Math.max(1, total) < .5 ? "You broke the deck early, leaving most of it on the far side" : "You broke the deck late, keeping most of it on the near side";
+  const reachNote = leftTaken === rightTaken
+    ? "and then you took evenly from both halves"
+    : `and then you reached ${Math.max(leftTaken, rightTaken)} times out of five to the same half`;
   const question = state.question.trim() || "this decision";
-  const lean = state.decision.lean;
-  const leaning = lean === 50
-    ? "you left the scales level, which is itself an answer worth sitting with"
-    : `you tilted the scales ${Math.round(Math.abs(lean - 50) * 2)}% toward “${lean > 50 ? a : b}” before a single card was turned`;
-  return `Your question — “${question}” — is held open here rather than settled. You sent ${counts[0]} card${counts[0] === 1 ? "" : "s"} down “${a}” and ${counts[1]} down “${b}”, and ${leaning}. The cards did not choose for you; they describe what each road is made of.
+  return `Your question — “${question}” — is not answered here, and the cards were never asked to answer it. ${breakNote}, ${reachNote}. Five cards stayed with you and five were set aside without ever being turned. That is the shape of any decision: you find out what you chose, and never what you didn't.
 
-${stand.name} is Where You Stand — the card that stayed in your hand while everything else was sorted. It names the ground you are deciding from: the mood, pressure, or story you bring to the fork before either road exists.
+${first.name} is The First Reach — the card you took before you had built a reason for taking it. Treat it as the preference that was already in the room, the one that arrives ahead of the arguments. It does not have to be obeyed, but it should be admitted.
 
-Down “${a}”, ${roadA.name} appeared ${picks.depthA} card${picks.depthA === 1 ? "" : "s"} in. Read it as the daily texture of that choice, not its verdict. Its toll, ${tollA.name}, is what that road quietly asks in return — the thing you would have to spend, postpone, or grieve to walk it.
+${ground.name} shows What You Are Standing In. Decisions are usually made in worse conditions than we would like: tired, rushed, or with incomplete information. This card describes those actual conditions rather than the ideal ones, and part of choosing well is choosing for the person you currently are.
 
-Down “${b}”, ${roadB.name} sits at the same depth, with ${tollB.name} as its toll. Compare the two tolls before you compare the two roads: most decisions are made bearable or unbearable by their cost, not their promise.
+${turning.name} marks The Turning — the point where this stops being something you are thinking about and becomes something you have done. ${cost.name} sits next to it as What It Costs. Read those two together and be specific: what exactly would you be spending, and would you still consider it fair a year from now?
 
-A decision does not need to be made today to be worked on. Name, out loud or on paper, which toll you could genuinely carry for a year. If one road's toll makes you flinch and the other's only makes you tired, you already have information. Tarot can lay the fork out clearly; only you can walk it.`;
+${opens.name} is What Opens. Not a reward and not a forecast — the room that gets made once the question stops taking up space. If you want one concrete step, write down the cost you just read and ask whether you could carry it without resentment. A cost you can name is a cost you can decide about; the five face-down cards will stay face-down either way.`;
 }
 // First sentence of a longer interpretation, for a one-line share/summary line.
 function firstSentence(text) {
@@ -1737,9 +1641,8 @@ function personalSummary(cards) {
     return `Keep ${keep.name} steady, grow through ${grow.name}, and let ${flow.name} restore movement.`;
   }
   if (state.category === "Decision") {
-    const [, roadA, tollA, roadB] = cards;
-    const { a, b } = decisionNames();
-    return `“${a}” looks like ${roadA.name} and costs ${tollA.name}; “${b}” looks like ${roadB.name}. Weigh the tolls, not the promises.`;
+    const [first, , , cost, opens] = cards;
+    return `${first.name} is what you reached for first; ${cost.name} is what it costs, and ${opens.name} is the room it makes.`;
   }
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
@@ -2151,7 +2054,7 @@ function renderReading() {
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
     : `<p class="ai-summary">${escapeHTML(summary)}</p><p class="ai-copy">${escapeHTML(state.aiText || personalInterpretation(cards))}</p>${state.aiError ? `<p class="disclaimer">${escapeHTML(state.aiError)} ${t("The prototype reading remains available below as a fallback.")}</p>` : ""}`;
-  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : ""}"><div class="parchment ${money ? "money-parchment" : decision ? "decision-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${escapeHTML(t(positions[index]))} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${escapeHTML(positionMeaning(positions[index], card, index))}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : decision ? "decision-world" : "");
+  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : ""}"><div class="parchment ${money ? "money-parchment" : decision ? "decision-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p><div class="reading-card-row">${cards.map((card) => `<div class="reading-card">${cardFace(card)}</div>`).join("")}</div><div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div><div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t("Generate my personal interpretation")}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : decision ? "decision-world" : "");
 }
 function renderAd() {
   if (!state.ad) return "";
@@ -2179,7 +2082,7 @@ function renderSettings() {
 }
 function debugPanel() {
   if (!state.debug) return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Open ritual diagnostics">⌘</button>`;
-  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.category === "Decision" ? decisionCardIds().filter(Boolean) : state.selectedIds;
+  const chosen = state.category === "Career" ? state.career.selectedIds : state.category === "Money" ? [state.money.seedId, ...state.money.selectedIds].filter(Boolean) : state.category === "Decision" ? state.decision.keptIds : state.selectedIds;
   return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
@@ -2250,7 +2153,7 @@ function reorderDeck(dx, dy, distance) {
 function bindGestures() {
   const shuffle = document.querySelector("#shuffle-surface"); if (shuffle) bindShuffle(shuffle);
   const scatter = document.querySelector("#career-scatter-surface"); if (scatter) bindCareerScatter(scatter);
-  const fork = document.querySelector("#decision-fork-surface"); if (fork) bindDecisionFork(fork);
+  const split = document.querySelector("#decision-split-surface"); if (split) bindDecisionSplit(split);
   const spread = document.querySelector("#spread-surface"); if (spread) bindSpread(spread);
 }
 function capturePointer(element, event) {
@@ -2442,57 +2345,49 @@ function nearestCareerCard(px, py, cards, box, cardBox) {
 }
 // The career table shares the sweep gesture with Love's pile, but every wave is followed
 // by a separation pass so the cards drift apart into a constellation instead of stacking up.
-// The fork is the only place in the app where a single card is held rather than a pile:
-// it follows the finger, leans toward whichever road it is closest to, and commits when
-// released past the halfway mark. Released short of it, it falls back into the hand.
-const DECISION_COMMIT_PX = 58;
-function bindDecisionFork(surface) {
-  const card = surface.querySelector("#decision-active-card");
-  if (!card) return;
-  const roads = [...surface.querySelectorAll(".decision-road")];
-  let active = false, startX = 0, startY = 0, dx = 0, dy = 0, moveRaf = 0;
-  const sideFor = (offset) => (offset < 0 ? "a" : "b");
-  const paint = () => {
-    moveRaf = 0;
-    card.style.transform = `translate(${dx}px, ${dy * .34}px) rotate(${clamp(dx / 11, -16, 16)}deg)`;
-    const reach = Math.abs(dx) > DECISION_COMMIT_PX ? sideFor(dx) : null;
-    roads.forEach((road) => road.classList.toggle("aimed", Boolean(reach) && road.dataset.road === reach && !road.classList.contains("closed")));
+// Breaking the deck is a drag across the table, not a number entry: the point under the
+// finger is where the two halves part, and the stacks thicken and thin as it moves.
+function bindDecisionSplit(surface) {
+  const field = surface.querySelector("#decision-split-field");
+  if (!field) return;
+  let active = false, box = null, pending = null, raf = 0;
+  const total = () => Math.max(1, state.deck.length);
+  const apply = () => {
+    raf = 0;
+    if (!active || pending === null) return;
+    const ratio = clamp((pending - box.left) / Math.max(1, box.width), 0, 1);
+    const next = clamp(Math.round(ratio * total()), DECISION_HALF_MINIMUM, total() - DECISION_HALF_MINIMUM);
+    pending = null;
+    if (next === state.decision.splitDraft) return;
+    state.decision.splitDraft = next;
+    updateDecisionSplit();
+    // One soft riffle per handful moved, so a long drag sounds like cards passing.
+    if (next % 4 === 0) sound("shuffle", .07);
   };
-  const release = () => {
-    roads.forEach((road) => road.classList.remove("aimed"));
-    card.classList.remove("held");
-    card.style.transform = "";
-  };
-  card.addEventListener("pointerdown", (event) => {
-    if (transitioning) return;
+  surface.addEventListener("pointerdown", (event) => {
+    if (transitioning || event.target.closest(".decision-split-range")) return;
+    box = field.getBoundingClientRect();
     active = true;
-    startX = event.clientX; startY = event.clientY;
-    dx = 0; dy = 0;
-    card.classList.add("held");
-    capturePointer(card, event);
+    field.classList.add("parting");
+    pending = event.clientX;
+    apply();
+    capturePointer(surface, event);
   });
-  card.addEventListener("pointermove", (event) => {
+  surface.addEventListener("pointermove", (event) => {
     if (!active) return;
-    dx = event.clientX - startX;
-    dy = event.clientY - startY;
-    if (!moveRaf) moveRaf = requestAnimationFrame(paint); // one transform per frame, as with the sweeps
+    pending = event.clientX;
+    if (!raf) raf = requestAnimationFrame(apply);
   });
-  const finish = (event) => {
+  const finish = () => {
     if (!active) return;
     active = false;
-    if (moveRaf) { cancelAnimationFrame(moveRaf); moveRaf = 0; }
-    const offset = Number.isFinite(event.clientX) ? event.clientX - startX : dx;
-    const side = sideFor(offset);
-    if (Math.abs(offset) > DECISION_COMMIT_PX && placeDecisionCard(side)) {
-      card.classList.add(side === "a" ? "sent-left" : "sent-right");
-      interaction(); buzz(10); sound("take", .14);
-      setTimeout(render, 150); // let the card finish leaving the hand before the roads redraw
-      return;
-    }
-    release();
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    pending = null;
+    field.classList.remove("parting");
+    interaction(); buzz(8);
   };
-  card.addEventListener("pointerup", finish);
-  card.addEventListener("pointercancel", () => { active = false; release(); });
+  surface.addEventListener("pointerup", finish);
+  surface.addEventListener("pointercancel", finish);
 }
 function bindCareerScatter(surface) {
   const field = surface.querySelector(".career-orbit");
@@ -2642,47 +2537,20 @@ function updateShuffleStatus() {
   if (guide) guide.textContent = `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}`;
   if (button) button.disabled = !ready;
 }
-// Both Decision dials repaint in place rather than through render(): one holds a text
-// field that must keep focus while typing, the other slides at pointer speed.
-function updateDecisionNaming() {
-  const { a, b } = decisionNameDraft();
-  const letters = a.length + b.length;
-  const same = Boolean(a) && a.toLowerCase() === b.toLowerCase();
-  const ready = Boolean(a) && Boolean(b) && !same;
-  const carved = `${letters} ${t("letters")} · ${letters % 78} ${t("cards carved off the top")}`;
-  [["decision-name-a", a], ["decision-name-b", b]].forEach(([id, value]) => {
-    const stone = document.querySelector(`#${id}`)?.closest(".decision-stone");
-    if (!stone) return;
-    stone.classList.toggle("carved", Boolean(value));
-    const count = stone.querySelector(".decision-stone-count");
-    if (count) count.textContent = value.length;
+// The split repaints in place while the finger is down: the two stacks gain and lose edges
+// and their card counts follow. Neither carries any reading of what the split means.
+function updateDecisionSplit() {
+  const at = decisionSplitAt();
+  const total = Math.max(1, state.deck.length);
+  const edges = document.querySelectorAll(".decision-half-edges");
+  const counts = document.querySelectorAll(".decision-half-count");
+  [at, total - at].forEach((count, side) => {
+    if (edges[side] && edges[side].childElementCount !== decisionEdges(count)) edges[side].innerHTML = decisionEdgeMarkup(count);
+    if (counts[side]) counts[side].textContent = `${count} ${t("cards")}`;
   });
-  const guide = document.querySelector("#decision-carve-guide");
-  if (guide) guide.textContent = carved;
-  const status = document.querySelector(".decision-ritual .status-note");
-  if (status) status.textContent = !a || !b ? t("Both roads need a name.") : same ? t("The two roads must differ.") : carved;
-  const button = document.querySelector('[data-action="decision-carve"]');
-  if (button) button.disabled = !ready;
-}
-function updateDecisionScales() {
-  const lean = state.decision.lean;
-  const depths = decisionDepths(lean);
-  const surface = document.querySelector(".decision-scales-surface");
-  if (surface) surface.style.setProperty("--lean", lean);
-  const value = document.querySelector("#decision-lean-value");
-  if (value) value.textContent = decisionLeanReading(lean);
-  const scales = document.querySelector(".decision-scales");
-  if (scales) scales.setAttribute("aria-label", `${t("Your lean")}: ${decisionLeanReading(lean)}`);
-  document.querySelectorAll(".decision-pan").forEach((pan, index) => {
-    const { depth, tollDepth, length } = depths[index] || {};
-    if (!length) return;
-    pan.querySelectorAll(".decision-pan-card").forEach((card, position) => {
-      card.classList.toggle("is-road", position === depth - 1);
-      card.classList.toggle("is-toll", position === length - tollDepth);
-    });
-    const readout = pan.querySelector(".decision-pan-depth");
-    if (readout) readout.textContent = `${depth} ${t("of")} ${length}`;
-  });
+  const range = document.querySelector("#decision-split-range");
+  if (range && Number(range.value) !== at) range.value = at;
+  document.querySelector(".decision-split-surface .physical-instruction")?.classList.add("quiet");
 }
 function animateDeckCut(pieces, done) {
   const deck = document.querySelector(".side-deck");
@@ -2925,7 +2793,7 @@ function act(action, element) {
       state.piles = [];
       state.revealedIds = [];
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
-      state.stage = "decisionNaming";
+      state.stage = "decisionSplit";
     } else if (state.category === "Career") {
       state.career = createCareerState(state.seed);
       state.revealedIds = [];
@@ -3112,75 +2980,33 @@ function act(action, element) {
     state.stage = "moneyReveal";
     interaction(); sound("spread", .18); render(); return;
   }
-  if (action === "decision-preset") {
-    state.decision.roadA = element.dataset.a || "";
-    state.decision.roadB = element.dataset.b || "";
-    interaction(); buzz(8); sound("take", .12); render(); return;
+  if (action === "decision-split") {
+    if (!state.deck.length) return;
+    const at = decisionSplitAt();
+    // The break is exactly where the reader left it: the deck becomes two real halves and
+    // two empty spaces on the table for what gets kept and what gets passed over.
+    state.decision.split = at;
+    state.piles = [state.deck.slice(0, at), state.deck.slice(at), [], []];
+    state.deck = [];
+    state.decision.rounds = [];
+    state.decision.keptIds = [];
+    state.decision.refusedIds = [];
+    state.stage = "decisionFork";
+    interaction(); buzz([9, 20, 9]); sound("cut", .2); render(); return;
   }
-  if (action === "decision-carve") {
-    const { a, b } = decisionNameDraft();
-    if (!a || !b || a.toLowerCase() === b.toLowerCase()) return;
-    // The letters of the two names are the first physical act of the ritual: they lift
-    // that many cards off the top of the deck and set them behind the rest.
-    const pivot = (a.length + b.length) % Math.max(1, state.deck.length);
-    state.deck = [...state.deck.slice(pivot), ...state.deck.slice(0, pivot)];
-    state.decision.names = { a, b };
-    state.decision.pivot = pivot;
-    state.decision.placed = [];
-    state.decision.standId = null;
-    state.decision.picks = null;
-    state.piles = [[], []];
-    state.stage = "decisionRoads";
-    interaction(); buzz([8, 16, 10]); sound("cut", .18); render(); return;
-  }
-  if (action === "decision-place") {
-    if (!placeDecisionCard(element.dataset.road)) return;
-    interaction(); buzz(10); sound("take", .14); render(); return;
-  }
-  if (action === "decision-undo") {
-    const side = state.decision.placed.pop();
-    if (!side) return;
-    const card = state.piles[side === "a" ? 0 : 1].pop();
-    if (card) state.deck.unshift(card);
-    state.decision.standId = null;
-    interaction(); buzz(7); sound("cut", .1); render(); return;
-  }
-  if (action === "decision-assist") {
-    let placed = 0;
-    while (state.decision.placed.length < DECISION_ROAD_CARDS) {
-      const side = decisionRoadBlocked("a") ? "b" : decisionRoadBlocked("b") ? "a" : Math.random() < .5 ? "a" : "b";
-      if (!placeDecisionCard(side)) break;
-      placed += 1;
-    }
-    if (!placed) return;
-    interaction(); buzz([8, 14, 8]); sound("shuffle", .16); render(); return;
-  }
-  if (action === "decision-stand") {
-    if (state.decision.placed.length !== DECISION_ROAD_CARDS || !state.deck.length) return;
-    state.decision.standId = state.deck[0].id;
-    preloadCardArt(state.deck[0]);
-    state.stage = "decisionScales";
-    interaction(); buzz([7, 15, 7]); sound("gather", .18); render(); return;
-  }
-  if (action === "decision-seal-scales") {
-    const [left, right] = decisionDepths();
-    if (!left?.road || !left?.toll || !right?.road || !right?.toll) return;
-    state.decision.picks = {
-      roadA: left.road.id, tollA: left.toll.id, roadB: right.road.id, tollB: right.toll.id,
-      depthA: left.depth, tollDepthA: left.tollDepth, lengthA: left.length,
-      depthB: right.depth, tollDepthB: right.tollDepth, lengthB: right.length
-    };
-    preloadCardArt(readingCards());
-    state.stage = "decisionCrossroads";
-    interaction(); buzz([7, 12, 7, 18]); sound("gather", .18); render(); return;
+  if (action === "decision-draw") {
+    if (!decisionDraw(element.dataset.side)) return;
+    preloadCardArt(decisionKeptCards());
+    interaction(); buzz([8, 16]); sound("take", .16); render(); return;
   }
   if (action === "decision-to-reveal") {
-    if (readingCards().length !== decisionPositions().length) return;
+    if (readingCards().length !== DECISION_POSITIONS.length) return;
     state.revealedIds = [];
     preloadCardArt(readingCards());
     state.stage = "decisionReveal";
     interaction(); sound("spread", .18); render(); return;
   }
+
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
     if (state.revealedIds.includes(id) || state.ad) return;
@@ -3332,16 +3158,9 @@ app.addEventListener("input", (event) => {
     persist();
     return;
   }
-  if (event.target.id === "decision-name-a" || event.target.id === "decision-name-b") {
-    if (event.target.id === "decision-name-a") state.decision.roadA = event.target.value;
-    else state.decision.roadB = event.target.value;
-    updateDecisionNaming();
-    persist();
-    return;
-  }
-  if (event.target.id === "decision-lean-range") {
-    state.decision.lean = clamp(Number(event.target.value), 0, 100);
-    updateDecisionScales();
+  if (event.target.id === "decision-split-range") {
+    state.decision.splitDraft = Number(event.target.value);
+    updateDecisionSplit();
     persist();
     return;
   }

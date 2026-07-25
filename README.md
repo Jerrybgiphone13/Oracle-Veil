@@ -49,13 +49,14 @@ For a purely offline visual/ritual demo, opening `index.html` directly also work
 
 ### Decision — the Crossroads
 
+The most deliberately wordless of the four. Nothing on screen says what any gesture means; the reader can see exactly what happens to the cards and nothing about why.
+
 1. Choose Decision through the same sponsored entry treatment as Career and Money, then place an open question about the choice.
-2. Name both options in your own words. The letters of the two names carve that many cards off the top of the real deck before anything is dealt, and the names then label the roads, the scales, the ledger, and the final spread positions.
-3. Ten cards pass through your hands one at a time. Drag each toward a road (or use the two push buttons) and it physically joins that road's pile in the order you sent it. A road is closed off once sending another card there would leave the other unable to reach its two-card minimum, so the fork can always be finished.
-4. Whichever card is still in your hand when the tenth is placed becomes Where You Stand — the one card the ritual never sorts.
-5. Tilt the scales toward the option you lean to. The tilt counts to that exact depth down each road for its road card, and back the same depth from the road's end for its toll, so no road can ever return the same card twice.
-6. Stand at the crossroads: five face-down cards, each labelled with the gesture that chose it (which road, which depth, counted down or up).
-7. Reveal Where You Stand, both roads, and both tolls, then read a reflection that describes each road and its cost without ever picking one for you.
+2. Drag across the deck to break it in two. The two stacks thicken and thin under the finger and carry only a card count — no marker, no ratio, no label saying which half is which.
+3. Five times, each half offers its top card. Take one; the other is set aside face-down. The pair on offer is always literally the top of each stack, so the card taken is the card that was looked at.
+4. The five taken cards line up face-down as they are drawn. The five passed over build into a heap that is never turned — through the reveal, through the reading, never.
+5. Reveal the five kept cards under fixed positions: The First Reach, What You Are Standing In, The Turning, What It Costs, and What Opens.
+6. The reading is the first and only place any of it is interpreted, and it reads back only what the reader watched happen — roughly where the deck broke and how often they reached to the same half.
 
 The lower-left `⌘` seal opens the development diagnostics panel. It exposes the stage, seed, pile boundaries, selected IDs, deck order, orientation, and a guided-interaction fallback. It is deliberately visible for prototype review and should be feature-flagged or removed for production.
 
