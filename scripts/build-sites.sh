@@ -24,10 +24,14 @@ cp \
   "$project_dir/icon-512.png" \
   "$project_dir/icon-maskable-512.png" \
   "$project_dir/apple-touch-icon.png" \
+  "$project_dir/og.png" \
   "$build_dir/client/"
 mkdir -p "$build_dir/client/.well-known"
 cp "$project_dir/.well-known/security.txt" "$build_dir/client/.well-known/security.txt"
 cp -R "$project_dir/assets" "$build_dir/client/assets"
 cp "$project_dir/worker/sites.js" "$build_dir/server/index.js"
+# index.js imports ./interpretation.js — the single copy of the prompt + card-count
+# contract it shares with server.mjs. It must land beside the entry point.
+cp "$project_dir/worker/interpretation.js" "$build_dir/server/interpretation.js"
 
 printf 'Sites build ready: %s\n' "$build_dir"
