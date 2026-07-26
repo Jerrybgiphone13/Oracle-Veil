@@ -338,6 +338,14 @@ button.career-step-card:hover { transform:translateY(-.28rem) rotate(-1deg); fil
     radial-gradient(circle at 50% 42%, rgba(184,164,238,.22), transparent 2.4rem),
     linear-gradient(145deg, rgba(112,96,178,.24), rgba(226,190,119,.09));
 }
+/* The Decision tile carries the newest ritual, so it sits a size above its
+   row-mates. "scale" rather than "transform" keeps the shared hover lift intact. */
+.category[data-action="choose-decision"] { scale: 1.09; z-index: 1; }
+.category[data-action="choose-decision"] .symbol { font-size: 1.6rem; }
+.category[data-action="choose-decision"] > span:not(.symbol) { font-size: 1.05rem; }
+.category[data-action="choose-decision"] small { font-size: .7rem; }
+/* The narrow grid gap leaves less room to grow into, so ease the scale back. */
+@media (max-width: 480px) { .category[data-action="choose-decision"] { scale: 1.05; } }
 .decision-world {
   background:
     radial-gradient(ellipse at 24% 10%, rgba(163,142,229,.22), transparent 21rem),
