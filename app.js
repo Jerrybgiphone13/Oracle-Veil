@@ -5,7 +5,7 @@ const INTERPRETATION_ENDPOINT = "/api/interpretation";
 // Kept in lockstep with the app-shell version by both deployment scripts.
 // Card art is otherwise cached for a long time, so an unversioned URL can leave
 // one previously viewed card stuck on obsolete artwork after the deck changes.
-const CARD_ART_VERSION = "34";
+const CARD_ART_VERSION = "42";
 
 const MAJORS = [
   "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", "The Hierophant",
@@ -18,7 +18,7 @@ const SUITS = [
 ];
 const RANKS = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Page", "Knight", "Queen", "King"];
 const LOVE_STAGES = ["shuffle", "cutOne", "ritualCard", "reassembleOne", "cutThree", "reassembleThree", "spread", "choose", "reveal", "reading"];
-const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerReveal", "reading"];
+const CAREER_STAGES = ["careerEmbers", "careerCut", "careerSpreadOne", "careerChooseOne", "careerSpreadTwo", "careerChooseTwo", "careerReveal", "reading"];
 // Money now shares Love's shuffle/cut-into-three/spread/choose machinery: the same stage
 // names ("shuffle", "cutThree", "spread", "choose") are reused so the generic gesture code
 // (bindShuffle, sideDeckMarkup, bindSpread, animatePickCard, ...) needs no per-topic branching
@@ -26,14 +26,21 @@ const CAREER_STAGES = ["careerEmbers", "careerCompass", "careerLadder", "careerR
 // "reassembleThree": the three piles are ordered but never merged back into one deck.
 const MONEY_STAGES = ["shuffle", "cutThree", "pileOrder", "spread", "choose", "moneyReveal", "reading"];
 const DECISION_STAGES = ["decisionShuffle", "decisionCut", "decisionFuse", "decisionSpread", "decisionChoose", "decisionReveal", "reading"];
+const KIN_STAGES = ["shuffle", "kinCut", "kinSpreadOne", "kinChooseOne", "kinSpreadTwo", "kinChooseTwo", "kinReveal", "reading"];
+const GROWTH_STAGES = ["shuffle", "spread", "choose", "growthReveal", "reading"];
+const FUTURE_STAGES = ["futureShuffle", "futureCutFour", "futureCompass", "futureSpread", "futureChooseDawn", "futureChooseZenith", "futureChooseDusk", "futureChooseMidnight", "futureReveal", "reading"];
 const LOVE_POSITIONS = ["Hidden Heart", "You", "The Connection", "The Path Ahead"];
 const CAREER_POSITIONS = ["Current Ground", "Your Unclaimed Strength", "The Friction", "Your Leverage", "The Next Bold Move"];
 const MONEY_POSITIONS = ["What to Keep", "What to Grow", "What to Let Flow"];
 const MONEY_VESSELS = ["Keep", "Grow", "Flow"];
 const DECISION_POSITIONS = ["The Chosen Card"];
+const KIN_POSITIONS = ["Your Voice", "Their Voice"];
+const GROWTH_POSITIONS = ["The Root", "The Threshold", "The Becoming"];
+const FUTURE_DIRECTIONS = ["Dawn", "Zenith", "Dusk", "Midnight"];
+const FUTURE_POSITIONS = ["Dawn — What Begins", "Zenith — What Becomes Clear", "Dusk — What Must Change", "Midnight — What Guides You"];
 // Money's entrance ad pays for its complete reading. Decision deliberately keeps the
 // same two pauses as Love: one at the first reveal and another for the AI reflection.
-const SEAMLESS_REVEAL_PATHS = ["Money"];
+const SEAMLESS_REVEAL_PATHS = ["Money", "Friendship / Family", "Personal Growth"];
 
 const CARD_NOTES = {
   "The Lovers": ["choice", "alignment", "honest intimacy"],
@@ -137,6 +144,7 @@ const I18N = {
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Le tarot est proposé ici comme un outil de réflexion et d'imagination — non comme une prédiction factuelle ou un conseil professionnel.",
     "Begin a new reading": "Commencer une nouvelle lecture", "Copy the reading": "Copier la lecture",
     "Share the reading": "Partager la lecture", "Share as an image": "Partager en image",
+    "New reading": "Nouvelle lecture", "Share": "Partager", "Reading actions": "Actions de lecture",
     "Sweep across the loose cards to send a wave through the pile.": "Balayez les cartes éparses pour envoyer une onde à travers le tas.",
     "Drag through the cards—a wave ripples across the pile": "Glissez à travers les cartes — une onde parcourt le tas",
     "physical moves · keep mixing or gather them": "gestes physiques · continuez à mélanger ou rassemblez-les",
@@ -245,6 +253,7 @@ const I18N = {
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "Таро предлагается здесь как инструмент размышления и воображения — не как фактическое предсказание или профессиональный совет.",
     "Begin a new reading": "Начать новое гадание", "Copy the reading": "Скопировать гадание",
     "Share the reading": "Поделиться гаданием", "Share as an image": "Поделиться как изображением",
+    "New reading": "Новое гадание", "Share": "Поделиться", "Reading actions": "Действия с гаданием",
     "Sweep across the loose cards to send a wave through the pile.": "Проведите по разложенным картам, чтобы послать волну по стопке.",
     "Drag through the cards—a wave ripples across the pile": "Проведите по картам — волна пройдёт по стопке",
     "physical moves · keep mixing or gather them": "физических движений · продолжайте мешать или соберите их",
@@ -353,6 +362,7 @@ const I18N = {
     "Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.": "此处的塔罗是一种用于反思与想象的工具——并非事实预测或专业建议。",
     "Begin a new reading": "开始新的解读", "Copy the reading": "复制解读",
     "Share the reading": "分享解读", "Share as an image": "分享为图片",
+    "New reading": "新的解读", "Share": "分享", "Reading actions": "解读操作",
     "Sweep across the loose cards to send a wave through the pile.": "扫过散开的牌，让一道波浪穿过牌堆。",
     "Drag through the cards—a wave ripples across the pile": "拖过牌面——涟漪将荡过整堆牌",
     "physical moves · keep mixing or gather them": "次实际移动 · 继续混合或将它们聚拢",
@@ -449,6 +459,16 @@ Object.assign(I18N.fr, {
   "The cards lie apart. Lay them out when you are ready.": "Les cartes sont bien séparées. Étalez-les quand vous êtes prêt·e.",
   "more sweeps will scatter the deck.": "balayages de plus disperseront le jeu.",
   "Scatter them for me": "Disperser pour moi", "Lay them out to choose": "Les étaler pour choisir", "Scatter them again": "Les disperser à nouveau",
+  "Keep these three and gather the rest": "Garder ces trois cartes et rassembler le reste",
+  "Cut the gathered deck into two.": "Coupez en deux le jeu rassemblé.", "Choose where the two remaining paths separate.": "Choisissez où les deux chemins restants se séparent.",
+  "Open the first pile.": "Ouvrez la première pile.", "Spread the first half and let one card become Your Leverage.": "Étalez la première moitié et laissez une carte devenir Votre levier.",
+  "Choose one card from the first spread.": "Choisissez une carte dans le premier éventail.", "This card will become Your Leverage.": "Cette carte deviendra Votre levier.",
+  "Open the second pile.": "Ouvrez la deuxième pile.", "Spread the second half and let one card become The Next Bold Move.": "Étalez la seconde moitié et laissez une carte devenir Le prochain geste audacieux.",
+  "Choose one card from the second spread.": "Choisissez une carte dans le second éventail.", "This card will become The Next Bold Move.": "Cette carte deviendra Le prochain geste audacieux.",
+  "Your three chosen cards are held aside. Cut the gathered deck into two.": "Vos trois cartes choisies restent de côté. Coupez le jeu rassemblé en deux.",
+  "Move the marker, then divide the gathered deck into two piles.": "Déplacez le repère, puis divisez le jeu rassemblé en deux piles.", "Make two piles": "Former deux piles",
+  "One card has joined your constellation.": "Une carte a rejoint votre constellation.", "Choose one face-down card from this spread.": "Choisissez une carte face cachée dans cet éventail.",
+  "Continue to the second pile": "Continuer vers la deuxième pile", "Reveal the constellation": "Révéler la constellation", "The pile opens directly into a spread.": "La pile s’ouvre directement en éventail.",
   "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "Regardez une courte publicité pour débloquer une réflexion basée sur votre question exacte et les cinq cartes."
 });
 Object.assign(I18N.ru, {
@@ -479,6 +499,16 @@ Object.assign(I18N.ru, {
   "The cards lie apart. Lay them out when you are ready.": "Карты лежат врозь. Разложите их, когда будете готовы.",
   "more sweeps will scatter the deck.": "движений ещё разбросают колоду.",
   "Scatter them for me": "Разбросать за меня", "Lay them out to choose": "Разложить для выбора", "Scatter them again": "Разбросать заново",
+  "Keep these three and gather the rest": "Оставить эти три и собрать остальные",
+  "Cut the gathered deck into two.": "Разрежьте собранную колоду на две части.", "Choose where the two remaining paths separate.": "Выберите место, где разделятся два оставшихся пути.",
+  "Open the first pile.": "Откройте первую стопку.", "Spread the first half and let one card become Your Leverage.": "Разложите первую половину и позвольте одной карте стать Вашим рычагом.",
+  "Choose one card from the first spread.": "Выберите одну карту из первого расклада.", "This card will become Your Leverage.": "Эта карта станет Вашим рычагом.",
+  "Open the second pile.": "Откройте вторую стопку.", "Spread the second half and let one card become The Next Bold Move.": "Разложите вторую половину и позвольте одной карте стать Следующим смелым шагом.",
+  "Choose one card from the second spread.": "Выберите одну карту из второго расклада.", "This card will become The Next Bold Move.": "Эта карта станет Следующим смелым шагом.",
+  "Your three chosen cards are held aside. Cut the gathered deck into two.": "Три выбранные карты отложены. Разрежьте собранную колоду на две части.",
+  "Move the marker, then divide the gathered deck into two piles.": "Передвиньте маркер, затем разделите собранную колоду на две стопки.", "Make two piles": "Сделать две стопки",
+  "One card has joined your constellation.": "Одна карта присоединилась к вашему созвездию.", "Choose one face-down card from this spread.": "Выберите одну закрытую карту из этого расклада.",
+  "Continue to the second pile": "Перейти ко второй стопке", "Reveal the constellation": "Открыть созвездие", "The pile opens directly into a spread.": "Стопка сразу раскрывается в расклад.",
   "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "Посмотрите короткую рекламу, чтобы открыть размышление по вашему вопросу и всем пяти картам."
 });
 Object.assign(I18N.zh, {
@@ -509,6 +539,16 @@ Object.assign(I18N.zh, {
   "The cards lie apart. Lay them out when you are ready.": "牌已散开。准备好后就摊开它们。",
   "more sweeps will scatter the deck.": "次划动后牌阵便会散开。",
   "Scatter them for me": "替我散牌", "Lay them out to choose": "摊开以供挑选", "Scatter them again": "重新散牌",
+  "Keep these three and gather the rest": "保留这三张，并收拢其余牌",
+  "Cut the gathered deck into two.": "将收拢后的牌组切成两半。", "Choose where the two remaining paths separate.": "选择两条余下道路分开的地方。",
+  "Open the first pile.": "展开第一叠牌。", "Spread the first half and let one card become Your Leverage.": "摊开第一半，让其中一张成为你的杠杆。",
+  "Choose one card from the first spread.": "从第一组摊牌中选择一张。", "This card will become Your Leverage.": "这张牌将成为你的杠杆。",
+  "Open the second pile.": "展开第二叠牌。", "Spread the second half and let one card become The Next Bold Move.": "摊开第二半，让其中一张成为下一个大胆行动。",
+  "Choose one card from the second spread.": "从第二组摊牌中选择一张。", "This card will become The Next Bold Move.": "这张牌将成为下一个大胆行动。",
+  "Your three chosen cards are held aside. Cut the gathered deck into two.": "你选中的三张牌已放在一旁。将收拢后的牌组切成两半。",
+  "Move the marker, then divide the gathered deck into two piles.": "移动标记，然后将收拢后的牌组分成两叠。", "Make two piles": "分成两叠",
+  "One card has joined your constellation.": "一张牌已加入你的星座。", "Choose one face-down card from this spread.": "从这组摊牌中选择一张背面朝上的牌。",
+  "Continue to the second pile": "继续前往第二叠", "Reveal the constellation": "揭示星座", "The pile opens directly into a spread.": "这叠牌会直接展开。",
   "Watch a short ad to unlock a reflection based on your exact question and all five cards.": "观看一个简短广告，解锁基于你的问题与全部五张牌的映照。"
 });
 
@@ -724,6 +764,81 @@ Object.assign(I18N.zh, {
   "Watch a short ad to unlock a reflection based on your exact question and chosen card.": "观看一个简短广告，解锁基于你的问题与所选牌面的映照。",
   "Watch an ad to unlock my interpretation": "观看广告以解锁我的解读"
 });
+Object.assign(I18N.fr, {
+  "Celestial tarot": "Tarot céleste",
+  "Seven paths are ready tonight. Sponsored paths open after a brief passage.": "Sept voies sont ouvertes ce soir. Les voies sponsorisées s’ouvrent après un bref passage.",
+  "The Bond": "Le Lien", "Inner Moon": "Lune intérieure", "The Far Horizon": "L’Horizon lointain",
+  "Enter the Bond ritual": "Entrer dans le rituel du Lien", "Enter the Growth ritual": "Entrer dans le rituel de Croissance", "Enter the Future ritual": "Entrer dans le rituel de l’Avenir",
+  "Friendship / Family ritual": "Rituel Amitié / Famille", "Personal Growth ritual": "Rituel de développement personnel", "General Future ritual": "Rituel de l’avenir général",
+  "Which bond is asking to be understood?": "Quel lien demande à être compris ?", "What within you is ready to change shape?": "Qu’est-ce qui, en vous, est prêt à changer de forme ?", "Which horizon are you looking toward?": "Vers quel horizon regardez-vous ?",
+  "Name the friendship or family dynamic that needs more honesty, warmth, or room. The two halves will hold both voices.": "Nommez la dynamique amicale ou familiale qui a besoin de plus de vérité, de chaleur ou d’espace. Les deux moitiés porteront les deux voix.",
+  "Name the habit, threshold, or part of yourself you want to meet more clearly. Three cards will trace the movement.": "Nommez l’habitude, le seuil ou la part de vous que vous souhaitez rencontrer plus clairement. Trois cartes en traceront le mouvement.",
+  "Place an open question about the season ahead. This longer ritual holds what is hidden, what is arriving, and what can guide you.": "Posez une question ouverte sur la saison à venir. Ce rituel plus long tient ce qui est caché, ce qui arrive et ce qui peut vous guider.",
+  "Your Voice": "Votre voix", "Their Voice": "Leur voix", "The Root": "La Racine", "The Threshold": "Le Seuil", "The Becoming": "Le Devenir",
+  "The Veiled Horizon": "L’Horizon voilé", "What Is Arriving": "Ce qui arrive", "What Is Changing": "Ce qui change", "What Guides You": "Ce qui vous guide",
+  "Loosen the cards between two voices.": "Déliez les cartes entre deux voix.", "Divide the deck into two voices.": "Divisez le jeu en deux voix.", "Let your half open.": "Laissez votre moitié s’ouvrir.", "Choose the card that sounds like you.": "Choisissez la carte qui vous ressemble.", "Let their half open.": "Laissez leur moitié s’ouvrir.", "Choose the card that answers from across the bond.": "Choisissez la carte qui répond de l’autre côté du lien.", "Turn over the two voices.": "Retournez les deux voix.",
+  "Loosen the pattern beneath your hands.": "Déliez le motif sous vos mains.", "Let the inner path open.": "Laissez le chemin intérieur s’ouvrir.", "Choose three moments of becoming.": "Choisissez trois moments de devenir.", "Turn over the movement within you.": "Retournez le mouvement en vous.",
+  "Loosen the cards beneath the coming sky.": "Déliez les cartes sous le ciel à venir.", "Cut where the horizon first opens.": "Coupez là où l’horizon s’ouvre.", "Take the card beneath the lifted future.": "Prenez la carte sous l’avenir soulevé.", "Return the two halves beneath the horizon.": "Réunissez les deux moitiés sous l’horizon.", "Divide the season ahead into three.": "Divisez la saison à venir en trois.", "Choose how the three currents return.": "Choisissez comment les trois courants reviennent.", "Let the horizon open.": "Laissez l’horizon s’ouvrir.", "Choose three signs from the road ahead.": "Choisissez trois signes sur la route à venir.", "Reveal the horizon in the order you wish.": "Révélez l’horizon dans l’ordre souhaité.",
+  "Divide the two voices": "Diviser les deux voix", "Continue to the second voice": "Continuer vers la seconde voix", "Reveal the bond": "Révéler le lien", "Place the three moments": "Placer les trois moments", "Place the four signs": "Placer les quatre signes",
+  "Two cards, two voices within one bond.": "Deux cartes, deux voix dans un même lien.", "Three cards, an inner movement taking shape.": "Trois cartes, un mouvement intérieur qui prend forme.", "Four cards, gathered along the far horizon.": "Quatre cartes, réunies sur l’horizon lointain.",
+  "Unlock the Bond path": "Ouvrir la voie du Lien", "Unlock the Growth path": "Ouvrir la voie de Croissance", "Unlock the Future path": "Ouvrir la voie de l’Avenir",
+  "Watch a short ad to unlock a reflection based on your exact question and both cards.": "Regardez une courte publicité pour ouvrir une réflexion fondée sur votre question et les deux cartes.",
+  "Watch a short ad to unlock a reflection based on your exact question and all three cards.": "Regardez une courte publicité pour ouvrir une réflexion fondée sur votre question et les trois cartes."
+});
+Object.assign(I18N.ru, {
+  "Celestial tarot": "Небесное таро",
+  "Seven paths are ready tonight. Sponsored paths open after a brief passage.": "Сегодня открыты семь путей. Спонсируемые пути откроются после короткой паузы.",
+  "The Bond": "Связь", "Inner Moon": "Внутренняя луна", "The Far Horizon": "Дальний горизонт",
+  "Enter the Bond ritual": "Войти в ритуал Связи", "Enter the Growth ritual": "Войти в ритуал Роста", "Enter the Future ritual": "Войти в ритуал Будущего",
+  "Friendship / Family ritual": "Ритуал дружбы / семьи", "Personal Growth ritual": "Ритуал личностного роста", "General Future ritual": "Ритуал общего будущего",
+  "Which bond is asking to be understood?": "Какая связь просит понимания?", "What within you is ready to change shape?": "Что внутри вас готово изменить форму?", "Which horizon are you looking toward?": "К какому горизонту вы обращены?",
+  "Your Voice": "Ваш голос", "Their Voice": "Их голос", "The Root": "Корень", "The Threshold": "Порог", "The Becoming": "Становление",
+  "The Veiled Horizon": "Скрытый горизонт", "What Is Arriving": "Что приходит", "What Is Changing": "Что меняется", "What Guides You": "Что вас направляет",
+  "Loosen the cards between two voices.": "Освободите карты между двумя голосами.", "Divide the deck into two voices.": "Разделите колоду на два голоса.", "Let your half open.": "Позвольте своей половине раскрыться.", "Choose the card that sounds like you.": "Выберите карту, которая звучит как вы.", "Let their half open.": "Позвольте их половине раскрыться.", "Choose the card that answers from across the bond.": "Выберите карту, отвечающую с другой стороны связи.", "Turn over the two voices.": "Переверните два голоса.",
+  "Loosen the pattern beneath your hands.": "Освободите узор под руками.", "Let the inner path open.": "Позвольте внутреннему пути раскрыться.", "Choose three moments of becoming.": "Выберите три момента становления.", "Turn over the movement within you.": "Переверните внутреннее движение.",
+  "Loosen the cards beneath the coming sky.": "Освободите карты под небом грядущего.", "Cut where the horizon first opens.": "Срежьте там, где впервые открывается горизонт.", "Take the card beneath the lifted future.": "Возьмите карту под поднятым будущим.", "Return the two halves beneath the horizon.": "Соедините две половины под горизонтом.", "Divide the season ahead into three.": "Разделите будущий сезон на три.", "Choose how the three currents return.": "Выберите, как вернутся три течения.", "Let the horizon open.": "Позвольте горизонту раскрыться.", "Choose three signs from the road ahead.": "Выберите три знака на пути впереди.", "Reveal the horizon in the order you wish.": "Откройте горизонт в любом порядке.",
+  "Divide the two voices": "Разделить два голоса", "Continue to the second voice": "Перейти ко второму голосу", "Reveal the bond": "Открыть связь", "Place the three moments": "Разместить три момента", "Place the four signs": "Разместить четыре знака",
+  "Two cards, two voices within one bond.": "Две карты, два голоса в одной связи.", "Three cards, an inner movement taking shape.": "Три карты, внутреннее движение обретает форму.", "Four cards, gathered along the far horizon.": "Четыре карты, собранные у дальнего горизонта.",
+  "Unlock the Bond path": "Открыть путь Связи", "Unlock the Growth path": "Открыть путь Роста", "Unlock the Future path": "Открыть путь Будущего"
+});
+Object.assign(I18N.zh, {
+  "Celestial tarot": "星穹塔罗",
+  "Seven paths are ready tonight. Sponsored paths open after a brief passage.": "今夜七条路径已经开启。赞助路径将在短暂片刻后开放。",
+  "The Bond": "羁绊", "Inner Moon": "内在之月", "The Far Horizon": "远方地平线",
+  "Enter the Bond ritual": "进入羁绊仪式", "Enter the Growth ritual": "进入成长仪式", "Enter the Future ritual": "进入未来仪式",
+  "Friendship / Family ritual": "友情 / 家庭仪式", "Personal Growth ritual": "个人成长仪式", "General Future ritual": "综合未来仪式",
+  "Which bond is asking to be understood?": "哪一段关系正在等待被理解？", "What within you is ready to change shape?": "你内在的什么已经准备好改变形态？", "Which horizon are you looking toward?": "你正望向哪一片地平线？",
+  "Your Voice": "你的声音", "Their Voice": "对方的声音", "The Root": "根源", "The Threshold": "门槛", "The Becoming": "成为",
+  "The Veiled Horizon": "隐秘地平线", "What Is Arriving": "正在到来", "What Is Changing": "正在改变", "What Guides You": "指引你的力量",
+  "Loosen the cards between two voices.": "在两种声音之间松开牌阵。", "Divide the deck into two voices.": "将牌组分成两种声音。", "Let your half open.": "让属于你的那一半展开。", "Choose the card that sounds like you.": "选择一张像你声音的牌。", "Let their half open.": "让属于对方的那一半展开。", "Choose the card that answers from across the bond.": "选择一张从关系另一端回应的牌。", "Turn over the two voices.": "翻开两种声音。",
+  "Loosen the pattern beneath your hands.": "松开手下熟悉的模式。", "Let the inner path open.": "让内在道路展开。", "Choose three moments of becoming.": "选择三个成为的时刻。", "Turn over the movement within you.": "翻开你内在的变化。",
+  "Loosen the cards beneath the coming sky.": "在将至的天空下松开牌阵。", "Cut where the horizon first opens.": "在地平线初次开启之处切牌。", "Take the card beneath the lifted future.": "抽出被抬起的未来之下那张牌。", "Return the two halves beneath the horizon.": "在地平线下重新合起两半牌。", "Divide the season ahead into three.": "将前方的时节分成三部分。", "Choose how the three currents return.": "选择三股流向回归的次序。", "Let the horizon open.": "让地平线展开。", "Choose three signs from the road ahead.": "从前方道路选择三个征兆。", "Reveal the horizon in the order you wish.": "按你希望的顺序揭开地平线。",
+  "Divide the two voices": "分开两种声音", "Continue to the second voice": "前往第二种声音", "Reveal the bond": "揭示羁绊", "Place the three moments": "安放三个时刻", "Place the four signs": "安放四个征兆",
+  "Two cards, two voices within one bond.": "两张牌，同一羁绊中的两种声音。", "Three cards, an inner movement taking shape.": "三张牌，内在变化正在成形。", "Four cards, gathered along the far horizon.": "四张牌，汇聚于远方地平线。",
+  "Unlock the Bond path": "解锁羁绊路径", "Unlock the Growth path": "解锁成长路径", "Unlock the Future path": "解锁未来路径"
+});
+Object.assign(I18N.fr, {
+  "Dawn": "Aube", "Zenith": "Zénith", "Dusk": "Crépuscule", "Midnight": "Minuit",
+  "Dawn — What Begins": "Aube — Ce qui commence", "Zenith — What Becomes Clear": "Zénith — Ce qui devient clair", "Dusk — What Must Change": "Crépuscule — Ce qui doit changer", "Midnight — What Guides You": "Minuit — Ce qui vous guide",
+  "Disturb the map of what comes next.": "Brouillez la carte de ce qui vient.", "Mark four quarters in the coming sky.": "Marquez quatre quartiers dans le ciel à venir.", "Give each pile its direction.": "Donnez sa direction à chaque pile.", "Let the compass breathe open.": "Laissez la boussole s’ouvrir.",
+  "Choose from Dawn.": "Choisissez à l’Aube.", "Choose from Zenith.": "Choisissez au Zénith.", "Choose from Dusk.": "Choisissez au Crépuscule.", "Choose from Midnight.": "Choisissez à Minuit.", "Turn over the four directions.": "Retournez les quatre directions.",
+  "Place the Dawn marker": "Placer le repère de l’Aube", "Place the Zenith marker": "Placer le repère du Zénith", "Complete the four quarters": "Compléter les quatre quartiers", "Align the four directions": "Aligner les quatre directions",
+  "Choose the pile that belongs to": "Choisissez la pile qui appartient à", "Only": "Seule", "is awake. Choose one card from its quarter.": "est éveillée. Choisissez une carte dans son quartier."
+});
+Object.assign(I18N.ru, {
+  "Dawn": "Рассвет", "Zenith": "Зенит", "Dusk": "Сумерки", "Midnight": "Полночь",
+  "Dawn — What Begins": "Рассвет — Что начинается", "Zenith — What Becomes Clear": "Зенит — Что проясняется", "Dusk — What Must Change": "Сумерки — Что должно измениться", "Midnight — What Guides You": "Полночь — Что вас направляет",
+  "Disturb the map of what comes next.": "Нарушьте карту того, что будет дальше.", "Mark four quarters in the coming sky.": "Отметьте четыре четверти грядущего неба.", "Give each pile its direction.": "Дайте каждой стопке направление.", "Let the compass breathe open.": "Позвольте компасу раскрыться.",
+  "Choose from Dawn.": "Выберите на Рассвете.", "Choose from Zenith.": "Выберите в Зените.", "Choose from Dusk.": "Выберите в Сумерках.", "Choose from Midnight.": "Выберите в Полночь.", "Turn over the four directions.": "Переверните четыре направления.",
+  "Place the Dawn marker": "Поставить метку Рассвета", "Place the Zenith marker": "Поставить метку Зенита", "Complete the four quarters": "Завершить четыре четверти", "Align the four directions": "Выровнять четыре направления"
+});
+Object.assign(I18N.zh, {
+  "Dawn": "黎明", "Zenith": "天顶", "Dusk": "黄昏", "Midnight": "午夜",
+  "Dawn — What Begins": "黎明 — 正在开始", "Zenith — What Becomes Clear": "天顶 — 逐渐清晰", "Dusk — What Must Change": "黄昏 — 必须改变", "Midnight — What Guides You": "午夜 — 指引你的力量",
+  "Disturb the map of what comes next.": "打乱下一程的旧地图。", "Mark four quarters in the coming sky.": "在将至的天空标记四个方位。", "Give each pile its direction.": "为每一叠牌赋予方向。", "Let the compass breathe open.": "让罗盘舒展开来。",
+  "Choose from Dawn.": "从黎明中选择。", "Choose from Zenith.": "从天顶中选择。", "Choose from Dusk.": "从黄昏中选择。", "Choose from Midnight.": "从午夜中选择。", "Turn over the four directions.": "翻开四个方向。",
+  "Place the Dawn marker": "放置黎明标记", "Place the Zenith marker": "放置天顶标记", "Complete the four quarters": "完成四个方位", "Align the four directions": "校准四个方向"
+});
 function t(source) {
   const lang = state?.settings?.language || "en";
   if (lang === "en") return source;
@@ -779,8 +894,9 @@ function createCareerState(seed) {
     scatter: buildCareerScatter(seed),
     shuffleMoves: 0,
     emberIds: [],
-    compass: 88,
-    candidateIds: [],
+    heldCards: [],
+    cut: null,
+    pileStep: 0,
     selectedIds: []
   };
 }
@@ -790,6 +906,21 @@ function createDecisionState() {
   return {
     cut: null,
     selectedId: null
+  };
+}
+function createKinState() {
+  return {
+    cut: null,
+    pileStep: 0,
+    selectedIds: []
+  };
+}
+function createFutureState() {
+  return {
+    cuts: [],
+    cutDraft: 19,
+    order: [],
+    selectedIds: []
   };
 }
 function createState() {
@@ -822,6 +953,8 @@ function createState() {
     // card taken from each as the reader moves left to right.
     money: { pileStep: 0, selectedIds: [] },
     decision: createDecisionState(),
+    kin: createKinState(),
+    future: createFutureState(),
     shareTheme: "midnight",
     aiUnlocked: false,
     aiLoading: false,
@@ -855,6 +988,7 @@ function loadState() {
 let state = loadState();
 let toastTimer;
 let transitioning = false;
+let autoSpreadTimer;
 let settingsOpen = false;
 let lastFocusedStage = state.stage;
 const MUSIC_URL = "https://upload.wikimedia.org/wikipedia/commons/a/af/Kai_Engel_-_09_-_Sunset.ogg";
@@ -882,18 +1016,26 @@ function ritualStages() {
   if (state.category === "Career") return CAREER_STAGES;
   if (state.category === "Money") return MONEY_STAGES;
   if (state.category === "Decision") return DECISION_STAGES;
+  if (state.category === "Friendship / Family") return KIN_STAGES;
+  if (state.category === "Personal Growth") return GROWTH_STAGES;
+  if (state.category === "General Future") return FUTURE_STAGES;
   return LOVE_STAGES;
 }
 function readingPositions() {
   if (state.category === "Career") return CAREER_POSITIONS;
   if (state.category === "Money") return MONEY_POSITIONS;
   if (state.category === "Decision") return DECISION_POSITIONS;
+  if (state.category === "Friendship / Family") return KIN_POSITIONS;
+  if (state.category === "Personal Growth") return GROWTH_POSITIONS;
+  if (state.category === "General Future") return FUTURE_POSITIONS;
   return LOVE_POSITIONS;
 }
 function stageIndex() { return Math.max(0, ritualStages().indexOf(state.stage)); }
 function cardById(id) {
   if (state.ritualCard?.id === id) return state.ritualCard;
-  return state.deck.find((card) => card.id === id) || state.piles.flat().find((card) => card.id === id);
+  return state.career?.heldCards?.find((card) => card.id === id)
+    || state.deck.find((card) => card.id === id)
+    || state.piles.flat().find((card) => card.id === id);
 }
 function readingCards() {
   const ids = state.category === "Career"
@@ -902,7 +1044,13 @@ function readingCards() {
       ? state.money.selectedIds
       : state.category === "Decision"
         ? [state.decision.selectedId]
-        : [state.ritualCardId, ...state.selectedIds];
+        : state.category === "Friendship / Family"
+          ? state.kin.selectedIds
+          : state.category === "Personal Growth"
+            ? state.selectedIds
+            : state.category === "General Future"
+              ? state.future.selectedIds
+              : [state.ritualCardId, ...state.selectedIds];
   return ids.map(cardById).filter(Boolean);
 }
 function interaction() { state.performance.interactions += 1; state.performance.lastGesture = Date.now(); persist(); }
@@ -1068,7 +1216,7 @@ function progress() {
   return `<div class="stage-progress" aria-label="Ritual progress">${ritualStages().map((stage, index) => `<i class="${index < current ? "done" : index === current ? "active" : ""}" title="${stage}"></i>`).join("")}</div>`;
 }
 function topbar() {
-  return `<header class="topbar"><button class="brand" data-action="home" aria-label="Return to the opening">Oracle Veil</button>
+  return `<header class="topbar"><button class="brand" data-action="home" aria-label="Return to the opening"><span class="brand-sigil" aria-hidden="true"><i></i></span><span class="brand-copy"><strong>Oracle Veil</strong><small>${t("Celestial tarot")}</small></span></button>
     <div class="utility-row"><button class="settings-button" data-action="open-settings" aria-haspopup="dialog">${t("Settings")}</button></div></header>`;
 }
 function world(content, className = "") {
@@ -1084,10 +1232,11 @@ function renderCategory() {
     { name: "Career", symbol: "⌁", action: "choose-career", note: "watch to enter", locked: true },
     { name: "Money", symbol: "◉", action: "choose-money", note: "watch to enter", locked: true },
     { name: "Decision", symbol: "⚭", action: "choose-decision", note: "watch to enter", locked: true },
-    { name: "Friendship / Family", symbol: "⌇" }, { name: "Personal Growth", symbol: "☾" },
-    { name: "General Future", symbol: "☉" }
+    { name: "Friendship / Family", symbol: "⌇", action: "choose-kin", note: "watch to enter", locked: true },
+    { name: "Personal Growth", symbol: "☾", action: "choose-growth", note: "watch to enter", locked: true },
+    { name: "General Future", symbol: "☉", action: "choose-future", note: "watch to enter", locked: true }
   ];
-  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Four paths are ready tonight. Career, Money and Decision open after a brief sponsored passage.")}</p></div><div class="category-grid">${categories.map(({ name, symbol, action, note, locked }) => `<button class="category ${action ? "available" : ""} ${locked ? "locked" : ""}" ${action ? `data-action="${action}"` : "disabled"}>${locked ? `<span class="category-lock" aria-hidden="true"><i></i></span>` : ""}<span class="symbol">${symbol}</span><span>${t(name)}</span><small>${action ? t(note) : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
+  return world(`<section class="scene"><div class="ritual-head"><p class="eyebrow">${t("Choose a path")}</p><h1>${t("What calls for your attention?")}</h1><p class="lede">${t("Seven paths are ready tonight. Sponsored paths open after a brief passage.")}</p></div><div class="category-grid">${categories.map(({ name, symbol, action, note, locked }) => `<button class="category ${action ? "available" : ""} ${locked ? "locked" : ""}" ${action ? `data-action="${action}"` : "disabled"}>${locked ? `<span class="category-lock" aria-hidden="true"><i></i></span>` : ""}<span class="symbol">${symbol}</span><span>${t(name)}</span><small>${action ? t(note) : t("coming soon")}</small></button>`).join("")}</div><button class="back-link" data-action="back-start">${t("Return to the book")}</button></section>`);
 }
 // Each path introduces itself with its own vocabulary before the ritual begins.
 const QUESTION_COPY = {
@@ -1108,6 +1257,24 @@ const QUESTION_COPY = {
     title: "Which choice is holding you still?",
     lede: "Name the tension that is holding you still. From here the ritual asks for nothing but your hands.",
     examples: ["Should I stay where I am or begin again?", "Which of these two offers is truly mine?", "Do I speak now or wait a little longer?", "What am I refusing to admit about this choice?"]
+  },
+  "Friendship / Family": {
+    pathName: "The Bond", nextLabel: "Enter the Bond ritual", theme: "kin",
+    title: "Which bond is asking to be understood?",
+    lede: "Name the friendship or family dynamic that needs more honesty, warmth, or room. The two halves will hold both voices.",
+    examples: ["What does this friendship need from me now?", "How can I meet this family tension differently?", "What remains unspoken between us?", "Where can this bond become more mutual?"]
+  },
+  "Personal Growth": {
+    pathName: "Inner Moon", nextLabel: "Enter the Growth ritual", theme: "growth",
+    title: "What within you is ready to change shape?",
+    lede: "Name the habit, threshold, or part of yourself you want to meet more clearly. Three cards will trace the movement.",
+    examples: ["What pattern am I ready to outgrow?", "Where am I being invited to trust myself?", "What deserves more courage from me?", "What would help me feel more whole?"]
+  },
+  "General Future": {
+    pathName: "The Far Horizon", nextLabel: "Enter the Future ritual", theme: "future",
+    title: "Which horizon are you looking toward?",
+    lede: "Place an open question about the season ahead. Four directional piles will hold what begins, clarifies, changes, and guides you.",
+    examples: ["What is the next season asking of me?", "What change is beginning to gather?", "Where should I place my attention now?", "What can help me meet the months ahead?"]
   },
   Love: {
     pathName: "Love", nextLabel: "Place the question", theme: "",
@@ -1143,6 +1310,9 @@ function renderRitual() {
   if (state.category === "Career") return renderCareerRitual();
   if (state.category === "Money") return renderMoneyRitual();
   if (state.category === "Decision") return renderDecisionRitual();
+  if (state.category === "Friendship / Family") return renderKinRitual();
+  if (state.category === "Personal Growth") return renderGrowthRitual();
+  if (state.category === "General Future") return renderFutureRitual();
   let surface = "";
   let actions = "";
   if (state.stage === "shuffle") ({ surface, actions } = renderShuffle());
@@ -1157,51 +1327,124 @@ function renderRitual() {
   return world(`<section class="scene ritual">${ritualTitle()}${surface}<div class="ritual-actions">${actions}</div></section>`);
 }
 
-function careerCompassTheme(degrees = state.career.compass) {
-  const angle = ((Number(degrees) % 360) + 360) % 360;
-  if (angle < 45 || angle >= 315) return "Mastery";
-  if (angle < 135) return "Visibility";
-  if (angle < 225) return "Security";
-  return "Reinvention";
+function kinTitle() {
+  const copy = {
+    shuffle: ["Loosen the cards between two voices.", "Sweep across the loose deck until the bond no longer follows its old order."],
+    kinCut: ["Divide the deck into two voices.", "Choose the place where your perspective and theirs separate."],
+    kinSpreadOne: ["Let your half open.", "The first half spreads for the voice, need, or truth you bring."],
+    kinChooseOne: ["Choose the card that sounds like you.", "Touch one card from the first voice."],
+    kinSpreadTwo: ["Let their half open.", "The second half spreads for what the other side may be carrying."],
+    kinChooseTwo: ["Choose the card that answers from across the bond.", "Touch one card from the second voice."],
+    kinReveal: ["Turn over the two voices.", "Read them beside one another. Neither card is a verdict on the other person."]
+  };
+  const [title, lede] = copy[state.stage] || ["The Bond", ""];
+  return `<div class="ritual-head kin-ritual-head">${progress()}<p class="eyebrow">${t("Friendship / Family ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
+function renderKinRitual() {
+  let view = { surface: "", actions: "" };
+  if (state.stage === "shuffle") view = renderShuffle();
+  if (state.stage === "kinCut") view = renderKinCut();
+  if (state.stage === "kinSpreadOne" || state.stage === "kinSpreadTwo") view = renderSpread();
+  if (state.stage === "kinChooseOne" || state.stage === "kinChooseTwo") view = renderChoose();
+  if (state.stage === "kinReveal") view = renderPositionReveal(KIN_POSITIONS, "kin-reveal-layout");
+  return world(`<section class="scene ritual kin-ritual">${kinTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "kin-world");
+}
+function renderKinCut() {
+  return {
+    surface: `<div class="table-surface cut-table kin-cut-surface" id="kin-cut-surface">${sideDeckMarkup("two")}<span class="piles-guide">${t("One deck will become two voices.")}</span></div>`,
+    actions: `<p class="status-note">${t("Move the marker, then let the deck divide at that exact place.")}</p><button class="seal-button kin-seal" data-action="kin-make-cut">${t("Divide the two voices")}</button>`
+  };
+}
+
+function growthTitle() {
+  const copy = {
+    shuffle: ["Loosen the pattern beneath your hands.", "Sweep the cards until the familiar order gives way."],
+    spread: ["Let the inner path open.", "The gathered deck spreads directly into one continuous path."],
+    choose: ["Choose three moments of becoming.", "Draw a Root, a Threshold, and a Becoming from the open path."],
+    growthReveal: ["Turn over the movement within you.", "Three cards trace what formed you, what asks courage, and what is emerging."]
+  };
+  const [title, lede] = copy[state.stage] || ["Inner Moon", ""];
+  return `<div class="ritual-head growth-ritual-head">${progress()}<p class="eyebrow">${t("Personal Growth ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
+}
+function renderGrowthRitual() {
+  let view = { surface: "", actions: "" };
+  if (state.stage === "shuffle") view = renderShuffle();
+  if (state.stage === "spread") view = renderSpread();
+  if (state.stage === "choose") view = renderChoose();
+  if (state.stage === "growthReveal") view = renderPositionReveal(GROWTH_POSITIONS, "growth-reveal-layout");
+  return world(`<section class="scene ritual growth-ritual">${growthTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "growth-world");
+}
+
+function futureTitle() {
+  const copy = {
+    futureShuffle: ["Disturb the map of what comes next.", "Sweep the full deck until expectation loses its familiar direction."],
+    futureCutFour: ["Mark four quarters in the coming sky.", "Place three brass markers to divide the deck into four living directions."],
+    futureCompass: ["Give each pile its direction.", "Touch the four piles in the order Dawn, Zenith, Dusk, and Midnight."],
+    futureSpread: ["Let the compass breathe open.", "The four directions will fan outward together around the central star."],
+    futureChooseDawn: ["Choose from Dawn.", "Draw one card for the first light: what is beginning before it has a name."],
+    futureChooseZenith: ["Choose from Zenith.", "Draw one card for what rises into view and asks to be seen clearly."],
+    futureChooseDusk: ["Choose from Dusk.", "Draw one card for the pattern that must change, soften, or be released."],
+    futureChooseMidnight: ["Choose from Midnight.", "Draw one card for the quiet inner compass that can guide the whole horizon."],
+    futureReveal: ["Turn over the four directions.", "The first turn opens a brief doorway. Then the compass reveals without interruption."]
+  };
+  const [title, lede] = copy[state.stage] || ["The Far Horizon", ""];
+  return `<div class="ritual-head future-ritual-head">${progress()}<p class="eyebrow">${t("General Future ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
+}
+function renderFutureRitual() {
+  let view = { surface: "", actions: "" };
+  if (state.stage === "futureShuffle") view = renderShuffle();
+  if (state.stage === "futureCutFour") view = renderFutureCutFour();
+  if (state.stage === "futureCompass") view = renderFutureCompass();
+  if (state.stage === "futureSpread") view = renderFutureSpread();
+  if (state.stage.startsWith("futureChoose")) view = renderFutureChoose();
+  if (state.stage === "futureReveal") view = renderPositionReveal(FUTURE_POSITIONS, "future-reveal-layout");
+  return world(`<section class="scene ritual future-ritual">${futureTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "future-world");
+}
+
 function careerTitle() {
   const scattering = state.stage === "careerEmbers" && state.career.phase !== "pick";
   const copy = {
     careerEmbers: scattering
       ? ["Loosen the cards beneath your hands.", "Sweep across the table—these cards scatter apart instead of gathering."]
       : ["Wake the embers in your deck.", "Touch three cards that feel alive. They will become the sparks beneath your path."],
-    careerCompass: ["Set the direction of your ambition.", "Turn the brass compass toward the quality your next chapter needs."],
-    careerLadder: ["Build your constellation ladder.", "At every rung, choose the stepping-stone that feels like yours."],
+    careerCut: ["Cut the gathered deck into two.", "Choose where the two remaining paths separate."],
+    careerSpreadOne: ["Open the first pile.", "Spread the first half and let one card become Your Leverage."],
+    careerChooseOne: ["Choose one card from the first spread.", "This card will become Your Leverage."],
+    careerSpreadTwo: ["Open the second pile.", "Spread the second half and let one card become The Next Bold Move."],
+    careerChooseTwo: ["Choose one card from the second spread.", "This card will become The Next Bold Move."],
     careerReveal: ["Turn over the path you have built.", "Five cards now hold the arc from where you stand to your next bold move."]
   };
   const [title, lede] = copy[state.stage] || ["Career Compass", ""];
   return `<div class="ritual-head career-ritual-head">${progress()}<p class="eyebrow">${t("Career ritual")}</p><h1>${t(title)}</h1><p class="lede">${t(lede)}</p></div>`;
 }
-function buildCareerCandidates() {
-  const source = [...state.deck];
-  const emberWeight = state.career.emberIds.reduce((sum, id) => sum + Math.max(0, state.deck.findIndex((card) => card.id === id)), 0);
-  const offset = Math.floor(state.career.compass / 360 * source.length + emberWeight) % source.length;
-  const stride = 5 + (emberWeight % 7);
-  const candidates = [];
-  for (let rung = 0; rung < 5; rung += 1) {
-    for (let fork = 0; fork < 2; fork += 1) {
-      const index = (offset + rung * stride + fork * (11 + rung * 2)) % source.length;
-      candidates.push(source.splice(index, 1)[0].id);
-    }
-  }
-  return candidates;
-}
 function renderCareerRitual() {
   let view = { surface: "", actions: "" };
   if (state.stage === "careerEmbers") view = renderCareerEmbers();
-  if (state.stage === "careerCompass") view = renderCareerCompass();
-  if (state.stage === "careerLadder") view = renderCareerLadder();
+  if (state.stage === "careerCut") view = renderCareerCut();
+  if (state.stage === "careerSpreadOne" || state.stage === "careerSpreadTwo") view = renderSpread();
+  if (state.stage === "careerChooseOne" || state.stage === "careerChooseTwo") view = renderChoose();
   if (state.stage === "careerReveal") view = renderCareerReveal();
   return world(`<section class="scene ritual career-ritual">${careerTitle()}${view.surface}<div class="ritual-actions">${view.actions}</div></section>`, "career-world");
 }
 function careerScatter() {
   if (!state.career.scatter?.length) state.career.scatter = buildCareerScatter(state.seed);
   return state.career.scatter;
+}
+// The engraved guide is an ellipse on screen. Keep each card's centre inside it even
+// after repeated sweeps and neighbour-separation passes.
+function confineCareerScatterPoint(piece) {
+  const radiusX = 43;
+  const radiusY = 43;
+  const dx = piece.x - 50;
+  const dy = piece.y - 50;
+  const distance = Math.hypot(dx / radiusX, dy / radiusY);
+  if (distance > 1) {
+    piece.x = 50 + dx / distance;
+    piece.y = 50 + dy / distance;
+  }
+  piece.x = Number(piece.x.toFixed(2));
+  piece.y = Number(piece.y.toFixed(2));
+  return piece;
 }
 function renderCareerEmbers() {
   const picking = state.career.phase === "pick";
@@ -1226,11 +1469,11 @@ function renderCareerEmbers() {
     : moves
       ? `${moves} ${t("sweeps · keep scattering or lay them out")}`
       : t("Drag through the cards—they push each other apart");
-  const surface = `<div class="table-surface career-ember-surface" id="career-scatter-surface"><div class="career-orbit ${picking ? "picking" : ""}" aria-label="A scatter of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div>${instruction ? `<p class="physical-instruction ${moves ? "quiet" : ""}">${instruction}</p>` : ""}<span class="piles-guide" id="career-scatter-guide">${guide}</span></div>`;
+  const surface = `<div class="table-surface career-ember-surface" id="career-scatter-surface"><div class="career-orbit ${picking ? "picking" : ""} ${picking && chosen.size ? "has-selection" : ""}" aria-label="A scatter of face-down cards">${field}<div class="career-forge-mark" aria-hidden="true"><span>⌁</span><i></i><i></i><i></i></div></div>${instruction ? `<p class="physical-instruction ${moves ? "quiet" : ""}">${instruction}</p>` : ""}<span class="piles-guide" id="career-scatter-guide">${guide}</span></div>`;
   if (picking) {
     return {
       surface,
-      actions: `<p class="status-note">${t("Touch any three cards. There is no wrong constellation.")}</p><button class="text-button" data-action="career-scatter-again">${t("Scatter them again")}</button><button class="seal-button career-seal" data-action="career-raise" ${state.career.emberIds.length === 3 ? "" : "disabled"}>${t("Raise the constellation")}</button>`
+      actions: `<p class="status-note">${t("Touch any three cards. There is no wrong constellation.")}</p><button class="text-button" data-action="career-scatter-again">${t("Scatter them again")}</button><button class="seal-button career-seal" data-action="career-raise" ${state.career.emberIds.length === 3 ? "" : "disabled"}>${t("Keep these three and gather the rest")}</button>`
     };
   }
   return {
@@ -1238,31 +1481,23 @@ function renderCareerEmbers() {
     actions: `<p class="status-note" id="career-scatter-status">${ready ? t("The cards lie apart. Lay them out when you are ready.") : `${3 - moves} ${t("more sweeps will scatter the deck.")}`}</p><button class="text-button" data-action="assist-career-scatter">${t("Scatter them for me")}</button><button class="seal-button career-seal" data-action="career-scatter-done" ${ready ? "" : "disabled"}>${t("Lay them out to choose")}</button>`
   };
 }
-function renderCareerCompass() {
-  const theme = careerCompassTheme();
-  return {
-    surface: `<div class="table-surface career-compass-surface" style="--needle:${state.career.compass}deg"><div class="career-compass" role="img" aria-label="${t("Your compass points toward")} ${t(theme)}"><span class="compass-label north">${t("Mastery")}</span><span class="compass-label east">${t("Visibility")}</span><span class="compass-label south">${t("Security")}</span><span class="compass-label west">${t("Reinvention")}</span><div class="compass-rings"><i class="compass-needle"></i><b>✦</b></div></div><label class="career-dial-label" for="career-compass-range">${t("Your compass points toward")} <output id="career-compass-value">${t(theme)}</output></label><input class="career-dial" id="career-compass-range" type="range" min="0" max="359" value="${state.career.compass}" aria-label="${t("Set the direction of your ambition.")}"></div>`,
-    actions: `<p class="status-note">${t("Turn the brass compass toward the quality your next chapter needs.")}</p><button class="seal-button career-seal" data-action="career-seal-compass">${t("Seal this direction")}</button>`
-  };
+function updateCareerEmberSelection(card) {
+  const id = card?.dataset.cardId;
+  if (!id) return;
+  const selected = state.career.emberIds.includes(id);
+  card.classList.toggle("awake", selected);
+  card.setAttribute("aria-pressed", String(selected));
+  card.setAttribute("aria-label", selected ? "Awake ember" : "Wake this card");
+  card.closest(".career-orbit")?.classList.toggle("has-selection", state.career.emberIds.length > 0);
+  const guide = document.querySelector("#career-scatter-guide");
+  if (guide) guide.textContent = `${state.career.emberIds.length}/3 ${t("embers awake")}`;
+  const gather = document.querySelector('[data-action="career-raise"]');
+  if (gather) gather.disabled = state.career.emberIds.length !== 3;
 }
-function renderCareerLadder() {
-  const selected = state.career.selectedIds;
-  const current = selected.length;
-  const rungs = CAREER_POSITIONS.map((position, index) => {
-    const complete = index < current;
-    const active = index === current;
-    const pair = state.career.candidateIds.slice(index * 2, index * 2 + 2);
-    const cards = complete
-      ? `<span class="career-step-card card back selected" aria-hidden="true"></span>`
-      : active
-        ? pair.map((id, fork) => `<button class="career-step-card card back" data-action="career-choose-step" data-card-id="${id}" aria-label="Choose ${fork + 1} for ${t(position)}"></button>`).join("")
-        : `<i class="career-step-placeholder"></i><i class="career-step-placeholder"></i>`;
-    return `<div class="career-rung ${complete ? "complete" : ""} ${active ? "active" : ""}" style="--rung:${index}"><span class="career-rung-number">0${index + 1}</span><span class="career-rung-label">${t(position)}</span><div class="career-rung-cards">${cards}</div></div>`;
-  }).reverse().join("");
-  const done = selected.length === CAREER_POSITIONS.length;
+function renderCareerCut() {
   return {
-    surface: `<div class="table-surface career-ladder-surface"><div class="career-ladder" aria-label="Five-rung career constellation">${rungs}</div><span class="piles-guide">${selected.length}/5</span></div>`,
-    actions: `<p class="status-note">${t(done ? "Your path is complete. The skyline is ready." : "Choose one of the two stepping-stones.")}</p>${done ? `<button class="seal-button career-seal" data-action="career-to-reveal">${t("Read the skyline")}</button>` : ""}`
+    surface: `<div class="table-surface cut-table career-cut-surface" id="career-cut-surface">${sideDeckMarkup("two")}<span class="piles-guide">${t("Your three chosen cards are held aside. Cut the gathered deck into two.")}</span></div>`,
+    actions: `<p class="status-note">${t("Move the marker, then divide the gathered deck into two piles.")}</p><button class="seal-button career-seal" data-action="career-make-cut">${t("Make two piles")}</button>`
   };
 }
 function renderCareerReveal() {
@@ -1284,7 +1519,7 @@ function moneyTitle() {
     shuffle: ["Loosen the cards beneath your hands.", "Sweep your hand across the loose pile to send a wave through the cards."],
     cutThree: ["Divide the deck into three.", "Place two markers along the side of the deck."],
     pileOrder: ["Choose the order of the three piles.", "Touch the piles left to right, in the order you want them to sit on the table."],
-    spread: ["Let this pile open.", "Open the spread and the cards will fan across the table on their own."],
+    spread: ["Let this pile open.", "The pile opens directly into a spread."],
     choose: ["Choose the card that calls to you.", "Touch a card to draw it into the reading."],
     moneyReveal: ["Turn over the three cards you chose.", "Each pile gave you exactly one card, in the order you set: Keep, Grow, and Flow."]
   };
@@ -1380,10 +1615,13 @@ function renderDecisionReveal() {
 function renderShuffle() {
   const ready = state.shuffleMoves >= 3;
   const pieces = state.shuffleLayout?.length ? state.shuffleLayout : buildShuffleLayout(state.seed);
-  const money = state.category === "Money";
+  const sealClass = state.category === "Money" ? "money-seal"
+    : state.category === "Friendship / Family" ? "kin-seal"
+      : state.category === "Personal Growth" ? "growth-seal"
+        : state.category === "General Future" ? "future-seal" : "";
   return {
     surface: `<div class="table-surface shuffle-table" id="shuffle-surface"><div class="scatter-pile" aria-label="A loose pile of face-down tarot cards">${pieces.map((piece, index) => `<button class="shuffle-card card back" data-shuffle-index="${index}" aria-label="${t("Move card")} ${index + 1}" style="--x:${piece.x}%;--y:${piece.y}%;--r:${piece.r}deg;--z:${piece.z}"></button>`).join("")}</div><p class="physical-instruction ${state.shuffleMoves ? "quiet" : ""}">${t("Sweep across the loose cards to send a wave through the pile.")}</p><span class="piles-guide" id="shuffle-guide">${state.shuffleMoves ? `${state.shuffleMoves} ${t("physical moves · keep mixing or gather them")}` : t("Drag through the cards—a wave ripples across the pile")}</span></div>`,
-    actions: `<p class="status-note" id="shuffle-status">${ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button ${money ? "money-seal" : ""}" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
+    actions: `<p class="status-note" id="shuffle-status">${ready ? t("The cards feel mixed. Gather them when you are ready.") : `${3 - state.shuffleMoves} ${t("more moves will loosen the order.")}`}</p><button class="text-button" data-action="assist-shuffle">${t("Send a wave for me")}</button><button class="seal-button ${sealClass}" data-action="shuffle-done" ${ready ? "" : "disabled"}>${t("Gather into a deck")}</button>`
   };
 }
 function cutMood(value, total) {
@@ -1394,19 +1632,28 @@ function cutMood(value, total) {
 }
 function sideDeckMarkup(mode) {
   const total = state.deck.length;
-  const draft = mode === "two" ? state.cutDraft : state.threeCutDraft;
-  const settled = mode === "three" ? [...state.threeCuts].sort((a, b) => a - b) : [];
+  const four = mode === "four";
+  const draft = mode === "two" ? state.cutDraft : four ? state.future.cutDraft : state.threeCutDraft;
+  const settled = mode === "three"
+    ? [...state.threeCuts].sort((a, b) => a - b)
+    : four
+      ? [...state.future.cuts].sort((a, b) => a - b)
+      : [];
   const markers = settled.map((cut, index) => `<i class="cut-marker settled" style="top:${cut / total * 100}%" aria-hidden="true"><span>${index + 1}</span></i>`).join("");
   const boundaries = mode === "two" ? [draft] : [...settled, draft].sort((a, b) => a - b);
   const all = [0, ...boundaries, total];
   const segments = all.slice(0, -1).map((start, index) => `<div class="edge-segment segment-${index + 1}" style="top:${start / total * 100}%;height:${(all[index + 1] - start) / total * 100}%"></div>`).join("");
-  return `<div class="cut-workbench" data-cut-mode="${mode}" style="--cut-pos:${draft / total * 100}%"><p class="side-label">${t("Side view · slide the brass marker up and down between the card edges")}</p><div class="cut-stage"><div class="side-deck" data-motion-key="main-deck">${segments}${markers}<i class="cut-marker active" aria-hidden="true"><span>✦</span></i></div><input class="cut-range" id="${mode === "two" ? "first-cut-range" : "three-cut-range"}" type="range" min="9" max="${total - 9}" value="${draft}" aria-label="${t("Choose where to cut the deck")}"></div><p class="cut-reading" id="cut-reading">${cutMood(draft, total)}</p></div>`;
+  const rangeId = mode === "two" ? "first-cut-range" : four ? "future-cut-range" : "three-cut-range";
+  return `<div class="cut-workbench" data-cut-mode="${mode}" style="--cut-pos:${draft / total * 100}%"><p class="side-label">${t("Side view · slide the brass marker up and down between the card edges")}</p><div class="cut-stage"><div class="side-deck" data-motion-key="main-deck">${segments}${markers}<i class="cut-marker active" aria-hidden="true"><span>${four ? "☉" : "✦"}</span></i></div><input class="cut-range" id="${rangeId}" type="range" min="${four ? 8 : 9}" max="${total - (four ? 8 : 9)}" value="${draft}" aria-label="${t("Choose where to cut the deck")}"></div><p class="cut-reading" id="cut-reading">${cutMood(draft, total)}</p></div>`;
 }
 function renderCutOne() {
   return { surface: `<div class="table-surface cut-table" id="cut-one-surface">${sideDeckMarkup("two")}<span class="piles-guide">${t("The deck is shown from the side so every possible cut is reachable.")}</span></div>`, actions: `<p class="status-note">${t("Move the marker, then lift the deck at that exact place.")}</p><button class="seal-button" data-action="make-first-cut">${t("Lift at this point")}</button>` };
 }
 function stackLayers() {
   return `<div class="stack-card"></div><div class="stack-card"></div><div class="stack-card"></div><div class="stack-card"></div>`;
+}
+function hiddenCardPosition() {
+  return "Hidden Heart";
 }
 function pileMarkup(cards, key, label, options = {}) {
   const { action = "", selected = false, order = null, extra = "" } = options;
@@ -1417,29 +1664,128 @@ function pileMarkup(cards, key, label, options = {}) {
 function renderRitualCard() {
   const top = state.piles[0] || [];
   const bottom = state.piles[1] || [];
-  return { surface: `<div class="table-surface centered-table" id="ritual-card-surface"><div class="pile-field two">${pileMarkup(top, "0", t("lifted packet"), { extra: "lifted" })}${pileMarkup(bottom, "1", t("resting packet"))}<button class="ritual-draw-card card back" data-action="take-ritual" aria-label="${t("Draw the hidden card from beneath the lifted packet")}"></button></div><div class="hidden-heart-slot"><span>${t("Hidden Heart")}</span><i>${t("one card waits here")}</i></div></div>`, actions: `<p class="status-note">${t("The card directly beneath the lifted packet becomes the Hidden Heart.")}</p><button class="seal-button" data-action="take-ritual">${t("Draw the hidden card")}</button>` };
+  const hidden = hiddenCardPosition();
+  return { surface: `<div class="table-surface centered-table" id="ritual-card-surface"><div class="pile-field two">${pileMarkup(top, "0", t("lifted packet"), { extra: "lifted" })}${pileMarkup(bottom, "1", t("resting packet"))}<button class="ritual-draw-card card back" data-action="take-ritual" aria-label="${t("Draw the hidden card from beneath the lifted packet")}"></button></div><div class="hidden-heart-slot"><span>${t(hidden)}</span><i>${t("one card waits here")}</i></div></div>`, actions: `<p class="status-note">${t("The card directly beneath the lifted packet becomes the Hidden Heart.")}</p><button class="seal-button" data-action="take-ritual">${t("Draw the hidden card")}</button>` };
 }
 function renderReassembleOne() {
-  return { surface: `<div class="table-surface centered-table" id="reassemble-one-surface"><div class="pile-field two choose-field">${pileMarkup(state.piles[0] || [], "0", `${t("pile")} 1`, { action: "choose-two-top", selected: state.twoTop === 0 })}${pileMarkup(state.piles[1] || [], "1", `${t("pile")} 2`, { action: "choose-two-top", selected: state.twoTop === 1 })}</div><div class="hidden-heart-slot filled"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${t("Tap the pile you want on top. Both piles will meet in the center.")}</p><button class="seal-button" data-action="join-two" ${state.twoTop === null ? "disabled" : ""}>${t("Stack with this pile on top")}</button>` };
+  return { surface: `<div class="table-surface centered-table" id="reassemble-one-surface"><div class="pile-field two choose-field">${pileMarkup(state.piles[0] || [], "0", `${t("pile")} 1`, { action: "choose-two-top", selected: state.twoTop === 0 })}${pileMarkup(state.piles[1] || [], "1", `${t("pile")} 2`, { action: "choose-two-top", selected: state.twoTop === 1 })}</div><div class="hidden-heart-slot filled"><span>${t(hiddenCardPosition())}</span>${cardBack("selected")}</div></div>`, actions: `<p class="status-note">${t("Tap the pile you want on top. Both piles will meet in the center.")}</p><button class="seal-button" data-action="join-two" ${state.twoTop === null ? "disabled" : ""}>${t("Stack with this pile on top")}</button>` };
 }
 function renderCutThree() {
   const cuts = state.threeCuts.length;
   const money = state.category === "Money";
-  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? t("Place the first marker") : t("First marker set · choose a different place for the second")}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? t("Choose the first break in the side of the deck.") : t("Choose the second break. The two markers will form three piles.")}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
+  const sealClass = money ? "money-seal" : "";
+  return { surface: `<div class="table-surface cut-table" id="cut-three-surface">${sideDeckMarkup("three")}<span class="piles-guide">${cuts === 0 ? t("Place the first marker") : t("First marker set · choose a different place for the second")}</span></div>`, actions: `<p class="status-note">${cuts === 0 ? t("Choose the first break in the side of the deck.") : t("Choose the second break. The two markers will form three piles.")}</p><button class="seal-button ${sealClass}" data-action="place-three-cut">${cuts === 0 ? t("Place first cut") : t("Make three piles")}</button>` };
 }
 function renderReassembleThree() {
   const selected = state.assemblyOrder;
   const money = state.category === "Money";
-  const heartSlot = money ? "" : `<div class="hidden-heart-slot filled compact"><span>${t("Hidden Heart")}</span>${cardBack("selected")}</div>`;
+  const heartSlot = money ? "" : `<div class="hidden-heart-slot filled compact"><span>${t(hiddenCardPosition())}</span>${cardBack("selected")}</div>`;
   const status = selected.length
     ? `${selected.length} ${t(money ? "of 3 chosen · numbers show the left-to-right order" : "of 3 chosen · numbers show the top-to-bottom order")}`
     : t(money ? "Tap the pile that should sit first, on the left." : "Tap the pile that should return first (on top).");
-  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `${t("pile")} ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div>${heartSlot}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t(money ? "Set this order" : "Stack in this order")}</button>` };
+  const sealClass = money ? "money-seal" : "";
+  return { surface: `<div class="table-surface centered-table" id="reassemble-three-surface"><div class="pile-field three choose-field">${state.piles.map((pile, index) => { const order = selected.indexOf(index); return pileMarkup(pile, String(index), `${t("pile")} ${index + 1}`, { action: "choose-pile", selected: order >= 0, order: order >= 0 ? order : null }); }).join("")}</div>${heartSlot}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${sealClass}" data-action="reassemble-three" ${selected.length === 3 ? "" : "disabled"}>${t(money ? "Set this order" : "Stack in this order")}</button>` };
+}
+function normalizeFutureCut(raw) {
+  const total = state.deck.length;
+  const minGap = 10;
+  const value = clamp(Math.round(raw || total * .25), minGap, total - minGap);
+  if ([0, total, ...state.future.cuts].every((boundary) => Math.abs(value - boundary) >= minGap)) return value;
+  const candidates = Array.from({ length: total - minGap * 2 + 1 }, (_, index) => index + minGap)
+    .filter((candidate) => [0, total, ...state.future.cuts].every((boundary) => Math.abs(candidate - boundary) >= minGap))
+    .sort((a, b) => Math.abs(a - value) - Math.abs(b - value));
+  return candidates[0] ?? null;
+}
+function nextFutureCutDraft() {
+  const total = state.deck.length;
+  const targets = [total * .25, total * .5, total * .75].map(Math.round);
+  const unused = targets.find((target) => [0, total, ...state.future.cuts].every((boundary) => Math.abs(target - boundary) >= 10));
+  return normalizeFutureCut(unused ?? total * .5) ?? Math.round(total * .5);
+}
+function renderFutureCutFour() {
+  const cuts = state.future.cuts.length;
+  const labels = ["Place the Dawn marker", "Place the Zenith marker", "Complete the four quarters"];
+  const guide = cuts
+    ? `${cuts} ${t(cuts === 1 ? "direction marked · choose the next break" : "directions marked · choose the final break")}`
+    : t("Place the first of three directional markers");
+  return {
+    surface: `<div class="table-surface cut-table future-cut-surface" id="future-cut-surface">${sideDeckMarkup("four")}<span class="piles-guide">${guide}</span></div>`,
+    actions: `<p class="status-note">${t("Each marker creates another quarter of the coming sky.")}</p><button class="seal-button future-seal" data-action="place-future-cut">${t(labels[cuts] || labels[2])}</button>`
+  };
+}
+function renderFutureCompass() {
+  const selected = state.future.order;
+  const nextDirection = FUTURE_DIRECTIONS[selected.length] || FUTURE_DIRECTIONS[3];
+  const piles = state.piles.map((pile, index) => {
+    const order = selected.indexOf(index);
+    const label = order >= 0 ? t(FUTURE_DIRECTIONS[order]) : `${t("pile")} ${index + 1}`;
+    return pileMarkup(pile, String(index), label, { action: "choose-future-pile", selected: order >= 0, order: order >= 0 ? order : null, extra: `future-compass-pile future-compass-pile-${index}` });
+  }).join("");
+  const status = selected.length < 4
+    ? `${t("Choose the pile that belongs to")} ${t(nextDirection)} · ${selected.length}/4`
+    : t("The four directions are named. Set the compass in motion.");
+  return {
+    surface: `<div class="table-surface future-compass-surface" id="future-compass-surface"><div class="future-compass-ring" aria-hidden="true"><i></i><b>☉</b><span class="north">N</span><span class="east">E</span><span class="south">S</span><span class="west">W</span></div><div class="future-compass-piles">${piles}</div><span class="piles-guide">${t("Touch a named pile again to release it and choose anew.")}</span></div>`,
+    actions: `<p class="status-note">${status}</p><button class="seal-button future-seal" data-action="align-future-compass" ${selected.length === 4 ? "" : "disabled"}>${t("Align the four directions")}</button>`
+  };
+}
+function futurePreviewCards(direction) {
+  return Array.from({ length: 11 }, (_, index) => `<i class="future-preview-card card back" style="--fp:${index};--direction:${direction}" aria-hidden="true"></i>`).join("");
+}
+function renderFutureSpread() {
+  const quarters = state.piles.map((pile, index) => `<div class="future-quarter quarter-${index}"><div class="future-quarter-stack">${stackLayers()}</div><div class="future-preview-fan">${futurePreviewCards(index)}</div><span>${t(FUTURE_DIRECTIONS[index])} · ${pile.length}</span></div>`).join("");
+  return {
+    surface: `<div class="table-surface future-spread-surface" id="future-spread-surface"><div class="future-compass-star" aria-hidden="true"><i></i><b>☉</b></div>${quarters}<span class="piles-guide">${t("Four quarters, opening as one sky.")}</span></div>`,
+    actions: `<p class="status-note">${t("Watch each direction unfold around the compass.")}</p>`
+  };
+}
+function futureStep() {
+  const stages = ["futureChooseDawn", "futureChooseZenith", "futureChooseDusk", "futureChooseMidnight"];
+  return Math.max(0, stages.indexOf(state.stage));
+}
+function futureSpreadPath(direction) {
+  return [
+    { start: { x: 31, y: 24 }, end: { x: 69, y: 24 }, bend: { x: 0, y: -7 }, rotation: 28 },
+    { start: { x: 76, y: 31 }, end: { x: 76, y: 69 }, bend: { x: 7, y: 0 }, rotation: 28 },
+    { start: { x: 69, y: 76 }, end: { x: 31, y: 76 }, bend: { x: 0, y: 7 }, rotation: 28 },
+    { start: { x: 24, y: 69 }, end: { x: 24, y: 31 }, bend: { x: -7, y: 0 }, rotation: 28 }
+  ][direction];
+}
+function renderFutureChoose() {
+  const active = futureStep();
+  const picked = new Set(state.future.selectedIds);
+  const cards = state.piles.map((pile, pileIndex) => pile.map((card, index) => {
+    const p = positionForSpread(index, pile.length, futureSpreadPath(pileIndex));
+    const isPicked = picked.has(card.id);
+    const selectable = pileIndex === active && !isPicked;
+    return `<div class="future-spread-card ${selectable ? "is-active" : ""} ${isPicked ? "picked" : ""} direction-${pileIndex}" style="left:${p.x}%;top:${p.y}%;z-index:${pileIndex * 100 + index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back" ${selectable ? `data-action="pick-future-card" data-card-id="${card.id}" data-pile-index="${pileIndex}"` : "disabled"} aria-label="${selectable ? t("Select a face-down card") : t(FUTURE_DIRECTIONS[pileIndex])}"></button></div>`;
+  }).join("")).join("");
+  const labels = FUTURE_DIRECTIONS.map((direction, index) => `<span class="future-direction-label direction-${index} ${index === active ? "is-active" : ""} ${index < active ? "is-done" : ""}">${t(direction)}<i>${index < active ? "✓" : index === active ? "✦" : ""}</i></span>`).join("");
+  const kept = state.future.selectedIds.map((id, index) => `<div class="future-kept-card" style="--kept:${index}">${cardBack("selected")}</div>`).join("");
+  return {
+    surface: `<div class="table-surface future-choose-surface"><div class="future-spread-layer">${cards}</div>${labels}<div class="future-compass-dock"><span>${state.future.selectedIds.length}/4</span><b aria-hidden="true">☉</b><div class="future-kept-row">${kept}</div></div></div>`,
+    actions: `<p class="status-note">${t("Only")} ${t(FUTURE_DIRECTIONS[active])} ${t("is awake. Choose one card from its quarter.")}</p>`
+  };
 }
 function renderSpread() {
   const money = state.category === "Money";
-  const guide = money ? `${t(MONEY_VESSELS[state.money.pileStep])} · ${state.deck.length} ${t("cards")}` : t("One touch fans every card into a reading arc");
-  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">${guide}</span></div>`, actions: `<p class="status-note">${t("Open the spread and the cards fan across the table.")}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="assist-spread">${t("Open the spread")}</button>` };
+  const career = state.category === "Career";
+  const kin = state.category === "Friendship / Family";
+  const growth = state.category === "Personal Growth";
+  const guide = money
+    ? `${t(MONEY_VESSELS[state.money.pileStep])} · ${state.deck.length} ${t("cards")}`
+    : career
+      ? `${t(CAREER_POSITIONS[3 + state.career.pileStep])} · ${state.deck.length} ${t("cards")}`
+      : kin
+        ? `${t(KIN_POSITIONS[state.kin.pileStep])} · ${state.deck.length} ${t("cards")}`
+        : growth
+          ? `${t("Three moments")} · ${state.deck.length} ${t("cards")}`
+          : t("One touch fans every card into a reading arc");
+  const sealClass = money ? "money-seal" : career ? "career-seal" : kin ? "kin-seal" : growth ? "growth-seal" : "";
+  const actions = money || career || kin || growth
+    ? `<p class="status-note">${t("The pile opens directly into a spread.")}</p>`
+    : `<p class="status-note">${t("Open the spread and the cards fan across the table.")}</p><button class="seal-button ${sealClass}" data-action="assist-spread">${t("Open the spread")}</button>`;
+  return { surface: `<div class="table-surface" id="spread-surface"><div class="spread-preview-layer" aria-hidden="true"></div>${deckBackStack("")}<span class="piles-guide">${guide}</span></div>`, actions };
 }
 function positionForSpread(index, total, path) {
   const t = index / Math.max(1, total - 1);
@@ -1453,19 +1799,39 @@ function renderChoose() {
   const picked = new Set(state.selectedIds);
   const drawn = state.selectedIds.length;
   const money = state.category === "Money";
-  const cap = money ? 1 : 3;
+  const career = state.category === "Career";
+  const kin = state.category === "Friendship / Family";
+  const growth = state.category === "Personal Growth";
+  const cap = money || career || kin ? 1 : 3;
   const dock = money
     ? `<div class="draw-dock"><span class="dock-title">${t(MONEY_VESSELS[state.money.pileStep])}</span><div class="drawn-row">${drawn ? cardBack("selected") : ""}</div></div>`
-    : `<div class="draw-dock"><span class="dock-title">${t("Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div>`;
+    : career
+      ? `<div class="draw-dock"><span class="dock-title">${t(CAREER_POSITIONS[3 + state.career.pileStep])} · ${drawn}/1</span><div class="drawn-row">${drawn ? cardBack("selected") : ""}</div></div>`
+      : kin
+        ? `<div class="draw-dock"><span class="dock-title">${t(KIN_POSITIONS[state.kin.pileStep])} · ${drawn}/1</span><div class="drawn-row">${drawn ? cardBack("selected") : ""}</div></div>`
+        : `<div class="draw-dock"><span class="dock-title">${t(growth ? "Moments" : "Drawn")} · ${drawn}/3</span><div class="drawn-row">${state.selectedIds.map((id, index) => `<div style="--dock-r:${index === 1 ? 0 : index ? 5 : -5}deg">${cardBack("selected")}</div>`).join("")}</div></div>`;
   const status = money
     ? (drawn ? t("One card has moved into the center.") : t("Tap any face-down card from this pile."))
-    : (drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray."));
-  const buttonLabel = money ? (state.money.pileStep === 2 ? t("Open the treasury") : t("Take this card")) : t("Place the four cards");
+    : career
+      ? (drawn ? t("One card has joined your constellation.") : t("Choose one face-down card from this spread."))
+      : kin
+        ? (drawn ? t("One voice has moved into the reading.") : t("Choose one face-down card from this voice."))
+        : (drawn ? `${drawn} ${t(drawn === 1 ? "card has moved into the center tray." : "cards have moved into the center tray.")}` : t("Tap any face-down card. It will travel into the center tray."));
+  const buttonLabel = money
+    ? (state.money.pileStep === 2 ? t("Open the treasury") : t("Take this card"))
+    : career
+      ? t(state.career.pileStep === 0 ? "Continue to the second pile" : "Reveal the constellation")
+      : kin
+        ? t(state.kin.pileStep === 0 ? "Continue to the second voice" : "Reveal the bond")
+        : growth
+          ? t("Place the three moments")
+          : t("Place the four cards");
+  const sealClass = money ? "money-seal" : career ? "career-seal" : kin ? "kin-seal" : growth ? "growth-seal" : "";
   return { surface: `<div class="table-surface"><div class="spread-layer">${state.deck.map((card, index) => {
     const p = positionForSpread(index, state.deck.length, spread);
     const isPicked = picked.has(card.id);
     return `<div class="spread-card ${isPicked ? "picked" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};transform:translate(-50%,-50%) rotate(${p.rotation + card.microRotation}deg)"><button class="card back ${isPicked ? "selected" : ""}" data-action="pick-card" data-card-id="${card.id}" aria-label="${t("Select a face-down card")}"></button></div>`;
-  }).join("")}</div>${dock}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${money ? "money-seal" : ""}" data-action="to-reveal" ${drawn === cap ? "" : "disabled"}>${buttonLabel}</button>` };
+  }).join("")}</div>${dock}</div>`, actions: `<p class="status-note">${status}</p><button class="seal-button ${sealClass}" data-action="to-reveal" ${drawn === cap ? "" : "disabled"}>${buttonLabel}</button>` };
 }
 function revealActions() {
   const done = state.revealedIds.length === readingPositions().length;
@@ -1476,12 +1842,24 @@ function revealActions() {
 }
 function renderReveal() {
   const cards = readingCards();
+  const positions = readingPositions();
   preloadCardArt(cards); // ensure art is warming even on a reload straight into this stage
   return { surface: `<div class="reveal-layout">${cards.map((card, index) => {
     const revealed = state.revealedIds.includes(card.id);
     const pending = state.ad?.cardId === card.id;
-    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(LOVE_POSITIONS[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(LOVE_POSITIONS[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""} ${pending ? "flip-pending" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(positions[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(positions[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
   }).join("")}</div>`, actions: revealActions() };
+}
+function renderPositionReveal(positions, layoutClass) {
+  const cards = readingCards();
+  preloadCardArt(cards);
+  return {
+    surface: `<div class="reveal-layout ${layoutClass}">${cards.map((card, index) => {
+      const revealed = state.revealedIds.includes(card.id);
+      return `<div class="reveal-slot"><button class="card reveal-card ${card.reversed ? "reversed" : ""} ${revealed ? "flipped" : ""}" data-action="reveal-card" data-card-id="${card.id}" ${revealed ? "disabled" : ""} aria-label="${revealed ? `${card.name}, ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}` : `${t("Reveal")} ${t(positions[index])}`}"><span class="card-inner"><span class="card-side back"></span><span class="card-side front">${faceInner(card)}</span></span></button><span class="label">${t(positions[index])}</span><span class="orientation ${revealed ? "" : "is-hidden"}">${t(card.reversed ? "Reversed" : "Upright")}</span></div>`;
+    }).join("")}</div>`,
+    actions: revealActions()
+  };
 }
 
 function cardKeywords(card) {
@@ -1504,11 +1882,29 @@ function cardKeywords(card) {
           Swords: ["the plain facts", "a clean cut", "second-guessing"], Pentacles: ["what it costs", "daily life after", "durability"],
           "Major Arcana": ["a threshold", "a turning point", "consequence"]
         }
+      : state.category === "Friendship / Family"
+        ? {
+            Wands: ["warmth", "shared momentum", "honest expression"], Cups: ["care", "belonging", "emotional reciprocity"],
+            Swords: ["the needed conversation", "perspective", "clear boundaries"], Pentacles: ["reliability", "shared history", "everyday care"],
+            "Major Arcana": ["a bond pattern", "mutual growth", "a defining truth"]
+          }
+        : state.category === "Personal Growth"
+          ? {
+              Wands: ["inner fire", "practice", "courage"], Cups: ["self-compassion", "intuition", "emotional room"],
+              Swords: ["a changing belief", "discernment", "a truer story"], Pentacles: ["embodiment", "patience", "steady becoming"],
+              "Major Arcana": ["an inner threshold", "integration", "deep change"]
+            }
+          : state.category === "General Future"
+            ? {
+                Wands: ["emerging momentum", "possibility", "the courage to begin"], Cups: ["a changing feeling", "connection", "receptivity"],
+                Swords: ["new information", "clarity", "a necessary choice"], Pentacles: ["what is taking form", "resources", "durable growth"],
+                "Major Arcana": ["a larger season", "turning", "the horizon ahead"]
+              }
       : {
         Wands: ["desire", "momentum", "courage"], Cups: ["feeling", "connection", "receptivity"],
         Swords: ["clarity", "truth", "a necessary thought"], Pentacles: ["grounding", "value", "what can grow"],
         "Major Arcana": ["a larger pattern", "inner change", "attention"]
-      };
+              };
   const words = suitWords[card.suit] || suitWords["Major Arcana"];
   return card.reversed ? ["turned inward", ...words.slice(0, 2)] : words;
 }
@@ -1538,6 +1934,30 @@ function positionMeaning(position, card) {
     };
     return moneySnippets[position];
   }
+  if (state.category === "Friendship / Family") {
+    const kinSnippets = {
+      "Your Voice": `${card.name} reflects the need, tone, or truth you bring into this bond: ${upright}. Notice what is yours to communicate or care for.`,
+      "Their Voice": `${card.name} offers a lens on what may be carried across the bond. Hold it as an invitation to curiosity, not a claim about another person's private mind.`
+    };
+    return kinSnippets[position];
+  }
+  if (state.category === "Personal Growth") {
+    const growthSnippets = {
+      "The Root": `${card.name} points toward an older pattern, strength, or need that helped form the ground beneath you: ${upright}.`,
+      "The Threshold": `${card.name} names the living edge of the work—the choice, discomfort, or practice that asks to be met now.`,
+      "The Becoming": `${card.name} suggests a quality that can emerge through repeated action. Treat it as a direction to practice, not an identity you must perform.`
+    };
+    return growthSnippets[position];
+  }
+  if (state.category === "General Future") {
+    const futureSnippets = {
+      "Dawn — What Begins": `${card.name} rises at Dawn as the first light of the reading: ${upright}. Look for beginnings that are already present in small, practical form.`,
+      "Zenith — What Becomes Clear": `${card.name} reaches Zenith where something can no longer remain half-seen. Let evidence, timing, and direct experience clarify its meaning.`,
+      "Dusk — What Must Change": `${card.name} belongs to Dusk and shows where an old arrangement may need to soften, end, or be carried differently.`,
+      "Midnight — What Guides You": `${card.name} waits at Midnight as the quiet inner compass. Carry its strongest quality into the season ahead without treating it as a fixed forecast.`
+    };
+    return futureSnippets[position];
+  }
   const snippets = {
     "Hidden Heart": `Under the question, ${card.name} suggests an influence that is ${upright}. Notice what has been felt before it has been named.`,
     "You": `In your own position, ${card.name} points to the way you are meeting this situation: ${upright}.`,
@@ -1550,6 +1970,9 @@ function personalInterpretation(cards) {
   if (state.category === "Career") return careerPersonalInterpretation(cards);
   if (state.category === "Money") return moneyPersonalInterpretation(cards);
   if (state.category === "Decision") return decisionPersonalInterpretation(cards);
+  if (state.category === "Friendship / Family") return kinPersonalInterpretation(cards);
+  if (state.category === "Personal Growth") return growthPersonalInterpretation(cards);
+  if (state.category === "General Future") return futurePersonalInterpretation(cards);
   const [hidden, you, connection, ahead] = cards;
   const reversed = cards.filter((card) => card.reversed).length;
   const question = state.question.trim() || "this question";
@@ -1567,16 +1990,15 @@ function careerPersonalInterpretation(cards) {
   const [ground, strength, friction, leverage, next] = cards;
   const reversed = cards.filter((card) => card.reversed).length;
   const question = state.question.trim() || "this career question";
-  const direction = careerCompassTheme();
-  return `Your question — “${question}” — is being read through the compass of ${direction.toLowerCase()}. Treat the cards as a way to frame choices and experiments, not as a fixed forecast.
+  return `Your question — “${question}” — is held in five cards: three sparks you chose from the first shuffle, followed by one card from each half of the deck after your cut. Treat them as a way to frame choices and experiments, not as a fixed forecast.
 
-${ground.name} marks your Current Ground: the real conditions, habits, and expectations you are standing on. ${strength.name} sits one rung higher as Your Unclaimed Strength, inviting you to name an ability you may be using quietly instead of owning visibly.
+${ground.name} marks your Current Ground: the real conditions, habits, and expectations you are standing on. ${strength.name} is Your Unclaimed Strength, inviting you to name an ability you may be using quietly instead of owning visibly.
 
 ${friction.name} describes The Friction. It may be a constraint, an outdated role, or the cost of a direction that no longer fits. ${reversed ? `With ${reversed} reversed card${reversed > 1 ? "s" : ""}, part of the work may be internal: confidence, timing, or a belief that needs testing against present evidence.` : "The spread is asking for direct observation and a clear conversation with reality."}
 
-${leverage.name} is Your Leverage—the relationship, system, practice, or resource that makes effort travel farther. Do not only ask what you can push through alone; ask what becomes possible when support is designed into the plan.
+From the first half, ${leverage.name} becomes Your Leverage—the relationship, system, practice, or resource that makes effort travel farther. Do not only ask what you can push through alone; ask what becomes possible when support is designed into the plan.
 
-For The Next Bold Move, ${next.name} favors one visible experiment. Choose a step you can take within the next seven days: make the request, show the work, learn the skill, or close one door with intention. Let the response become data for the rung after that.`;
+From the second half, ${next.name} becomes The Next Bold Move and favors one visible experiment. Choose a step you can take within the next seven days: make the request, show the work, learn the skill, or close one door with intention. Let the response become useful evidence for what follows.`;
 }
 function moneyPersonalInterpretation(cards) {
   const [keep, grow, flow] = cards;
@@ -1602,6 +2024,42 @@ ${chosen.name} brings ${cardKeywords(chosen).join(", ")} into the room. ${orient
 
 Use it as a practical prompt: name one fact in your situation that reflects this card, one fear that might be coloring it, and one small reversible step that would give you better information. The decision remains yours; the card simply gives you a clearer place to look from.`;
 }
+function kinPersonalInterpretation(cards) {
+  const [yours, theirs] = cards;
+  const question = state.question.trim() || "this bond";
+  return `Your question — “${question}” — is held by two halves of one deck. ${yours.name} came from the half named Your Voice; ${theirs.name} came from the half named Their Voice. Read them as two perspectives that need room beside each other, not as proof of what anyone else thinks.
+
+${yours.name} asks you to own the part of the bond that is within your reach: what you feel, what you need, what you can say cleanly, and what kind of care or boundary you can offer without abandoning yourself.
+
+${theirs.name} invites curiosity about the other side. Instead of assuming, make space for one question that could reveal more. Notice whether the bond allows difference, repair, and reciprocity—or whether one voice repeatedly has to disappear.
+
+Choose one small act that honors both cards: name something true without accusation, ask rather than guess, or make one dependable gesture of care. Let the real response—not the cards—show you what this bond can hold.`;
+}
+function growthPersonalInterpretation(cards) {
+  const [root, threshold, becoming] = cards;
+  const question = state.question.trim() || "this inner change";
+  return `Your question — “${question}” — moves through three cards chosen from one continuous path.
+
+${root.name} is The Root. It points toward what has shaped the pattern: perhaps a protection, value, fear, or strength that once had a reason to exist. Understanding the root is not the same as staying loyal to it.
+
+${threshold.name} is The Threshold. This is where insight asks to become practice. Look for a choice small enough to repeat: a boundary, a conversation, a pause before the old reaction, or a way to ask for support.
+
+${becoming.name} is The Becoming. It does not describe a finished version of you; it names a quality that can grow through lived evidence. Give it one visible action this week. Measure progress by greater honesty, steadiness, and freedom—not by perfection.`;
+}
+function futurePersonalInterpretation(cards) {
+  const [dawn, zenith, dusk, midnight] = cards;
+  const reversed = cards.filter((card) => card.reversed).length;
+  const question = state.question.trim() || "the season ahead";
+  return `Your question — “${question}” — is held in a four-direction compass. You shuffled the full deck, placed three cuts to create four quarters, assigned each pile to Dawn, Zenith, Dusk, and Midnight, then drew one card from every direction.
+
+${dawn.name} rises at Dawn as What Begins. Look for its first evidence in a new desire, invitation, practice, or possibility that is still small enough to overlook.
+
+${zenith.name} stands at Zenith as What Becomes Clear. It asks you to bring something into full light: a fact, priority, capacity, or truth that becomes easier to meet when it is named plainly.
+
+${dusk.name} rests at Dusk as What Must Change. ${reversed ? `With ${reversed} reversed card${reversed > 1 ? "s" : ""}, some of this movement may begin internally or unfold more slowly than expected.` : "The compass leans toward changes that become easier to understand through direct observation."} Release the need to decide too quickly what the change means.
+
+${midnight.name} waits at Midnight as What Guides You. Carry its strongest quality into one decision you can make now. This compass is not a fixed forecast; it is a way to meet the future with a clearer gaze, a steadier hand, and room to revise as reality speaks.`;
+}
 // First sentence of a longer interpretation, for a one-line share/summary line.
 function firstSentence(text) {
   const s = String(text || "").replace(/\s+/g, " ").trim();
@@ -1622,6 +2080,18 @@ function personalSummary(cards) {
   if (state.category === "Decision") {
     const [chosen] = cards;
     return chosen ? `${chosen.name} is the single lens your hand chose for this decision.` : "One card is settling into place.";
+  }
+  if (state.category === "Friendship / Family") {
+    const [yours, theirs] = cards;
+    return `${yours.name} names your voice; ${theirs.name} invites curiosity about the voice across the bond.`;
+  }
+  if (state.category === "Personal Growth") {
+    const [root, threshold, becoming] = cards;
+    return `${root.name} holds the root, ${threshold.name} marks the threshold, and ${becoming.name} gives becoming a direction.`;
+  }
+  if (state.category === "General Future") {
+    const [dawn, zenith, dusk, midnight] = cards;
+    return `${dawn.name} begins the movement, ${zenith.name} clarifies it, ${dusk.name} changes it, and ${midnight.name} guides it.`;
   }
   const [, , connection, ahead] = cards;
   return `${connection.name} shapes the connection now, while ${ahead.name} points toward ${cardKeywords(ahead)[0]} as the next step.`;
@@ -1661,8 +2131,8 @@ function drawWrappedText(ctx, text, cx, y, maxWidth, lineHeight) {
 }
 // The three celestial "story" looks a reader can pick before saving/sharing.
 const SHARE_THEMES = [
-  { id: "paper-moon", label: "Paper Moon" },
   { id: "midnight", label: "Midnight" },
+  { id: "paper-moon", label: "Paper Moon" },
   { id: "golden-hour", label: "Golden Hour" }
 ];
 const SHARE_INK = "#071b24";
@@ -1763,16 +2233,18 @@ async function buildShareCanvas(question, cards, summary, theme = shareThemeId()
   ctx.fillStyle = SHARE_INK;
   ctx.fillText(q, 540, 571);
 
-  // Love keeps the four-card fan, Career uses five slimmer cards, Money uses three,
-  // and the one-card Decision reading gets a large centered portrait.
+  // Love keeps the four-card fan, Career forms a centered 3-over-2 constellation,
+  // Money and Growth use three, the Bond holds two facing cards, and the one-card
+  // Decision reading gets a large portrait.
   const one = cards.length === 1;
+  const two = cards.length === 2;
   const five = cards.length === 5;
   const three = cards.length === 3;
-  const cw = one ? 328 : five ? 188 : three ? 268 : 238;
-  const ch = one ? 548 : five ? 314 : three ? 447 : 397;
-  const lefts = one ? [376] : five ? [36, 241, 446, 651, 856] : three ? [118, 406, 694] : [40, 295, 548, 801];
-  const tops = one ? [682] : five ? [690, 658, 645, 658, 690] : three ? [658, 636, 658] : [664, 640, 646, 671];
-  const angles = one ? [0] : five ? [-6, -3, 0, 3, 6] : three ? [-5, 0, 5] : [-5, -1, 2, 5];
+  const cw = one ? 328 : two ? 300 : five ? 176 : three ? 268 : 238;
+  const ch = one ? 548 : two ? 500 : five ? 294 : three ? 447 : 397;
+  const lefts = one ? [376] : two ? [224, 556] : five ? [282, 452, 622, 367, 537] : three ? [118, 406, 694] : [40, 295, 548, 801];
+  const tops = one ? [682] : two ? [662, 662] : five ? [650, 650, 650, 914, 914] : three ? [658, 636, 658] : [664, 640, 646, 671];
+  const angles = one ? [0] : two ? [-3, 3] : five ? [-2.5, 0, 2.5, -1.5, 1.5] : three ? [-5, 0, 5] : [-5, -1, 2, 5];
   cards.forEach((card, index) => {
     drawFramedShareCard(ctx, images[index], card.reversed, lefts[index] + cw / 2, tops[index] + ch / 2, cw, ch, angles[index]);
   });
@@ -2014,27 +2486,38 @@ async function requestAIInterpretation() {
     persist(); render();
   }
 }
-function readingShareText() {
-  return `${state.question}\n\n${readingCards().map((card, index) => `${readingPositions()[index]}: ${card.name} (${card.reversed ? "reversed" : "upright"})`).join("\n")}`;
-}
 function renderReading() {
   const cards = readingCards();
   const positions = readingPositions();
   const career = state.category === "Career";
   const money = state.category === "Money";
   const decision = state.category === "Decision";
+  const kin = state.category === "Friendship / Family";
+  const growth = state.category === "Personal Growth";
+  const future = state.category === "General Future";
   const readingTitle = career
     ? "Five cards, a constellation for the work ahead."
     : money
       ? "Three cards, a living ledger for your resources."
       : decision
         ? "One card, held at the crossroads."
-        : "Four cards, gathered beneath one sky.";
+        : kin
+          ? "Two cards, two voices within one bond."
+          : growth
+            ? "Three cards, an inner movement taking shape."
+            : future
+              ? "Four cards, gathered along the far horizon."
+              : "Four cards, gathered beneath one sky.";
+  const cardCount = positions.length;
   const unlockCopy = decision
     ? t("Watch a short ad to unlock a reflection based on your exact question and chosen card.")
-    : positions.length === 5
-      ? t("Watch a short ad to unlock a reflection based on your exact question and all five cards.")
-      : t("Watch a short ad to unlock a reflection based on your exact question and all four cards.");
+    : cardCount === 2
+      ? t("Watch a short ad to unlock a reflection based on your exact question and both cards.")
+      : cardCount === 3
+        ? t("Watch a short ad to unlock a reflection based on your exact question and all three cards.")
+        : cardCount === 5
+          ? t("Watch a short ad to unlock a reflection based on your exact question and all five cards.")
+          : t("Watch a short ad to unlock a reflection based on your exact question and all four cards.");
   const summary = state.aiSummary || personalSummary(cards);
   const interpretation = state.aiLoading
     ? `<p class="ai-copy">${t("Listening to the cards…")}</p>`
@@ -2043,17 +2526,23 @@ function renderReading() {
   const meaningGrid = `<div class="meaning-grid">${cards.map((card, index) => `<article class="meaning"><p class="meaning-meta">${t(positions[index])} · ${t(card.reversed ? "Reversed" : "Upright").toLowerCase()}</p><h3>${escapeHTML(card.name)}</h3><p><strong>${cardKeywords(card).join(" · ")}</strong></p><p>${positionMeaning(positions[index], card)}</p></article>`).join("")}</div>`;
   const cardReading = decision ? `<div class="decision-reading-core">${cardRow}${meaningGrid}</div>` : `${cardRow}${meaningGrid}`;
   const unlockLabel = decision ? "Watch an ad to unlock my interpretation" : "Generate my personal interpretation";
-  return world(`<section class="scene reading ${career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : ""}"><div class="parchment ${money ? "money-parchment" : decision ? "decision-parchment" : ""}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p>${cardReading}<div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t(unlockLabel)}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="question-actions"><button class="back-link" data-action="restart">${t("Begin a new reading")}</button><button class="text-button" data-action="share-copy">${t("Copy the reading")}</button>${navigator.share ? `<button class="text-button" data-action="share-reading">${t("Share the reading")}</button>` : ""}</div><div class="share-row"><button class="seal-button share-button" data-action="share-image">${t("Share as an image")}</button></div></div></section>`, career ? "career-world" : money ? "money-world" : decision ? "decision-world" : "");
+  const readingClass = career ? "career-reading" : money ? "money-reading" : decision ? "decision-reading" : kin ? "kin-reading" : growth ? "growth-reading" : future ? "future-reading" : "";
+  const parchmentClass = money ? "money-parchment" : decision ? "decision-parchment" : kin ? "kin-parchment" : growth ? "growth-parchment" : future ? "future-parchment" : "";
+  const worldClass = career ? "career-world" : money ? "money-world" : decision ? "decision-world" : kin ? "kin-world" : growth ? "growth-world" : future ? "future-world" : "";
+  return world(`<section class="scene reading ${readingClass}"><div class="parchment ${parchmentClass}"><p class="eyebrow">Oracle Veil · ${t("your reading")}</p><h2>${t(readingTitle)}</h2><p class="reading-question">“${escapeHTML(state.question)}”</p>${cardReading}<div class="ai-block">${state.aiUnlocked ? `<p class="eyebrow">${t("Personal interpretation")}</p><h3>${t("A reflection for the path in front of you")}</h3>${interpretation}` : `<div class="ai-lock"><p class="eyebrow">${t("A closer reflection")}</p><h3>${t("Would you like a personal interpretation?")}</h3><p>${unlockCopy}</p><button class="seal-button" data-action="unlock-ai">${t(unlockLabel)}</button></div>`}</div><p class="disclaimer">${t("Tarot is offered here as a reflective, imaginative tool—not a factual prediction or professional advice.")}</p><div class="reading-actions" aria-label="${t("Reading actions")}"><button class="reading-action reading-action-new" data-action="restart"><span>${t("New reading")}</span></button><button class="reading-action reading-action-share" data-action="share-image"><span>${t("Share")}</span></button></div></div></section>`, worldClass);
 }
 function renderAd() {
   if (!state.ad) return "";
   const ready = state.ad.ready;
-  // The three gated paths share one entrance ad, differing only in the copy and artwork
+  // Gated paths share one entrance ad, differing only in the copy and artwork
   // that promises what is on the other side of it.
   const entries = {
     "career-entry": { theme: "career-ad", title: "Unlock the Career path", illustration: "The next horizon<br>is taking shape.", copy: "Watch this brief sponsored moment to open the Career ritual.", wait: "A short passage before the Career ritual" },
     "money-entry": { theme: "money-ad", title: "Unlock the Money path", illustration: "The treasury<br>is taking shape.", copy: "Watch this brief sponsored moment to open the Money ritual.", wait: "A short passage before the Money ritual" },
-    "decision-entry": { theme: "decision-ad", title: "Unlock the Decision path", illustration: "The crossroads<br>is taking shape.", copy: "Watch this brief sponsored moment to open the Decision ritual.", wait: "A short passage before the Decision ritual" }
+    "decision-entry": { theme: "decision-ad", title: "Unlock the Decision path", illustration: "The crossroads<br>is taking shape.", copy: "Watch this brief sponsored moment to open the Decision ritual.", wait: "A short passage before the Decision ritual" },
+    "kin-entry": { theme: "kin-ad", title: "Unlock the Bond path", illustration: "Two voices<br>find their place.", copy: "Watch this brief sponsored moment to open the Friendship / Family ritual.", wait: "A short passage before the Bond ritual" },
+    "growth-entry": { theme: "growth-ad", title: "Unlock the Growth path", illustration: "The inner moon<br>is rising.", copy: "Watch this brief sponsored moment to open the Personal Growth ritual.", wait: "A short passage before the Growth ritual" },
+    "future-entry": { theme: "future-ad", title: "Unlock the Future path", illustration: "The far horizon<br>is gathering light.", copy: "Watch this brief sponsored moment to open the General Future ritual.", wait: "A short passage before the Future ritual" }
   };
   const entry = entries[state.ad.intent];
   const title = entry
@@ -2074,7 +2563,9 @@ function debugPanel() {
   const chosen = state.category === "Career" ? state.career.selectedIds
     : state.category === "Money" ? state.money.selectedIds
       : state.category === "Decision" ? [state.decision.selectedId].filter(Boolean)
-        : state.selectedIds;
+        : state.category === "Friendship / Family" ? state.kin.selectedIds
+          : state.category === "General Future" ? state.future.selectedIds
+            : state.selectedIds;
   return `<button class="debug-toggle" data-action="toggle-debug" aria-label="Close ritual diagnostics">×</button><aside class="debug-panel"><strong>Ritual diagnostics</strong><br>topic: ${state.category}<br>stage: ${state.stage}<br>seed: ${state.seed}<br>deck cards: ${state.deck.length}<br>piles: ${state.piles.map((p) => p.length).join(" / ") || "—"}<br>first cut: ${state.firstCut ?? "—"}<br>three cuts: ${state.threeCuts.join(", ") || "—"}<br>chosen: ${chosen.map((id) => id.split("-").slice(1, 2)).join(", ") || "—"}<br>revealed: ${state.revealedIds.length}/${readingPositions().length}<br>interactions: ${state.performance.interactions}<details><summary>Deck order (top → bottom)</summary>${state.deck.map((card, index) => `${String(index + 1).padStart(2, "0")}. ${escapeHTML(card.name)} ${card.reversed ? "↕" : "↑"}`).join("<br>")}</details><p><button class="text-button" data-action="toggle-simplified" aria-pressed="${state.settings.simplified}">${state.settings.simplified ? "Guided mode on" : "Guided mode off"}</button> <button class="text-button" data-action="reset-reading">Reset</button></p></aside>`;
 }
 
@@ -2118,6 +2609,7 @@ function render() {
   updatePageLanguage();
   paintCardArt();
   bindGestures();
+  if (shouldAutoSpread()) scheduleAutoSpread();
   if (state.stage === "share") void mountSharePreview();
   persist();
   // Announce stage changes by moving focus to the new heading (like a page change).
@@ -2283,8 +2775,9 @@ function separateCareerScatter(box, cardBox, strength = .34) {
   const gapX = Math.max(16, cardBox.width * 1.15);
   const gapY = Math.max(22, cardBox.height * .88);
   const shift = (piece, index, dxPx, dyPx) => {
-    piece.x = clamp(piece.x + dxPx / box.width * 100, 6, 94);
-    piece.y = clamp(piece.y + dyPx / box.height * 100, 10, 90);
+    piece.x += dxPx / box.width * 100;
+    piece.y += dyPx / box.height * 100;
+    confineCareerScatterPoint(piece);
     moved.add(index);
   };
   for (let a = 0; a < pieces.length; a += 1) {
@@ -2320,6 +2813,94 @@ function relaxCareerScatter(passes = 26) {
   const cardBox = { width: card.offsetWidth, height: card.offsetHeight };
   if (!box.width || !cardBox.width) return;
   for (let pass = 0; pass < passes; pass += 1) separateCareerScatter(box, cardBox, .5);
+}
+function paintCareerScatterNodes(nodes) {
+  nodes.forEach((node) => {
+    const piece = state.career.scatter[Number(node.dataset.shuffleIndex)];
+    if (!piece) return;
+    node.style.setProperty("--x", `${piece.x}%`);
+    node.style.setProperty("--y", `${piece.y}%`);
+    node.style.setProperty("--r", `${piece.r}deg`);
+    node.style.setProperty("--z", piece.z);
+  });
+}
+function animateCareerAssistedScatter() {
+  const surface = document.querySelector("#career-scatter-surface");
+  const field = surface?.querySelector(".career-orbit");
+  const nodes = [...(surface?.querySelectorAll(".career-ember-card") || [])];
+  const pieces = careerScatter();
+  const focus = pieces[Math.floor(Math.random() * pieces.length)];
+  let moved = 0;
+  pieces.forEach((piece) => {
+    const dx = piece.x - focus.x;
+    const dy = piece.y - focus.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance > 34) return;
+    const falloff = 1 - distance / 34;
+    const ux = distance > .4 ? dx / distance : (piece.z % 2 ? 1 : -1);
+    const uy = distance > .4 ? dy / distance : (piece.z % 3 ? .7 : -.7);
+    piece.x += ux * 26 * falloff;
+    piece.y += uy * 22 * falloff;
+    confineCareerScatterPoint(piece);
+    piece.r = Number((piece.r + (ux >= 0 ? 22 : -22) * falloff).toFixed(2));
+    moved += 1;
+  });
+  // Vary the travel so two taps in a row cannot cut the same packet back where it started.
+  const travel = 45 + Math.random() * 90;
+  reorderDeck(Math.random() < .5 ? -travel : travel, 20, travel);
+  state.career.shuffleMoves = (state.career.shuffleMoves || 0) + 2;
+  interaction();
+  buzz([7, 15, 9]);
+  if (!surface || !field || !nodes.length) {
+    render();
+    return;
+  }
+  transitioning = true;
+  field.classList.add("assisted-scatter");
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  void field.offsetWidth;
+  requestAnimationFrame(() => paintCareerScatterNodes(nodes));
+  const soundCount = clamp(Math.ceil(moved / 4), 3, 5);
+  for (let index = 0; index < soundCount; index += 1) {
+    setTimeout(() => sound("shuffle", .1 + index * .008), index * 210);
+  }
+  setTimeout(() => {
+    field.classList.remove("assisted-scatter");
+    transitioning = false;
+    const assist = document.querySelector('[data-action="assist-career-scatter"]');
+    if (assist) assist.disabled = false;
+    updateCareerScatterStatus();
+  }, 1120);
+}
+function animateCareerLayOut() {
+  const surface = document.querySelector("#career-scatter-surface");
+  const field = surface?.querySelector(".career-orbit");
+  const nodes = [...(surface?.querySelectorAll(".career-ember-card") || [])];
+  if (!surface || !field || !nodes.length) {
+    relaxCareerScatter();
+    state.career.phase = "pick";
+    interaction();
+    render();
+    return;
+  }
+  transitioning = true;
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  relaxCareerScatter(30);
+  surface.classList.add("laying-out");
+  const guide = document.querySelector("#career-scatter-guide");
+  if (guide) guide.textContent = t("The cards lie apart. Lay them out when you are ready.");
+  void surface.offsetWidth;
+  requestAnimationFrame(() => paintCareerScatterNodes(nodes));
+  buzz([8, 14, 8]);
+  [0, 280, 570, 880].forEach((delay, index) => {
+    setTimeout(() => sound(index === 3 ? "spread" : "shuffle", .11 + index * .014), delay);
+  });
+  setTimeout(() => {
+    state.career.phase = "pick";
+    transitioning = false;
+    interaction();
+    render();
+  }, 1450);
 }
 let careerPickAt = 0;
 // Which tiny card did that tap mean? The closest centre inside a fingertip-sized reach,
@@ -2363,8 +2944,9 @@ function bindCareerScatter(surface) {
   const move = (index, dxPx, dyPx, spin) => {
     const piece = state.career.scatter[index];
     if (!piece) return;
-    piece.x = clamp(piece.x + dxPx / box.width * 100, 6, 94);
-    piece.y = clamp(piece.y + dyPx / box.height * 100, 10, 90);
+    piece.x += dxPx / box.width * 100;
+    piece.y += dyPx / box.height * 100;
+    confineCareerScatterPoint(piece);
     if (spin) piece.r = Number((piece.r + spin).toFixed(2));
   };
   const nudge = (index, dx, dy, falloff) => {
@@ -2499,11 +3081,89 @@ function animateDeckCut(pieces, done) {
   const deck = document.querySelector(".side-deck");
   if (!deck || transitioning) return;
   transitioning = true;
-  deck.classList.add(pieces === 2 ? "splitting-two" : "splitting-three");
+  deck.classList.add(pieces === 2 ? "splitting-two" : pieces === 4 ? "splitting-four" : "splitting-three");
   document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
   buzz([9, 20, 9]);
   sound("cut", .2);
   setTimeout(() => { done(); transitioning = false; render(); }, 720);
+}
+function animateFutureCompassAlign() {
+  const surface = document.querySelector("#future-compass-surface");
+  if (!surface || transitioning || state.future.order.length !== 4) return;
+  transitioning = true;
+  surface.classList.add("aligning");
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  buzz([7, 12, 7, 16, 10]);
+  sound("gather", .18);
+  setTimeout(() => sound("cut", .11), 270);
+  setTimeout(() => {
+    state.piles = state.future.order.map((index) => state.piles[index]);
+    state.stage = "futureSpread";
+    transitioning = false;
+    interaction();
+    render();
+  }, 880);
+}
+function animateFutureSpread() {
+  const surface = document.querySelector("#future-spread-surface");
+  if (!surface || transitioning) return;
+  transitioning = true;
+  surface.classList.add("opening");
+  sound("spread", .18);
+  setTimeout(() => sound("spread", .12), 230);
+  setTimeout(() => sound("spread", .1), 480);
+  buzz([7, 14, 7, 14]);
+  setTimeout(() => {
+    state.stage = "futureChooseDawn";
+    transitioning = false;
+    interaction();
+    render();
+  }, 980);
+}
+function finishFuturePick(id) {
+  if (!state.future.selectedIds.includes(id)) state.future.selectedIds.push(id);
+  const nextStages = ["futureChooseDawn", "futureChooseZenith", "futureChooseDusk", "futureChooseMidnight"];
+  const current = nextStages.indexOf(state.stage);
+  if (current >= 0 && current < nextStages.length - 1) {
+    state.stage = nextStages[current + 1];
+  } else {
+    preloadCardArt(readingCards());
+    state.revealedIds = [];
+    state.stage = "futureReveal";
+  }
+  transitioning = false;
+  interaction();
+  buzz([8, 16, 9]);
+  sound("take", .17);
+  render();
+}
+function animateFuturePickCard(element, id, pileIndex) {
+  const active = futureStep();
+  if (transitioning || pileIndex !== active || state.future.selectedIds.includes(id)) return;
+  const card = cardById(id);
+  const dock = document.querySelector(".future-compass-dock");
+  if (!card || !dock) return;
+  preloadCardArt(card);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finishFuturePick(id);
+    return;
+  }
+  transitioning = true;
+  const from = element.getBoundingClientRect();
+  const to = dock.getBoundingClientRect();
+  const scale = (element.offsetWidth && from.width / element.offsetWidth) || 1;
+  const dx = (to.left + to.width / 2 - (from.left + from.width / 2)) / scale;
+  const dy = (to.top + to.height / 2 - (from.top + from.height / 2)) / scale;
+  element.closest(".future-spread-card")?.classList.add("future-flying");
+  const animation = element.animate([
+    { transform: "translate(0,0) rotate(0deg) scale(1)", filter: "brightness(1)", offset: 0 },
+    { transform: `translate(${dx * .72}px,${dy * .7 - 24}px) rotate(${pileIndex % 2 ? 7 : -7}deg) scale(.92)`, filter: "brightness(1.3)", offset: .68 },
+    { transform: `translate(${dx}px,${dy}px) rotate(0deg) scale(.64)`, filter: "brightness(1.12)", offset: 1 }
+  ], { duration: 620, easing: "cubic-bezier(.18,.82,.2,1)", fill: "forwards" });
+  animation.finished.catch(() => {}).then(() => {
+    dock.classList.add("receiving");
+    setTimeout(() => finishFuturePick(id), 250);
+  });
 }
 function createDefaultSpread() { return { start: { x: 13, y: 64 }, end: { x: 85, y: 56 }, bend: { x: 0, y: -17 }, rotation: 34 }; }
 function spreadFromPoints(rect, points) {
@@ -2519,6 +3179,12 @@ function spreadPreviewMarkup(path, count, committed = false) {
     const p = positionForSpread(index, count, path);
     return `<i class="preview-card card back ${committed ? "committed" : ""}" style="left:${p.x}%;top:${p.y}%;z-index:${index + 1};--preview-r:${p.rotation}deg;--preview-delay:${Math.min(index * 5, 210)}ms"></i>`;
   }).join("");
+}
+function chooseStageAfterSpread() {
+  if (state.category === "Decision") return "decisionChoose";
+  if (state.category === "Career") return state.career.pileStep === 0 ? "careerChooseOne" : "careerChooseTwo";
+  if (state.category === "Friendship / Family") return state.kin.pileStep === 0 ? "kinChooseOne" : "kinChooseTwo";
+  return "choose";
 }
 function bindSpread(surface) {
   const deck = surface.querySelector(".deck"); if (!deck) return;
@@ -2556,7 +3222,7 @@ function bindSpread(surface) {
     transitioning = true;
     interaction(); buzz([7, 17, 7]); sound("spread", clamp(.1 + distance / 1000, .1, .22));
     setTimeout(() => {
-      state.stage = state.category === "Decision" ? "decisionChoose" : "choose";
+      state.stage = chooseStageAfterSpread();
       transitioning = false;
       render();
     }, 620);
@@ -2592,11 +3258,53 @@ function animateShuffleGather() {
       state.threeCuts = [];
       state.threeCutDraft = Math.round(state.deck.length * .3);
       state.stage = "cutThree";
+    } else if (state.category === "Friendship / Family") {
+      state.cutDraft = Math.round(state.deck.length * .46);
+      state.stage = "kinCut";
+    } else if (state.category === "Personal Growth") {
+      state.spread = null;
+      state.stage = "spread";
+    } else if (state.category === "General Future") {
+      state.future.cuts = [];
+      state.future.cutDraft = Math.round(state.deck.length * .24);
+      state.stage = "futureCutFour";
     } else {
       state.stage = state.category === "Decision" ? "decisionCut" : "cutOne";
     }
     transitioning = false; interaction(); render();
   }, 760);
+}
+function finishCareerGather() {
+  const embers = state.career.emberIds.map(cardById).filter(Boolean);
+  const emberSet = new Set(state.career.emberIds);
+  state.career.heldCards = embers;
+  state.career.selectedIds = [...state.career.emberIds];
+  state.career.cut = null;
+  state.career.pileStep = 0;
+  state.deck = state.deck.filter((card) => !emberSet.has(card.id));
+  state.piles = [];
+  state.selectedIds = [];
+  state.spread = null;
+  state.cutDraft = Math.round(state.deck.length * .46);
+  state.stage = "careerCut";
+  transitioning = false;
+  interaction();
+  render();
+}
+function animateCareerGather() {
+  const surface = document.querySelector("#career-scatter-surface");
+  if (!surface || transitioning || state.career.emberIds.length !== 3) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finishCareerGather();
+    return;
+  }
+  transitioning = true;
+  surface.classList.add("gathering");
+  document.querySelectorAll(".ritual-actions button").forEach((button) => { button.disabled = true; });
+  buzz([7, 14, 8, 18, 10]);
+  sound("gather", .2);
+  setTimeout(() => sound("gather", .13), 260);
+  setTimeout(finishCareerGather, 860);
 }
 function animateRitualDraw() {
   const surface = document.querySelector("#ritual-card-surface");
@@ -2693,6 +3401,22 @@ function animateMoneyPileOrder() {
     transitioning = false; interaction(); render();
   }, 700);
 }
+function shouldAutoSpread() {
+  return (state.category === "Career" && (state.stage === "careerSpreadOne" || state.stage === "careerSpreadTwo"))
+    || (state.category === "Friendship / Family" && (state.stage === "kinSpreadOne" || state.stage === "kinSpreadTwo"))
+    || (state.category === "Money" && state.stage === "spread")
+    || (state.category === "Personal Growth" && state.stage === "spread")
+    || (state.category === "General Future" && state.stage === "futureSpread");
+}
+function scheduleAutoSpread() {
+  clearTimeout(autoSpreadTimer);
+  autoSpreadTimer = setTimeout(() => {
+    autoSpreadTimer = null;
+    if (!shouldAutoSpread()) return;
+    if (state.category === "General Future") animateFutureSpread();
+    else animateAssistedSpread();
+  }, 140);
+}
 function animateAssistedSpread() {
   const surface = document.querySelector("#spread-surface");
   const preview = surface?.querySelector(".spread-preview-layer");
@@ -2704,13 +3428,13 @@ function animateAssistedSpread() {
   transitioning = true;
   interaction(); sound("spread", .16);
   setTimeout(() => {
-    state.stage = state.category === "Decision" ? "decisionChoose" : "choose";
+    state.stage = chooseStageAfterSpread();
     transitioning = false;
     render();
   }, 620);
 }
 function animatePickCard(element, id) {
-  const cap = state.category === "Money" ? 1 : 3;
+  const cap = state.category === "Money" || state.category === "Career" || state.category === "Friendship / Family" ? 1 : 3;
   if (transitioning || state.selectedIds.includes(id) || state.selectedIds.length >= cap) return;
   preloadCardArt(cardById(id)); // start loading the art now, while it flies to the dock
   const dock = document.querySelector(".draw-dock");
@@ -2860,6 +3584,15 @@ function act(action, element) {
     setTimeout(() => { if (state.ad?.intent === "decision-entry") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
     return;
   }
+  if (action === "choose-kin" || action === "choose-growth" || action === "choose-future") {
+    const path = action === "choose-kin" ? "kin" : action === "choose-growth" ? "growth" : "future";
+    state.category = path === "kin" ? "Friendship / Family" : path === "growth" ? "Personal Growth" : "General Future";
+    state.question = "";
+    state.ad = { intent: `${path}-entry`, ready: false };
+    mountAd(); interaction();
+    setTimeout(() => { if (state.ad?.intent === `${path}-entry`) { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
+    return;
+  }
   if (action === "back-category") { state.stage = "category"; render(); return; }
   if (action === "question-next") {
     if (state.question.trim().length < 4) return;
@@ -2887,6 +3620,30 @@ function act(action, element) {
       state.revealedIds = [];
       state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
       state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
+    } else if (state.category === "Friendship / Family") {
+      state.kin = createKinState();
+      state.piles = [];
+      state.selectedIds = [];
+      state.spread = null;
+      state.revealedIds = [];
+      state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.cutDraft = 36; state.stage = "shuffle";
+    } else if (state.category === "Personal Growth") {
+      state.piles = [];
+      state.ritualCardId = null; state.ritualCard = null;
+      state.selectedIds = [];
+      state.spread = null;
+      state.revealedIds = [];
+      state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
+    } else if (state.category === "General Future") {
+      state.future = createFutureState();
+      state.piles = [];
+      state.selectedIds = [];
+      state.spread = null;
+      state.revealedIds = [];
+      state.aiUnlocked = false; state.aiLoading = false; state.aiText = null; state.aiSummary = null; state.aiError = null;
+      state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "futureShuffle";
     } else {
       state.shuffleLayout = buildShuffleLayout(state.seed); state.shuffleMoves = 0; state.stage = "shuffle";
     }
@@ -2944,6 +3701,50 @@ function act(action, element) {
   if (action === "pick-card") { animatePickCard(element, element.dataset.cardId); return; }
   if (action === "pick-decision-card") { animateDecisionPickCard(element, element.dataset.cardId); return; }
   if (action === "to-reveal") {
+    if (state.category === "Career") {
+      if (state.selectedIds.length !== 1) return;
+      state.career.selectedIds.push(state.selectedIds[0]);
+      if (state.career.pileStep === 0) {
+        state.career.pileStep = 1;
+        state.deck = state.piles[1] || [];
+        state.selectedIds = [];
+        state.spread = null;
+        state.stage = "careerSpreadTwo";
+        interaction(); sound("cut", .14); render();
+      } else {
+        preloadCardArt(readingCards());
+        state.revealedIds = [];
+        state.stage = "careerReveal";
+        interaction(); sound("spread", .18); render();
+      }
+      return;
+    }
+    if (state.category === "Friendship / Family") {
+      if (state.selectedIds.length !== 1) return;
+      state.kin.selectedIds.push(state.selectedIds[0]);
+      if (state.kin.pileStep === 0) {
+        state.kin.pileStep = 1;
+        state.deck = state.piles[1] || [];
+        state.selectedIds = [];
+        state.spread = null;
+        state.stage = "kinSpreadTwo";
+        interaction(); sound("cut", .14); render();
+      } else {
+        preloadCardArt(readingCards());
+        state.revealedIds = [];
+        state.stage = "kinReveal";
+        interaction(); sound("spread", .18); render();
+      }
+      return;
+    }
+    if (state.category === "Personal Growth") {
+      if (state.selectedIds.length !== 3) return;
+      preloadCardArt(readingCards());
+      state.revealedIds = [];
+      state.stage = "growthReveal";
+      interaction(); sound("spread", .18); render();
+      return;
+    }
     if (state.category === "Money") {
       if (state.selectedIds.length !== 1) return;
       state.money.selectedIds.push(state.selectedIds[0]);
@@ -2966,35 +3767,11 @@ function act(action, element) {
     preloadCardArt(readingCards()); state.stage = "reveal"; interaction(); render(); return;
   }
   if (action === "assist-career-scatter") {
-    const pieces = careerScatter();
-    const focus = pieces[Math.floor(Math.random() * pieces.length)];
-    let moved = 0;
-    pieces.forEach((piece) => {
-      const dx = piece.x - focus.x, dy = piece.y - focus.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 34) return;
-      const f = 1 - dist / 34;
-      const ux = dist > .4 ? dx / dist : (piece.z % 2 ? 1 : -1);
-      const uy = dist > .4 ? dy / dist : (piece.z % 3 ? .7 : -.7);
-      piece.x = clamp(piece.x + ux * 26 * f, 6, 94);
-      piece.y = clamp(piece.y + uy * 22 * f, 10, 90);
-      piece.r = Number((piece.r + (ux >= 0 ? 22 : -22) * f).toFixed(2));
-      moved += 1;
-    });
-    // Vary the travel so two taps in a row cannot cut the same packet back where it started.
-    const travel = 45 + Math.random() * 90;
-    reorderDeck(Math.random() < .5 ? -travel : travel, 20, travel);
-    state.career.shuffleMoves = (state.career.shuffleMoves || 0) + 2;
-    interaction(); buzz([7, 15, 9]);
-    for (let i = 0; i < moved; i += 1) sound("shuffle", .08 + Math.random() * .08);
-    render();
-    return;
+    animateCareerAssistedScatter(); return;
   }
   if (action === "career-scatter-done") {
     if ((state.career.shuffleMoves || 0) < 3) return;
-    relaxCareerScatter(); // every card reachable before the choosing begins
-    state.career.phase = "pick";
-    interaction(); buzz([8, 14, 8]); sound("spread", .16); render(); return;
+    animateCareerLayOut(); return;
   }
   if (action === "career-scatter-again") {
     state.career.phase = "shuffle";
@@ -3005,37 +3782,60 @@ function act(action, element) {
     if (state.career.phase !== "pick") return;
     const id = element.dataset.cardId;
     const selected = state.career.emberIds;
-    if (selected.includes(id)) state.career.emberIds = selected.filter((cardId) => cardId !== id);
-    else if (selected.length < 3) { state.career.emberIds.push(id); buzz(8); sound("take", .1); }
-    interaction(); render(); return;
+    let changed = false;
+    if (selected.includes(id)) {
+      state.career.emberIds = selected.filter((cardId) => cardId !== id);
+      changed = true;
+      sound("flip", .07);
+    } else if (selected.length < 3) {
+      state.career.emberIds.push(id);
+      changed = true;
+      buzz(8);
+      sound("take", .09);
+    }
+    if (changed) {
+      updateCareerEmberSelection(element);
+      interaction();
+    }
+    return;
   }
   if (action === "career-raise") {
-    if (state.career.emberIds.length !== 3) return;
-    const embers = state.career.emberIds.map(cardById).filter(Boolean);
-    const emberSet = new Set(state.career.emberIds);
-    state.deck = [...embers, ...state.deck.filter((card) => !emberSet.has(card.id))];
-    state.stage = "careerCompass";
-    interaction(); buzz([8, 18, 10]); sound("gather", .18); render(); return;
+    animateCareerGather();
+    return;
   }
-  if (action === "career-seal-compass") {
-    state.career.candidateIds = buildCareerCandidates();
-    state.career.selectedIds = [];
-    state.stage = "careerLadder";
-    interaction(); buzz([7, 15, 7]); sound("cut", .16); render(); return;
+  if (action === "career-make-cut") {
+    if (!state.deck.length) return;
+    const cut = clamp(Number(state.cutDraft) || Math.round(state.deck.length * .46), 9, state.deck.length - 9);
+    animateDeckCut(2, () => {
+      const source = state.deck;
+      state.career.cut = cut;
+      state.piles = [source.slice(0, cut), source.slice(cut)];
+      state.career.pileStep = 0;
+      state.career.selectedIds = [...state.career.emberIds];
+      state.deck = state.piles[0];
+      state.selectedIds = [];
+      state.spread = null;
+      state.stage = "careerSpreadOne";
+      interaction();
+    });
+    return;
   }
-  if (action === "career-choose-step") {
-    const rung = state.career.selectedIds.length;
-    const choices = state.career.candidateIds.slice(rung * 2, rung * 2 + 2);
-    const id = element.dataset.cardId;
-    if (rung >= CAREER_POSITIONS.length || !choices.includes(id)) return;
-    state.career.selectedIds.push(id);
-    preloadCardArt(cardById(id));
-    interaction(); buzz(11); sound("take", .15); render(); return;
-  }
-  if (action === "career-to-reveal") {
-    if (state.career.selectedIds.length !== CAREER_POSITIONS.length) return;
-    preloadCardArt(readingCards()); state.revealedIds = []; state.stage = "careerReveal";
-    interaction(); sound("spread", .18); render(); return;
+  if (action === "kin-make-cut") {
+    if (!state.deck.length) return;
+    const cut = clamp(Number(state.cutDraft) || Math.round(state.deck.length * .46), 9, state.deck.length - 9);
+    animateDeckCut(2, () => {
+      const source = state.deck;
+      state.kin.cut = cut;
+      state.piles = [source.slice(0, cut), source.slice(cut)];
+      state.kin.pileStep = 0;
+      state.kin.selectedIds = [];
+      state.deck = state.piles[0];
+      state.selectedIds = [];
+      state.spread = null;
+      state.stage = "kinSpreadOne";
+      interaction();
+    });
+    return;
   }
   if (action === "decision-make-cut") {
     if (!state.deck.length) return;
@@ -3051,6 +3851,44 @@ function act(action, element) {
     return;
   }
   if (action === "decision-fuse") { animateDecisionFuse(); return; }
+  if (action === "place-future-cut") {
+    const cut = normalizeFutureCut(Number(state.future.cutDraft));
+    if (!cut) return;
+    if (state.future.cuts.length < 2) {
+      state.future.cuts.push(cut);
+      state.future.cuts.sort((a, b) => a - b);
+      state.future.cutDraft = nextFutureCutDraft();
+      interaction(); buzz(9); sound("cut", .13); render();
+    } else {
+      state.future.cuts.push(cut);
+      state.future.cuts.sort((a, b) => a - b);
+      animateDeckCut(4, () => {
+        const [a, b, c] = state.future.cuts;
+        state.piles = [state.deck.slice(0, a), state.deck.slice(a, b), state.deck.slice(b, c), state.deck.slice(c)];
+        state.deck = [];
+        state.future.order = [];
+        state.future.selectedIds = [];
+        state.stage = "futureCompass";
+        interaction();
+      });
+    }
+    return;
+  }
+  if (action === "choose-future-pile") {
+    const index = Number(element.dataset.pileIndex);
+    if (state.future.order.includes(index)) state.future.order = state.future.order.filter((item) => item !== index);
+    else if (state.future.order.length < 4) { state.future.order.push(index); buzz(7); sound("take", .1); }
+    interaction(); render(); return;
+  }
+  if (action === "align-future-compass") {
+    if (state.future.order.length !== 4) return;
+    animateFutureCompassAlign();
+    return;
+  }
+  if (action === "pick-future-card") {
+    animateFuturePickCard(element, element.dataset.cardId, Number(element.dataset.pileIndex));
+    return;
+  }
 
   if (action === "reveal-card") {
     const id = element.dataset.cardId;
@@ -3075,7 +3913,7 @@ function act(action, element) {
     } else if (ad.intent === "career-entry") {
       state.stage = "question";
       interaction(); render();
-    } else if (ad.intent === "money-entry" || ad.intent === "decision-entry") {
+    } else if (["money-entry", "decision-entry", "kin-entry", "growth-entry", "future-entry"].includes(ad.intent)) {
       state.stage = "question";
       interaction(); render();
     } else {
@@ -3100,9 +3938,7 @@ function act(action, element) {
     setTimeout(() => { if (state.ad?.intent === "interpretation") { state.ad.ready = true; persist(); markAdReady(); } }, AD_CONFIG.minimumWatchMs);
     return;
   }
-  if (action === "share-copy") { navigator.clipboard?.writeText(readingShareText()).then(() => showToast(t("Reading copied.")), () => showToast(t("Copy is unavailable in this browser."))); return; }
-  if (action === "share-reading") { if (navigator.share) navigator.share({ title: "Oracle Veil", text: readingShareText() }).catch(() => {}); return; }
-  if (action === "share-image") { if (readingCards().length !== readingPositions().length) return; resetShareCache(); state.stage = "share"; interaction(); render(); return; }
+  if (action === "share-image") { if (readingCards().length !== readingPositions().length) return; resetShareCache(); state.shareTheme = "midnight"; state.stage = "share"; interaction(); render(); return; }
   if (action === "share-back") { shareSheetOpen = false; state.stage = "reading"; render(); return; }
   if (action === "share-theme") { const theme = element.dataset.theme; if (theme && theme !== state.shareTheme) { state.shareTheme = theme; sound("flip", .12); render(); } return; }
   if (action === "share-continue") { shareSheetOpen = true; sound("flip", .12); render(); document.querySelector(".share-tile")?.focus(); return; }
@@ -3130,11 +3966,14 @@ function pickCutFromPoint(deck, clientY, knownRect = null) {
   const total = state.deck.length;
   const rect = knownRect || deck.getBoundingClientRect();
   const frac = clamp((clientY - rect.top) / rect.height, 0, 1);
-  let value = clamp(Math.round(frac * total), 9, total - 9);
+  let value = clamp(Math.round(frac * total), mode === "four" ? 8 : 9, total - (mode === "four" ? 8 : 9));
   if (mode === "three") {
     if (state.threeCuts.length && Math.abs(value - state.threeCuts[0]) < 12) value = value < state.threeCuts[0] ? state.threeCuts[0] - 12 : state.threeCuts[0] + 12;
     value = clamp(value, 9, total - 9);
     state.threeCutDraft = value;
+  } else if (mode === "four") {
+    value = normalizeFutureCut(value) ?? state.future.cutDraft;
+    state.future.cutDraft = value;
   } else {
     state.cutDraft = value;
   }
@@ -3150,7 +3989,8 @@ function updateCutDeckVisual(mode, value) {
   workbench.style.setProperty("--cut-pos", `${percent}%`);
   const reading = workbench.querySelector("#cut-reading");
   if (reading) reading.textContent = cutMood(value, total);
-  const boundaries = mode === "two" ? [value] : [...state.threeCuts, value].sort((a, b) => a - b);
+  const settled = mode === "four" ? state.future.cuts : state.threeCuts;
+  const boundaries = mode === "two" ? [value] : [...settled, value].sort((a, b) => a - b);
   const all = [0, ...boundaries, total];
   workbench.querySelectorAll(".edge-segment").forEach((segment, index) => {
     const start = all[index];
@@ -3191,18 +4031,6 @@ app.addEventListener("input", (event) => {
     if (button) button.disabled = state.question.trim().length < 4;
     return;
   }
-  if (event.target.id === "career-compass-range") {
-    state.career.compass = Number(event.target.value);
-    const surface = document.querySelector(".career-compass-surface");
-    const value = document.querySelector("#career-compass-value");
-    const compass = document.querySelector(".career-compass");
-    const theme = careerCompassTheme();
-    if (surface) surface.style.setProperty("--needle", `${state.career.compass}deg`);
-    if (value) value.textContent = t(theme);
-    if (compass) compass.setAttribute("aria-label", `${t("Your compass points toward")} ${t(theme)}`);
-    persist();
-    return;
-  }
   if (event.target.id === "first-cut-range") {
     state.cutDraft = Number(event.target.value);
     persist(); updateCutDeckVisual("two", state.cutDraft);
@@ -3215,6 +4043,14 @@ app.addEventListener("input", (event) => {
     event.target.value = value;
     state.threeCutDraft = value;
     persist(); updateCutDeckVisual("three", value);
+    return;
+  }
+  if (event.target.id === "future-cut-range") {
+    const value = normalizeFutureCut(Number(event.target.value));
+    if (value === null) return;
+    event.target.value = value;
+    state.future.cutDraft = value;
+    persist(); updateCutDeckVisual("four", value);
   }
 });
 

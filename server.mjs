@@ -77,20 +77,35 @@ function promptFor({ question, cards, topic }) {
   const career = topic === "Career";
   const money = topic === "Money";
   const decision = topic === "Decision";
+  const kin = topic === "Friendship / Family";
+  const growth = topic === "Personal Growth";
+  const future = topic === "General Future";
   const focus = career
     ? "a career reading. Keep the guidance practical and agency-centered; never promise a job, promotion, income, or business outcome"
     : money
       ? "a money reading. Keep it reflective and agency-centered; never recommend a specific investment, debt product, purchase, trade, or financial outcome"
       : decision
         ? "a one-card decision reading. The reader shuffled the full deck, cut it in two, riffle-mixed the halves together, opened the spread, chose one card, and revealed it after a deliberate pause. Never tell the reader which option to pick, predict how a choice turns out, or imply there is a correct answer; use the chosen card as a reflective lens and leave the decision with them"
-        : "a love reading";
+        : kin
+          ? "a two-card friendship or family reading. One card represents the reader's voice and one represents the voice across the bond. Never claim to know another person's private thoughts; invite curiosity, communication, reciprocity, and healthy boundaries"
+          : growth
+            ? "a three-card personal-growth reading moving through root, threshold, and becoming. Keep it compassionate, practical, and free from diagnostic or therapeutic claims"
+            : future
+              ? "a four-card general-future reading built as a compass. The reader shuffled, cut the deck into four quarters, assigned them to Dawn, Zenith, Dusk, and Midnight, then chose one card from each. Never predict fixed events, dates, probabilities, or guaranteed outcomes"
+              : "a love reading";
   const structure = career
     ? "5 short paragraphs (current ground, unclaimed strength, friction, leverage/support, and one specific gentle next experiment)"
     : money
       ? "3 short paragraphs (what to protect, what to grow, and what to let circulate) plus one small verifiable next action"
       : decision
         ? "3 short paragraphs (what the chosen card brings into focus, what to examine honestly, and one small reversible step that can produce better information)"
-        : "4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step)";
+        : kin
+          ? "3 short paragraphs (the reader's voice, the other voice held as a curious lens rather than mind-reading, and one practical act of communication or care)"
+          : growth
+            ? "3 short paragraphs (the root, the threshold or practice, and the quality becoming available) plus one small repeatable next action"
+            : future
+              ? "4 short paragraphs (what begins at Dawn, what becomes clear at Zenith, what must change at Dusk, and the grounded inner guidance held at Midnight)"
+              : "4 short paragraphs (underlying theme, the reader's stance, connection dynamics, and one practical gentle next step)";
   return `You are writing a concise, emotionally intelligent tarot reflection for ${focus}. Tarot is reflective and uncertain, not predictive fact. Do not claim certainty, manipulate emotion, give medical/legal/financial advice, or state probabilities.\n\nQuestion:\n${question}\n\nCards:\n${list}\n\nRespond with a JSON object with two fields:\n"summary": a single short, warm sentence (max 18 words) that reads like a gentle, direct answer to the question, suitable as a headline on its own — no hedging phrases like "the cards suggest".\n"reading": ${structure}, referring to the exact cards naturally, under 380 words total.`;
 }
 async function interpret(request, response) {
@@ -98,8 +113,12 @@ async function interpret(request, response) {
   if (rateLimited(request.socket.remoteAddress || "unknown")) return sendJSON(response, 429, { error: "Too many requests. Please wait a few minutes before asking again." });
   try {
     const input = JSON.parse(await readBody(request));
-    const topic = ["Love", "Career", "Money", "Decision"].includes(input.topic) ? input.topic : "Love";
-    const expectedCards = topic === "Decision" ? 1 : topic === "Career" ? 5 : topic === "Money" ? 3 : 4;
+    const topics = ["Love", "Career", "Money", "Decision", "Friendship / Family", "Personal Growth", "General Future"];
+    const topic = topics.includes(input.topic) ? input.topic : "Love";
+    const expectedCards = {
+      Love: 4, Career: 5, Money: 3, Decision: 1,
+      "Friendship / Family": 2, "Personal Growth": 3, "General Future": 4
+    }[topic];
     if (typeof input.question !== "string" || input.question.trim().length < 4 || !Array.isArray(input.cards) || input.cards.length !== expectedCards) throw new Error(`A question and ${expectedCards} cards are required.`);
     const cards = input.cards.map((card) => ({ position: String(card.position || "").slice(0, 48), name: String(card.name || "").slice(0, 90), orientation: card.orientation === "reversed" ? "reversed" : "upright" }));
     const gemini = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
